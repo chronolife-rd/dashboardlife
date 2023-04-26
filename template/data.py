@@ -10,6 +10,7 @@ from template.constant import URL_DATA
 from template.constant import URL_USER
 from template.constant import TYPE_SIGNALS
 from template.constant import TYPE_INDICATORS
+from template.constant import MONTHS
 import requests
 import json
 from pylife.api_functions import map_data
@@ -17,6 +18,7 @@ from pylife.api_functions import map_data_filt
 from pylife.api_functions import map_results
 from pylife.api_functions import get_sig_info
 from pylife.api_functions import get_result_info
+from pylife.useful import unwrap
 
 def get_myendusers():
     
@@ -418,3 +420,119 @@ def datetime2str(duration):
     duration = duration + ' min'
     return duration
     
+def get_sessions(end_user, year, month):
+    """
+    """
+    
+    url         = URL_DATA
+    api_key     = st.session_state.api_key
+    
+    from_date = str(year) + "-" + MONTHS[month]
+    to_date = np.datetime64(from_date) + np.timedelta64(1, 'M')
+    to_date = np.datetime64(str(to_date) + "-01") - np.timedelta64(1, 'D')
+    from_date += "-01"
+    to_date = str(to_date)
+        
+    # %
+    days_s                  = []
+    starts_s                = []
+    ends_s                  = []
+    durations_s             = []
+    heartbeat_qualitys_s    = []
+    user_ids_s              = []
+
+    types           = 'heartbeat_quality_index'
+    
+    from_date64 = np.datetime64(from_date) 
+    to_date64   = np.datetime64(to_date) 
+    dates       = np.arange(from_date64, to_date64 + np.timedelta64(1, 'D'))
+    
+    days                = []
+    starts              = []
+    ends                = []
+    durations           = []
+    heartbeat_qualitys  = []
+    
+    for it, date in enumerate(dates):
+        
+        # day
+        params = {
+               'user':      end_user, # sub-user username
+               'types':     "heartbeat_quality_index", 
+               'date':      date,
+             }
+        
+        # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).
+        reply = requests.get(url, headers={"X-API-Key": api_key}, params=params)
+        message, status_code = test.api_status(reply)
+        datas = []
+        if status_code == 200:
+            json_list_of_records = json.loads(reply.text) 
+            for record in json_list_of_records:
+                datas.append(record)
+
+        if len(datas) > 0:
+            
+            results_mapped          = map_results(datas, types)
+            heartbeat_quality_info  = get_result_info(datas=results_mapped, result_type='heartbeat_quality_index')
+            
+            hrq                     = unwrap(heartbeat_quality_info['values'])
+            times                   = unwrap(heartbeat_quality_info['times'])
+            
+            array                   = np.array([times, hrq])
+            df                      = pd.DataFrame(array.T, columns=['times', 'hrq'])
+            df                      = df.sort_values(by='times')
+            
+            if len(df) == 0:
+                continue
+            
+            timestamps              = df['times'].values.astype('datetime64[s]')
+            hrqs                    = df['hrq'].values.astype('float')
+            tdiff                   = (timestamps[1:] - timestamps[:-1])/np.timedelta64(1, 's')
+            idiff                   = np.where(tdiff > 30*60)
+            if len(idiff) > 0:
+                idiff = idiff[0]+1
+                timestamps_s    = np.split(timestamps, idiff)
+                hrqs_s          = np.split(hrqs, idiff)
+            else:
+                timestamps_s    = timestamps
+                hrqs_s          = hrqs
+            if len(timestamps_s[0]) == 0:
+                continue
+                
+            for i in range(len(timestamps_s)):
+                timestamps              = timestamps_s[i]
+                hrq                     = hrqs_s[i]
+                start                   = timestamps[0]
+                end                     = timestamps[-1]
+    
+                minutes_total           = (end - start)/np.timedelta64(1, 'm')
+                hours                   = int(minutes_total/60)
+                minutes                 = int((minutes_total/60 - hours)*60)
+                duration                = str(hours) + ':' + str(minutes)
+                
+                hrq_mean                = int(round(sum(hrq)/len(hrq)*100))
+                
+                if duration == '0:0':
+                    continue
+                
+                days.append(str(date))
+                starts.append(str(start)[11:-3])
+                ends.append(str(end)[11:-3])
+                durations.append(duration)
+                heartbeat_qualitys.append(hrq_mean)
+    
+    user_ids_s.extend(np.repeat(end_user, len(days)))
+    days_s.extend(days)
+    starts_s.extend(starts)
+    ends_s.extend(ends)
+    durations_s.extend(durations)
+    heartbeat_qualitys_s.extend(heartbeat_qualitys)
+
+    # %
+    data    = [user_ids_s, days_s, starts_s, ends_s, durations_s]
+    columns = ['End User', 'Date', 'Start (UTC)', 'Stop (UTC)', 'Duration']
+
+    df = pd.DataFrame(np.array(data).T, columns=columns)
+    
+    return df

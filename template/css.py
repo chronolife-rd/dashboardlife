@@ -12,7 +12,7 @@ def config():
 def hide_streamlit_menu():
     hide_streamlit_style = """
     <style>
-    #MainMenu {visibility: hidden;}
+        #MainMenu {visibility: hidden;}
     </style>
     
     """
@@ -34,23 +34,21 @@ def body():
                     .intro_section {
                         background-image: url('data:image/png;base64,""" + st.session_state.background_wave + """');
                         background-size: cover;
-                        /* width: 111%; */
-                        /* margin-left: -5%; */
                         margin-top: -100px;
+                        margin-bottom: -100px;
                         padding-top: 0px;
                         padding-bottom: 13%;
                         border-radius: 30px;
+                        height: 250px;
                     }
                     
                     .intro_style {
                         color: white;
-                        font-size: 2.5em;
-                        padding: 40px;
+                        font-size: 2em;
                     }
                     
                     .intro_logo {
-                        float: right;
-                        width: 300px;
+                        width: 150px;
                         margin-top: 20px;
                         margin-right: 60px;
                         }
@@ -62,6 +60,7 @@ def body():
                         border: solid darkgrey 0px;
                         border-radius: 30px;
                         padding: 15px;
+                        margin-bottom: 20px;
                         }
                     
                     .overview_sub_section_smart_textile {
@@ -100,14 +99,26 @@ def body():
                         font-weight: bold;
                         }
                     
+                    .overview_health_section {
+                        font-size: 24px;
+                        background-color: white;
+                        color: #3E738D;
+                        border: solid darkgrey 0px;
+                        border-radius: 30px;
+                        padding: 25px 15px 15px 25px;
+                        margin-bottom: 20px;
+                        height: 370px;
+                        }
+                    
                     .health_section {
                         font-size: 24px;
                         background-color: white;
                         color: #3E738D;
                         border: solid darkgrey 0px;
                         border-radius: 30px;
-                        padding: 15px;
+                        padding: 25px 15px 15px 25px;
                         margin-bottom: 20px;
+                        height: 300px;
                         }
                     
                     .device_icon {
@@ -167,21 +178,17 @@ def body():
                         }
                     
                     .donut { 
-                        width: 280px;
+                        width: 200px;
                         margin-left: -80px;
-                        margin-top: -30px;
+                        margin-top: 0px;
                         }
                     
-                    /* logout button */
-                    .css-52v4ru {
-                        margin-top: -100px;
-                        }
-                                        
                     /* form section */
                     .epcbefy1 {
                         background-color: white;
                         border-radius: 30px;
                         padding: 30px;
+                        border-color: white;
                         }
                     
                     /* form label */
@@ -240,7 +247,7 @@ def body():
                         }
                     
                     /* menu button */
-                    .menu {
+                    /* .menu {
                         background-color: #3F738D !important;
                         border-radius: 20px;
                         height: 60px;
@@ -248,15 +255,16 @@ def body():
                         text-align: center;
                         width: 100%;
                         }
+                    */
                     
                     .menu a {
-                        background-color: #3F738D !important;
+                         /* background-color: #3F738D !important; */
                         text-decoration: none !important;
                         }
                     
                     .menu a span {
-                        color: white;
-                        font-size: 25px;
+                        color: #3F738D;
+                        font-size: 20px;
                         font-weight: bold;
                         }
                     
@@ -289,6 +297,7 @@ def body():
                         border-radius: 30px;
                         padding: 25px;
                         height: 300px;
+                        margin-bottom: 20px;
                         }
                     
                     /* Health indicator value */
@@ -321,13 +330,29 @@ def body():
                         margin-right: 8px;
                         }
                     
-                    /* modal_enduser */
-                    .modal_enduser {
+                    /* expander */
+                    .streamlit-expander {
+                        border-radius: 30px;
+                        background-color: white;
+                        }
+                    
+                    /*expander title */
+                    .streamlit-expander .css-9plt3t p {
+                        font-weight: bold;
+                        }
+                    
+                    /* enduser list */
+                    .enduser {
                         background-color: #5590ad;
                         color: white;
                         padding-left: 10px;
                         padding-right: 10px;
                         border-radius: 15px;
+                        }
+                    
+                    /* sessions table */
+                    .e1tzin5v3 .e19lei0e0 {
+                        text-align: center;
                         }
                     
       </style>""", unsafe_allow_html=True)
