@@ -1,6 +1,8 @@
 import streamlit as st
 import datetime
+import numpy as np
 from template.constant import URL_ROOT
+from template.constant import MONTHS
 import template.html as html 
 import template.chart as chart 
 import template.session as session 
@@ -23,14 +25,15 @@ def run():
         
     # Display dashboard if session is logged in
     if st.session_state.is_logged:
-        # Logout button
-        logout_submit = logout()
+        
+        # My end users form
+        myendusers()
+        
+        # Enduser sessions form
+        form_enduser_sessions()
         
         # Indicators form
         form_indicators()
-        
-        # My end users form
-        form_myendusers()
         
         if st.session_state.is_data:
             with st.spinner("Wait for it..."):
@@ -51,11 +54,12 @@ def run():
                 
                 # Definitions section
                 definitions()
-        
-        # show_historical_data(form_indicators_layout, form_indicators_submit)
+            
+        # Logout button
+        logout()
         
         # Restart session logout button is clicked
-        if logout_submit:
+        if st.session_state.logout_submit:
             session.restart()
             
         button_scroll_to_top()
@@ -76,7 +80,7 @@ def button_scroll_to_top():
     
 def login():
     
-    _,col_login,_=st.columns(3)
+    _,col_login,_=st.columns([1,4,1])
     layout_login = col_login.empty()
     login_form  = layout_login.form('login')
     
@@ -104,6 +108,7 @@ def login():
         if not error:
             if status_code == 200:
                 st.session_state.is_logged = True
+                data.get_myendusers()
             else:
                 st.session_state.is_logged = False
                 
@@ -113,50 +118,83 @@ def login():
                 login_form.error(message)
                 
 def logout():
-    _,col_logout = st.columns([11,1])
+    # _,col_logout = st.columns([11,1])
     
-    layout_logout = col_logout.empty()
+    layout_logout = st.sidebar.empty()
     logout_submit = layout_logout.button('Logout')
     
-    return logout_submit
+    st.session_state.logout_submit = logout_submit
 
-def form_myendusers():
+def myendusers():
     # ----- Parameters selection -----
-    _, col_form, _= st.columns(3)
-    form_myendusers_layout = col_form.form("myendusers_form")
-    form_myendusers_layout.markdown("<b>My end users ID</b>", unsafe_allow_html=True) 
-    form_myendusers_onclick = form_myendusers_layout.form_submit_button("Show")
-    
-    if form_myendusers_onclick:
-        data.get_myendusers()
-        # st.write("Please find the list of the end-users'ID related to your Smart Textile account")
-        c1,c2,c3 = form_myendusers_layout.columns(3)
-        cnt=1
-        for end_user_id in st.session_state.myendusers:
-            if cnt==1:
-                col=c1
-            elif cnt==2:
-                col=c2
-            elif cnt==3:
-                col=c3
-                cnt=0
-            col.markdown("""
-                          <span class="modal_enduser">""" + end_user_id + """</span>
-                          """, unsafe_allow_html=True)
-            
-            cnt+=1
+    _, col_form, _= st.columns([1,4,1])
+    expander_endusers = col_form.expander("My end-users ID", expanded=False)
+    c1,c2,c3 = expander_endusers.columns(3)
+    cnt=1
+    for end_user_id in st.session_state.myendusers:
+        if cnt==1:
+            col=c1
+        elif cnt==2:
+            col=c2
+        elif cnt==3:
+            col=c3
+            cnt=0
+        col.markdown("""
+                      <span class="enduser">""" + end_user_id + """</span>
+                      """, unsafe_allow_html=True)
+        
+        cnt+=1
                 
+def form_enduser_sessions():
+    
+    _, col_form, _= st.columns([1,4,1])
+    title = "Sessions of a specific end-user"
+    sessions_exp = col_form.expander(title, expanded=False)
+    form_sessions = sessions_exp.form("form_sessions")
+    c1, c2, c3 = form_sessions.columns(3)
+    
+    today = datetime.datetime.now()
+    year0 = 2020
+    years = range(year0, today.year+1)
+    year = c1.selectbox('Year', years, index=years.index(today.year))
+    
+    months = ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 
+     'September', 'October', 'November', 'December')
+    month = c2.selectbox('Month', months, index=months.index(MONTHS[str(today.month)]))
+    end_user = c3.text_input('End-user ID')
+    go_session = form_sessions.form_submit_button('Search')
+    
+    if go_session:
+        with st.spinner(("Getting sessions of " + end_user + " in " + str(month) + " " + str(year) + " ...")):
+            message, error = test.end_user(end_user, form_sessions)
+            if error:
+                form_sessions.error(message)
+                return
+            enduser_sessions = data.get_sessions(year=year, month=month, end_user=end_user)
+            enduser_sessions = enduser_sessions.set_axis(range(1, 1+len(enduser_sessions)), axis='index') # begin index at 1
+            st.session_state.enduser_sessions = enduser_sessions 
+    
+        if enduser_sessions is not None:
+            if len(enduser_sessions) > 0:
+                sessions_exp.write(enduser_sessions)
+            else:
+                sessions_exp.info("No session found")
+
 
 def form_indicators():
     
     # ----- Parameters selection -----
-    _, col_form, _= st.columns(3)
-    form_indicators_layout = col_form.form("data_form")
+    _, col_form, _= st.columns([1,4,1])
+    title = "Data Explorer"
+    sessions_exp = col_form.expander(title, expanded=True)
+    form_indicators_layout = sessions_exp.form("data_form")
+    
+    c1, c2 = form_indicators_layout.columns(2)
     
     # Date picker
-    date = form_indicators_layout.date_input("🗓️ Select date", max_value=datetime.datetime.now(), key="ksd")
+    date = c1.date_input("Date", max_value=datetime.datetime.now(), key="ksd")
     # User ID input
-    end_user = form_indicators_layout.text_input("🏃🏼‍♂️ End-user ID","5P4svk")
+    end_user = c2.text_input("End-user ID","5P4svk")
     
     # Show button
     form_indicators_submit = form_indicators_layout.form_submit_button("Submit")
@@ -183,7 +221,11 @@ def form_indicators():
             form_indicators_layout.warning("No data found")
 
 def menu():
-    st.markdown(html.menu(), unsafe_allow_html=True)
+    st.sidebar.markdown(html.menu_overview(), unsafe_allow_html=True)
+    st.sidebar.markdown(html.menu_smart_textile_raw_data(), unsafe_allow_html=True)
+    st.sidebar.markdown(html.menu_health_indicators(), unsafe_allow_html=True)
+    st.sidebar.markdown(html.menu_data_report(), unsafe_allow_html=True)
+    st.sidebar.markdown(html.menu_definitions(), unsafe_allow_html=True)
 
 def overview():
     st.markdown(html.overview_title(), unsafe_allow_html=True)
@@ -222,7 +264,7 @@ def form_smart_textile_raw_data():
     form_raw_layout = st.empty()
     form_raw_layout = st.form("raw_form")
     form_raw_layout.write("Select the time from which you wish to display the data (5 min display time):")
-    col1, col2, col3, col4 = form_raw_layout.columns([1,1,1,6])
+    col1, col2, col3, col4 = form_raw_layout.columns([3,3,3,6])
     # start_time = form_raw_layout.time_input('Start Time (UTC)', datetime.time(9, 20))
     
     form_hour = col1.selectbox(
@@ -311,7 +353,7 @@ def health_indicators():
 
 def health_indicators_heart_bpm():
     st.markdown(html.health_indicators_heart_bpm_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,4])
+    col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_heart_bpm_results(), unsafe_allow_html=True)
     
     fig = chart.heart_bpm()
@@ -320,7 +362,7 @@ def health_indicators_heart_bpm():
 
 def health_indicators_heart_hrv():
     st.markdown(html.health_indicators_heart_hrv_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,4])
+    col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_heart_hrv_results(), unsafe_allow_html=True)
     
     fig = chart.heart_hrv()
@@ -333,7 +375,7 @@ def health_indicators_heart_tachy_brady_qt():
     
 def health_indicators_breath_brpm():
     st.markdown(html.health_indicators_breath_brpm_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,4])
+    col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_breath_brpm_results(), unsafe_allow_html=True)
     
     fig = chart.breath_brpm()
@@ -342,7 +384,7 @@ def health_indicators_breath_brpm():
 
 def health_indicators_breath_brv():
     st.markdown(html.health_indicators_breath_brv_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,4])
+    col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_breath_brv_results(), unsafe_allow_html=True)
     
     fig = chart.breath_brv()
@@ -355,7 +397,7 @@ def health_indicators_breath_tachy_brady_inexratio():
     
 def health_indicators_temperature():
     st.markdown(html.health_indicators_temperature_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,4])
+    col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_temperature_results(), unsafe_allow_html=True)
     
     fig = chart.temperature_mean()
@@ -382,7 +424,7 @@ def health_indicators_pulseox():
 
 def health_indicators_bodybattery():
     st.markdown(html.health_indicators_bodybattery_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,4])
+    col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_bodybattery_results(), unsafe_allow_html=True)
     
     fig = chart.bodybattery()

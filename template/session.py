@@ -26,6 +26,10 @@ def init():
     if 'timezone' not in st.session_state:
             st.session_state.timezone = ''
             
+    if 'enduser_sessions' not in st.session_state:
+            st.session_state.enduser_sessions = ''
+    
+            
     if 'form_indicators_layout' not in st.session_state:
             st.session_state.form_indicators_layout = ''
             
@@ -40,6 +44,9 @@ def init():
             
     if 'is_logged' not in st.session_state:
             st.session_state.is_logged = False
+    
+    if 'logout_submit' not in st.session_state:
+            st.session_state.logout_submit = False
             
     if 'is_data' not in st.session_state:
             st.session_state.is_data = False
