@@ -26,6 +26,8 @@ def run():
     # Display dashboard if session is logged in
     if st.session_state.is_logged:
         
+        profile()
+        
         # My end users form
         myendusers()
         
@@ -37,6 +39,7 @@ def run():
         
         if st.session_state.is_data:
             with st.spinner("Wait for it..."):
+                
                 # Main menu
                 menu()
                 
@@ -62,7 +65,7 @@ def run():
         if st.session_state.logout_submit:
             session.restart()
             
-        button_scroll_to_top()
+        # button_scroll_to_top()
         
     footer()
 
@@ -75,12 +78,16 @@ def header():
 def footer():
     st.markdown(html.footer(), unsafe_allow_html=True)
 
+def profile():
+    st.sidebar.markdown(html.profile(), unsafe_allow_html=True)
+    st.sidebar.markdown("---")
+    
 def button_scroll_to_top():
     st.markdown(html.button_scroll_to_top(), unsafe_allow_html=True)
     
 def login():
     
-    _,col_login,_=st.columns([1,4,1])
+    _,col_login,_=st.columns([2,3,2])
     layout_login = col_login.empty()
     login_form  = layout_login.form('login')
     
@@ -215,7 +222,7 @@ def form_indicators():
         
         if len(st.session_state.smart_textile_indicators) > 0:
             st.session_state.is_data = True
-            form_indicators_layout.info("Data has been successfully requested")
+            # form_indicators_layout.info("Data has been successfully requested")
         else:
             st.session_state.is_data = False
             form_indicators_layout.warning("No data found")

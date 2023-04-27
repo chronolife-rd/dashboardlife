@@ -26,7 +26,7 @@ def header():
     <div id="top" class='intro_section'>
         <p><img class='intro_logo' src='data:image/png;base64,""" + st.session_state.logo_clife_white + """'/></p>
         <center>
-        <p class='intro_style'>Smart Textile Dashboard</p>
+        <p class='intro_style'><b>Smart Textile Dashboard</b></p>
         </center>
     </div>
     """
@@ -41,6 +41,22 @@ def footer():
     html += VERSION 
     html +="""
         </p>
+    </div>
+    """
+    
+    return html
+
+def profile():
+    
+    username = st.session_state.username
+    
+    html = """
+    <div class="user_icon_section">
+        <p>    
+            <img class="user_icon" src='data:image/png;base64,""" + st.session_state.user_icon + """'/>
+            <br>
+        </p>
+        <p>""" + username + """</p>
     </div>
     """
     
