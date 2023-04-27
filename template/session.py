@@ -189,6 +189,9 @@ def init():
     if 'to_top' not in st.session_state:
         st.session_state.to_top = img_to_bytes('assets/to_top.png')
         
+    if 'user_icon' not in st.session_state:
+        st.session_state.user_icon = img_to_bytes('assets/user.png')
+        
     if 'stress_donut' not in st.session_state:
         st.session_state.stress_donut = None
         

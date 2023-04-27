@@ -35,7 +35,7 @@ def body():
                         background-image: url('data:image/png;base64,""" + st.session_state.background_wave + """');
                         background-size: cover;
                         margin-top: -100px;
-                        margin-bottom: -100px;
+                        margin-bottom: -50px;
                         padding-top: 0px;
                         padding-bottom: 13%;
                         border-radius: 30px;
@@ -51,6 +51,16 @@ def body():
                         width: 150px;
                         margin-top: 20px;
                         margin-right: 60px;
+                        }
+                    
+                    /* User icon section */
+                    .user_icon_section {
+                        text-align: center;
+                        }
+                    
+                    /* User icon */
+                    .user_icon {
+                        width: 50%;
                         }
                     
                     .overview_section {
