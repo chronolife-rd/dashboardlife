@@ -138,24 +138,27 @@ def myendusers():
     expander_endusers = col_form.expander("My end-users ID", expanded=False)
     c1,c2,c3 = expander_endusers.columns(3)
     cnt=1
-    for end_user_id in st.session_state.myendusers:
-        if cnt==1:
-            col=c1
-        elif cnt==2:
-            col=c2
-        elif cnt==3:
-            col=c3
-            cnt=0
-        col.markdown("""
-                      <span class="enduser">""" + end_user_id + """</span>
-                      """, unsafe_allow_html=True)
-        
-        cnt+=1
+    if len(st.session_state.myendusers) > 0:
+        for end_user_id in st.session_state.myendusers:
+            if cnt==1:
+                col=c1
+            elif cnt==2:
+                col=c2
+            elif cnt==3:
+                col=c3
+                cnt=0
+            col.markdown("""
+                          <span class="enduser">""" + end_user_id + """</span>
+                          """, unsafe_allow_html=True)
+            
+            cnt+=1
+    else:
+        expander_endusers.info("No end user found")
                 
 def form_enduser_sessions():
     
     _, col_form, _= st.columns([1,4,1])
-    title = "Sessions of a specific end-user"
+    title = "Search Data"
     sessions_exp = col_form.expander(title, expanded=False)
     form_sessions = sessions_exp.form("form_sessions")
     c1, c2, c3 = form_sessions.columns(3)
@@ -192,7 +195,7 @@ def form_indicators():
     
     # ----- Parameters selection -----
     _, col_form, _= st.columns([1,4,1])
-    title = "Data Explorer"
+    title = "Show Data"
     sessions_exp = col_form.expander(title, expanded=True)
     form_indicators_layout = sessions_exp.form("data_form")
     
@@ -237,7 +240,7 @@ def menu():
 def overview():
     st.markdown(html.overview_title(), unsafe_allow_html=True)
     st.markdown(html.overview_data_collection(), unsafe_allow_html=True)
-    st.markdown(html.overview_duration_title(), unsafe_allow_html=True)
+    # st.markdown(html.overview_duration_title(), unsafe_allow_html=True)
     
     fig = chart.duration()
     config = {'displayModeBar': False}
@@ -260,7 +263,7 @@ def smart_textile_raw_data():
                 st.session_state.form_raw_layout.warning("No data found")
             else:    
                 download_text_layout.markdown(html.smart_textile_raw_data_download(), unsafe_allow_html=True)
-                smart_textile_raw_data_download_button = download_button_layout.button('Download Smart Textile Raw Data', key="download_smart_textile_raw_data")
+                smart_textile_raw_data_download_button = download_button_layout.button('Download', key="download_smart_textile_raw_data")
                 # st.session_state.form_raw_layout.success("Smart Textile Data has been successfully requested")
                 
     st.markdown("---")
@@ -278,7 +281,7 @@ def form_smart_textile_raw_data():
     'Hour',
     ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'))
     form_time = col2.selectbox(
-    'Time',
+    'Minute',
     ('00', '05', '10', '15', '20', '25', 
      '30', '35', '40', '45', '50', '55'))
     form_period = col3.selectbox(
@@ -310,7 +313,7 @@ def health_indicators():
     
     st.markdown(html.health_indicators_title(), unsafe_allow_html=True)
     st.markdown(html.health_indicators_download(), unsafe_allow_html=True)
-    health_indicator_download_button = st.button('Download Health Indicators', key="download_health_indicators")
+    health_indicator_download_button = st.button('Download', key="download_health_indicators")
     tab_heart, tab_breath, tab_stress, tab_pulseox, tab_bodybattery, tab_sleep, tab_temp = st.tabs(["Heart", 
                                                                                                   "Breath", 
                                                                                                   "Stress",
@@ -450,7 +453,7 @@ def health_indicators_sleep():
 def data_report():
     st.markdown(html.data_report_title(), unsafe_allow_html=True)
     st.markdown(html.data_report_download(), unsafe_allow_html=True)
-    data_report_download_button = st.button('Download Data Report', key="download_data_report")
+    data_report_download_button = st.button('Download', key="download_data_report")
     
     st.markdown("---")
     

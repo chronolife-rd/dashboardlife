@@ -89,7 +89,7 @@ def menu_smart_textile_raw_data():
     <div class="menu">
         <p>
             <a href="#smart_textile_raw_data">
-                <span>Smart Textile Rax Data</span>
+                <span>Smart Textile Raw Data</span>
             </a>
         </p>
     </div>
@@ -171,6 +171,7 @@ def overview_data_collection():
     col_icon        = "col-2"
     col_key         = "col-5"
     col_val         = "col-5"
+    class_val       = "indicator_value"
     
     html = """
         <div class="second_title">
@@ -191,7 +192,7 @@ def overview_data_collection():
                         <div class='""" + col_data + """'>
                             <div class="row data_collection">
                                 <div class='""" + col_duration + """'>
-                                    <p>Collected data &ensp; <span class='collect_duration'>""" + str(chronolife_duration) + """ hours</span></p> 
+                                    <p>Total data &ensp; <span class='collect_duration'>""" + str(chronolife_duration) + """ hours</span></p> 
                                 </div>
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.night + """'/> 
@@ -200,7 +201,7 @@ def overview_data_collection():
                                     <p>Night</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(chronolife_duration_day) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_day) + """ hours</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
@@ -209,7 +210,7 @@ def overview_data_collection():
                                     <p>Day</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(chronolife_duration_night) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_night) + """ hours</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
@@ -218,7 +219,7 @@ def overview_data_collection():
                                     <p>Rest</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(chronolife_duration_rest) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_rest) + """ hours</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.activity + """'/> 
@@ -227,7 +228,7 @@ def overview_data_collection():
                                     <p>Activity</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(chronolife_duration_activity) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_activity) + """ hours</p>
                                 </div> 
                             </div>
                         </div>
@@ -248,7 +249,7 @@ def overview_data_collection():
                         <div class='""" + col_data + """'>
                             <div class="row data_collection">
                                 <div class='""" + col_duration + """'>
-                                    <p>Collected data &ensp; <span class='collect_duration'>""" + str(garmin_duration) + """ hours</span></p> 
+                                    <p>Total data &ensp; <span class='collect_duration'>""" + str(garmin_duration) + """ hours</span></p> 
                                 </div>
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.night + """'/> 
@@ -257,7 +258,7 @@ def overview_data_collection():
                                     <p>Night</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(garmin_duration_day) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_day) + """ hours</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
@@ -266,7 +267,7 @@ def overview_data_collection():
                                     <p>Day</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(garmin_duration_night) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_night) + """ hours</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
@@ -275,7 +276,7 @@ def overview_data_collection():
                                     <p>Rest</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(garmin_duration_rest) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_rest) + """ hours</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.activity + """'/> 
@@ -284,7 +285,7 @@ def overview_data_collection():
                                     <p>Activity</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p>""" + str(garmin_duration_activity) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_activity) + """ hours</p>
                                 </div> 
                             </div>
                         </div>
@@ -380,9 +381,10 @@ def overview_health_indicators():
     body_bat_high = overview_bodybattery["high"]
     body_bat_low = overview_bodybattery["low"]
     col_section = "col-xl-4 col-lg-6 col-md-6 col-sm-12"
-    col_title = "col-12"
-    col_key = "col-6"
-    col_val = "col-6"
+    col_title   = "col-12"
+    col_key     = "col-6"
+    col_val     = "col-6"
+    class_val   = "indicator_value"
     
     html = """
     <div class="second_title">
@@ -418,19 +420,19 @@ def overview_health_indicators():
                         <p>HR high</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(bpm_high) + """ bpm</p>
+                        <p class='""" + class_val + """'>""" + str(bpm_high) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>HR resting</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(bpm_rest) + """ bpm</p>
+                        <p class='""" + class_val + """'>""" + str(bpm_rest) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>HRV resting</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(hrv_rest) + """ ms</p>
+                        <p class='""" + class_val + """'>""" + str(hrv_rest) + """ ms</p>
                     </div>
                 </div>
             </div>
@@ -458,19 +460,19 @@ def overview_health_indicators():
                         <p>BR high</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brpm_high) + """ brpm</p>
+                        <p class='""" + class_val + """'>""" + str(brpm_high) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>BR resting</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brpm_rest) + """ brpm</p>
+                        <p class='""" + class_val + """'>""" + str(brpm_rest) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>BRV resting</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brv_rest) + """ s</p>
+                        <p class='""" + class_val + """'>""" + str(brv_rest) + """ s</p>
                         <br>
                     </div>
                 </div>
@@ -549,28 +551,28 @@ def overview_health_indicators():
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_rest + """'/> 
                                 <p>
                                     Rest <br>
-                                    """ + str(stress_duration_rest) + """ min (""" + str(stress_percentage_rest) + """%)
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_rest) + """ min (""" + str(stress_percentage_rest) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_low + """'/>
                                 <p>
                                     Low <br>
-                                    """ + str(stress_duration_low) + """ min (""" + str(stress_percentage_low) + """%)
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_low) + """ min (""" + str(stress_percentage_low) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_medium + """'/>
                                 <p>
                                     Medium <br>
-                                    """ + str(stress_duration_medium) + """ min (""" + str(stress_percentage_medium) + """%)
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_medium) + """ min (""" + str(stress_percentage_medium) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_high + """'/>
                                 <p>
                                     High <br>
-                                    """ + str(stress_duration_high) + """ min (""" + str(stress_percentage_high) + """%)
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_high) + """ min (""" + str(stress_percentage_high) + """%)</span>
                                 </p>
                             </div>
                         </div>
@@ -596,28 +598,28 @@ def overview_health_indicators():
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_deep + """'/>
                                 <p>
                                     Deep <br>
-                                    """ + str(sleep_duration_deep) + """ min (""" + str(sleep_percentage_deep) + """%)
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_deep) + """ min (""" + str(sleep_percentage_deep) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_light + """'/>
                                 <p>
                                     Light <br>
-                                    """ + str(sleep_duration_light) + """ min (""" + str(sleep_percentage_light) + """%)
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_light) + """ min (""" + str(sleep_percentage_light) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_rem + """'/>
                                 <p>
                                     REM <br>
-                                    """ + str(sleep_duration_rem) + """ min (""" + str(sleep_percentage_rem) + """%)
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_rem) + """ min (""" + str(sleep_percentage_rem) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_awake + """'/>
                                 <p>
                                     Awake <br>
-                                """ + str(sleep_duration_awake) + """ min (""" + str(sleep_percentage_awake) + """%)    
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_awake) + """ min (""" + str(sleep_percentage_awake) + """%)</span>  
                                 </p>
                             </div>
                         </div>
@@ -653,7 +655,7 @@ def overview_health_indicators():
                                 <p>Active</p>
                             </div>
                             <div class="col-12">
-                                <p>""" + str(calories_rest) + """ kcals</p>
+                                <p class='""" + class_val + """'>""" + str(calories_rest) + """ kcals</p>
                             </div>
                         </div>
                     </div>
@@ -663,7 +665,7 @@ def overview_health_indicators():
                                 <p>Resting</p>
                             </div>
                             <div class="col-12">
-                                <p>""" + str(calories_active) + """ kcals</p>
+                                <p class='""" + class_val + """'>""" + str(calories_active) + """ kcals</p>
                             </div>
                         </div>
                     </div>
@@ -693,7 +695,7 @@ def overview_health_indicators():
                                 <p>Moderate</p>
                             </div>
                             <div class="col-12">
-                                <p>""" + str(intensity_moderate) + """ min</p>
+                                <p class='""" + class_val + """'>""" + str(intensity_moderate) + """ min</p>
                             </div>
                         </div>
                     </div>
@@ -703,7 +705,7 @@ def overview_health_indicators():
                                 <p>Vigorous</p>
                             </div>
                             <div class="col-12">
-                                <p>""" + str(intensity_vigorous) + """ min</p>
+                                <p class='""" + class_val + """'>""" + str(intensity_vigorous) + """ min</p>
                             </div>
                         </div>
                     </div>
@@ -871,6 +873,7 @@ def health_indicators_heart_tachy_brady_qt():
     col_title   = "col-12"
     col_key     = "col-4"
     col_val     = "col-8"
+    class_val   = "indicator_value"
     
     html = """
     <div class="row">
@@ -885,19 +888,19 @@ def health_indicators_heart_tachy_brady_qt():
                         <p>HR</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(tachy_mean) + """ bpm</p>
+                        <p class='""" + class_val + """'>""" + str(tachy_mean) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Duration</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(tachy_duration) + """ min</p>
+                        <p class='""" + class_val + """'>""" + str(tachy_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Proportion</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(tachy_percentage) + """ %</p>
+                        <p class='""" + class_val + """'>""" + str(tachy_percentage) + """ %</p>
                     </div>
                 </div>
             </div>
@@ -913,19 +916,19 @@ def health_indicators_heart_tachy_brady_qt():
                         <p>HR</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brady_mean) + """ bpm</p>
+                        <p class='""" + class_val + """'>""" + str(brady_mean) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Duration</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brady_duration) + """ min</p>
+                        <p class='""" + class_val + """'>""" + str(brady_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Proportion</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brady_percentage) + """ %</p>
+                        <p class='""" + class_val + """'>""" + str(brady_percentage) + """ %</p>
                     </div>
                 </div>
             </div>
@@ -941,19 +944,19 @@ def health_indicators_heart_tachy_brady_qt():
                         <p>Median</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(qt_mean) + """ ms</p>
+                        <p class='""" + class_val + """'>""" + str(qt_mean) + """ ms</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Min</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(qt_min) + """ ms</p>
+                        <p class='""" + class_val + """'>""" + str(qt_min) + """ ms</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Max</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(qt_max) + """ ms</p>
+                        <p class='""" + class_val + """'>""" + str(qt_max) + """ ms</p>
                     </div>
                 </div>
             </div>
@@ -1046,6 +1049,7 @@ def health_indicators_breath_tachy_brady_inexratio():
     col_title   = "col-12"
     col_key     = "col-4"
     col_val     = "col-8"
+    class_val   = "indicator_value"
     
     html = """
     <div class="row">
@@ -1060,19 +1064,19 @@ def health_indicators_breath_tachy_brady_inexratio():
                         <p>BR</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(tachy_mean) + """ brpm</p>
+                        <p class='""" + class_val + """'>""" + str(tachy_mean) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Duration</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(tachy_duration) + """ min</p>
+                        <p class='""" + class_val + """'>""" + str(tachy_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Proportion</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(tachy_percentage) + """ %</p>
+                        <p class='""" + class_val + """'>""" + str(tachy_percentage) + """ %</p>
                     </div>
                 </div>
             </div>
@@ -1088,19 +1092,19 @@ def health_indicators_breath_tachy_brady_inexratio():
                         <p>BR</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brady_mean) + """ brpm</p>
+                        <p class='""" + class_val + """'>""" + str(brady_mean) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Duration</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brady_duration) + """ min</p>
+                        <p class='""" + class_val + """'>""" + str(brady_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Proportion</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(brady_percentage) + """ %</p>
+                        <p class='""" + class_val + """'>""" + str(brady_percentage) + """ %</p>
                     </div>
                 </div>
             </div>
@@ -1116,19 +1120,19 @@ def health_indicators_breath_tachy_brady_inexratio():
                         <p>Median</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(inexratio_mean) + """</p>
+                        <p class='""" + class_val + """'>""" + str(inexratio_mean) + """</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Min</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(inexratio_min) + """</p>
+                        <p class='""" + class_val + """'>""" + str(inexratio_min) + """</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Max</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p>""" + str(inexratio_max) + """</p>
+                        <p class='""" + class_val + """'>""" + str(inexratio_max) + """</p>
                     </div>
                 </div>
             </div>
@@ -1162,6 +1166,8 @@ def health_indicators_stress_results():
     stress_percentage_medium    = stress["percentage_medium"]
     stress_percentage_high      = stress["percentage_high"]
     
+    class_val   = "indicator_value"
+    
     html = """
     <div class='col-12'>
         <div class='health_section'> 
@@ -1172,28 +1178,28 @@ def health_indicators_stress_results():
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_rest + """'/> 
                             <p>
                                 Rest <br>
-                                """ + str(stress_duration_rest) + """ min (""" + str(stress_percentage_rest) + """%)
+                                <span class='""" + class_val + """'>""" + str(stress_duration_rest) + """ min (""" + str(stress_percentage_rest) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_low + """'/>
                             <p>
                                 Low <br>
-                                """ + str(stress_duration_low) + """ min (""" + str(stress_percentage_low) + """%)
+                                <span class='""" + class_val + """'>""" + str(stress_duration_low) + """ min (""" + str(stress_percentage_low) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_medium + """'/>
                             <p>
                                 Medium <br>
-                                """ + str(stress_duration_medium) + """ min (""" + str(stress_percentage_medium) + """%)
+                                <span class='""" + class_val + """'>""" + str(stress_duration_medium) + """ min (""" + str(stress_percentage_medium) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_high + """'/>
                             <p>
                                 High <br>
-                                """ + str(stress_duration_high) + """ min (""" + str(stress_percentage_high) + """%)
+                                <span class='""" + class_val + """'>""" + str(stress_duration_high) + """ min (""" + str(stress_percentage_high) + """%)</span>
                             </p>
                         </div>
                     </div>
@@ -1299,6 +1305,8 @@ def health_indicators_sleep_results():
     sleep_percentage_rem    = sleep["percentage_rem"]
     sleep_percentage_awake  = sleep["percentage_awake"]    
     
+    class_val               = "indicator_value"
+    
     html = """
     <div class='col-12'>
         <div class='health_section'> 
@@ -1309,28 +1317,28 @@ def health_indicators_sleep_results():
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_deep + """'/>
                             <p>
                                 Deep <br>
-                                """ + str(sleep_duration_deep) + """ min (""" + str(sleep_percentage_deep) + """%)
+                                <span class='""" + class_val + """'>""" + str(sleep_duration_deep) + """ min (""" + str(sleep_percentage_deep) + """%)</span> 
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_light + """'/>
                             <p>
                                 Light <br>
-                                """ + str(sleep_duration_light) + """ min (""" + str(sleep_percentage_light) + """%)
+                                <span class='""" + class_val + """'>""" + str(sleep_duration_light) + """ min (""" + str(sleep_percentage_light) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_rem + """'/>
                             <p>
                                 REM <br>
-                                """ + str(sleep_duration_rem) + """ min (""" + str(sleep_percentage_rem) + """%)
+                                <span class='""" + class_val + """'>""" + str(sleep_duration_rem) + """ min (""" + str(sleep_percentage_rem) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_awake + """'/>
                             <p>
                                 Awake <br>
-                            """ + str(sleep_duration_awake) + """ min (""" + str(sleep_percentage_awake) + """%)    
+                                <span class='""" + class_val + """'>""" + str(sleep_duration_awake) + """ min (""" + str(sleep_percentage_awake) + """%)</span> 
                             </p>
                         </div>
                     </div>
@@ -1393,7 +1401,7 @@ def data_report_download():
     
     html = """
     <div>
-        <p>Download Download the daily data report (PDF):</p>
+        <p>Download the daily data report (PDF):</p>
     </div>
     """
     
