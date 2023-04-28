@@ -157,6 +157,11 @@ def body():
                     .indicator_name {
                         color: #3E738D;
                         font-size: 1.2em;
+                        font-weight: bold;
+                        }
+                    
+                    .indicator_value {
+                        font-weight: bold;
                         }
         
                     #steps {
@@ -213,21 +218,21 @@ def body():
                     
                     /* form submit button */
                     .edgvbvh5 {
-                        background-color: #F7931E; 
-                        border-color: #F7931E;;
+                        background-color: #3F738D; 
+                        border-color: #3F738D;;
                         color: white;
                         border-radius: 20px;
                         }
                     
                     .edgvbvh5:hover {
-                        background-color: #FABB6E; /* bleu clair => #5590ad; orange clair => #FABB6E;*/
-                        border-color: #FABB6E; 
+                        background-color: #5590ad; /* bleu clair => #5590ad; orange clair => #FABB6E;*/
+                        border-color: #5590ad; 
                         color: white;
                         }
                     
                     .edgvbvh5:focus {
-                        box-shadow: 1px 1px 3px 3px #FABB6E !important;
-                        border-color: #FABB6E !important;
+                        box-shadow: 1px 1px 3px 3px #5590ad !important;
+                        border-color: #5590ad !important;
                     }
                     
                     .edgvbvh5 p {
@@ -236,7 +241,7 @@ def body():
                     
                     /* button */
                     .edgvbvh10 {
-                        background-color: #3F738D;; /* bleu => #3F738D; orange => #F7931E; bleu clair => #5590ad; orange clair => #FABB6E;*/
+                        background-color: #3F738D; /* bleu => #3F738D; orange => #F7931E; bleu clair => #5590ad; orange clair => #FABB6E;*/
                         color: white;
                         width: auto !important;
                         border-radius: 30px !important;
