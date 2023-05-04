@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import template.data as data
+import template.chronolife_data as chronolife_data
 import template.constant as constant 
 from pylife.useful import unwrap
 from scipy.signal import medfilt
@@ -14,6 +15,7 @@ def temperature_mean():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
@@ -44,6 +46,7 @@ def sleep():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
 
@@ -119,6 +122,7 @@ def bodybattery():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
@@ -151,6 +155,7 @@ def pulseox():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
 
@@ -226,6 +231,7 @@ def stress():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
@@ -301,6 +307,7 @@ def breath_brv():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
@@ -336,6 +343,7 @@ def breath_brpm():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
@@ -372,6 +380,7 @@ def heart_hrv():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
@@ -408,6 +417,7 @@ def heart_bpm():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     y = []
@@ -444,6 +454,7 @@ def duration():
     
     translate = st.session_state.translate
     
+    # !!! TO BE UPDATED WITH REAL DATA !!!
     date = st.session_state.date
     date = datetime.datetime.strptime(date, "%Y-%m-%d")
     xmin = date
@@ -513,7 +524,7 @@ def duration():
 
 def smart_textile_raw_data(layout=False):
 
-    data.get_smart_textile_raw_data()
+    chronolife_data.get_smart_textile_raw_data()
     
     error = False
     if len(st.session_state.smart_textile_raw_data) == 0:
@@ -625,14 +636,20 @@ def temperature(al, template='plotly_white', width_line=2, height=500):
 
 def sleep_donut():
     
-    translate = st.session_state.translate
+    translate   = st.session_state.translate
+    sleep       = data.get_sleep()
     
-    sleep   = data.get_sleep()
     score   = sleep["score"]
-    deep    = sleep["percentage_deep"]
-    light   = sleep["percentage_light"]
-    rem     = sleep["percentage_rem"]
-    awake   = sleep["percentage_awake"]
+    if sleep["score"] == "":
+        deep    = 25
+        light   = 25
+        rem     = 25
+        awake   = 25
+    else:
+        deep    = sleep["percentage_deep"]
+        light   = sleep["percentage_light"]
+        rem     = sleep["percentage_rem"]
+        awake   = sleep["percentage_awake"]
     quality = sleep["quality"]
     
     plt.rcParams['figure.facecolor'] = "white" #cycler(color="#F0F2F6")
@@ -653,12 +670,17 @@ def sleep_donut():
     my_circle=plt.Circle( (0,0), 0.8, color="white")
     p=plt.gcf()
     p.gca().add_artist(my_circle)
-    plt.text(0, 0.2, (str(score) + '/100'), fontsize=30, color=constant.COLORS()["text"],
-             horizontalalignment='center')
-    plt.text(0, -.2, translate["quality"], fontsize=20, color=constant.COLORS()["text"],
-             horizontalalignment='center')
-    plt.text(0, -.5, quality, fontsize=20, color=constant.COLORS()["text"],
-             horizontalalignment='center')
+    if sleep["score"] == "":
+        plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
+                 horizontalalignment='center',verticalalignment='center')
+        
+    else:
+        plt.text(0, 0.2, (str(score) + '/100'), fontsize=30, color=constant.COLORS()["text"],
+                 horizontalalignment='center')
+        plt.text(0, -.2, translate["quality"], fontsize=20, color=constant.COLORS()["text"],
+                 horizontalalignment='center')
+        plt.text(0, -.5, quality, fontsize=20, color=constant.COLORS()["text"],
+                 horizontalalignment='center')
     
     plt.savefig("images/sleep_donut.png", transparent=True)
     st.session_state.sleep_donut = img_to_bytes('images/sleep_donut.png')
@@ -688,32 +710,37 @@ def spo2_donut():
     my_circle=plt.Circle( (0,0), 0.85, color="white")
     p=plt.gcf()
     p.gca().add_artist(my_circle)
-    plt.text(0, 0.20, (str(score_mean) + '%'), fontsize=40, color=constant.COLORS()['text'],
-             horizontalalignment='center')
-    plt.text(0, -0.20, translate["lowest"], fontsize=20, color=constant.COLORS()['text'],
-             horizontalalignment='center')
-    plt.text(0, -0.50, (str(score_min) + '%'), fontsize=20, color=constant.COLORS()['text'],
-             horizontalalignment='center')
+    
+    if spo2["mean"] == "":
+        plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
+                 horizontalalignment='center',verticalalignment='center')
+    else:
+        plt.text(0, 0.20, (str(score_mean) + '%'), fontsize=40, color=constant.COLORS()['text'],
+                 horizontalalignment='center')
+        plt.text(0, -0.20, translate["lowest"], fontsize=20, color=constant.COLORS()['text'],
+                 horizontalalignment='center')
+        plt.text(0, -0.50, (str(score_min) + '%'), fontsize=20, color=constant.COLORS()['text'],
+                 horizontalalignment='center')
 
-    # setting the axes projection as polar
-    plt.axes(projection = 'polar')
-    radius = 0.75
-
-    score_reshape = ((100 - 0)/(100-60)) * (score_mean - 60)
-    deg = (270-(4/100*360)) - score_reshape/100*(92/100*360)
-    rad = np.deg2rad(deg)
-
-    if score_mean < 70:
-        color_spo2_score = constant.COLORS()['spo2_high']
-    elif 70 <= score_mean < 80:
-        color_spo2_score = constant.COLORS()['spo2_medium']
-    elif 80 <= score_mean < 90:
-        color_spo2_score = constant.COLORS()['spo2_low']
-    elif 90 <= score_mean <= 100:
-        color_spo2_score = constant.COLORS()['spo2_green']
-        
-    plt.polar(rad, radius, '.', markersize=75, color=color_spo2_score)
-    plt.polar(rad, 1, '.', color="white")
+        # setting the axes projection as polar
+        plt.axes(projection = 'polar')
+        radius = 0.75
+    
+        score_reshape = ((100 - 0)/(100-60)) * (score_mean - 60)
+        deg = (270-(4/100*360)) - score_reshape/100*(92/100*360)
+        rad = np.deg2rad(deg)
+    
+        if score_mean < 70:
+            color_spo2_score = constant.COLORS()['spo2_high']
+        elif 70 <= score_mean < 80:
+            color_spo2_score = constant.COLORS()['spo2_medium']
+        elif 80 <= score_mean < 90:
+            color_spo2_score = constant.COLORS()['spo2_low']
+        elif 90 <= score_mean <= 100:
+            color_spo2_score = constant.COLORS()['spo2_green']
+            
+        plt.polar(rad, radius, '.', markersize=75, color=color_spo2_score)
+        plt.polar(rad, 1, '.', color="white")
     plt.axis('off')
     
     plt.savefig("images/spo2_donut.png", transparent=True)
@@ -721,11 +748,17 @@ def spo2_donut():
     
 def steps_donut():
     
+    translate = st.session_state.translate
     steps           = data.get_steps()
     steps_score     = steps["score"]
     
     color_text = '#3E738D'
-    size_of_groups=[steps_score, 100-steps_score]
+    
+    if steps["score"] == "":
+        size_of_groups=[0, 100]
+    else:
+        size_of_groups=[steps_score, 100-steps_score]
+        
     wedgeprops = {"linewidth": 1, "edgecolor": "white"}
     plt.close('all')
     plt.figure()
@@ -735,8 +768,14 @@ def steps_donut():
             counterclock=False,
             wedgeprops=wedgeprops)
     my_circle=plt.Circle( (0,0), 0.8, color="white")
-    plt.text(0, 0, (str(steps_score) + '%'), fontsize=40, color=color_text,
-             horizontalalignment='center')
+    
+    if steps["score"] == "":
+        plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
+                 horizontalalignment='center',verticalalignment='center')
+    else:
+        plt.text(0, 0, (str(steps_score) + '%'), fontsize=40, color=color_text,
+                 horizontalalignment='center')
+        
     p=plt.gcf()
     p.gca().add_artist(my_circle)
     
@@ -748,12 +787,19 @@ def stress_donut():
     translate = st.session_state.translate
     
     stress      = data.get_stress()
-    score_mean  = stress["score"]
-    rest        = stress["percentage_rest"]
-    low         = stress["percentage_low"]
-    medium      = stress["percentage_medium"]
-    high        = stress["percentage_high"]
     
+    score_mean  = stress["score"]
+    if stress["score"] == "":
+        rest        = 25
+        low         = 25
+        medium      = 25
+        high        = 25
+    else:
+        rest        = stress["percentage_rest"]
+        low         = stress["percentage_low"]
+        medium      = stress["percentage_medium"]
+        high        = stress["percentage_high"]
+        
     size_of_groups = [rest,low,medium,high]
     wedgeprops = {"linewidth": 1, "edgecolor": "white"}
     plt.close('all')
@@ -770,11 +816,17 @@ def stress_donut():
     my_circle=plt.Circle( (0,0), 0.85, color="white")
     p=plt.gcf()
     p.gca().add_artist(my_circle)
-    plt.text(0, 0.2, (str(score_mean)), fontsize=40, color=constant.COLORS()["text"],
-             horizontalalignment='center',
-             verticalalignment='center')
-    plt.text(0, -.3, translate["overall"], fontsize=30, color=constant.COLORS()["text"],
-             horizontalalignment='center')
+    
+    if stress["score"] == "":
+        plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
+                 horizontalalignment='center',verticalalignment='center')
+        
+    else:
+        plt.text(0, 0.2, (str(score_mean)), fontsize=40, color=constant.COLORS()["text"],
+                 horizontalalignment='center',verticalalignment='center')
+                 
+        plt.text(0, -.3, translate["overall"], fontsize=30, color=constant.COLORS()["text"],
+                 horizontalalignment='center')
     
     plt.savefig("images/stress_donut.png", transparent=True)
     st.session_state.stress_donut = img_to_bytes('images/stress_donut.png')

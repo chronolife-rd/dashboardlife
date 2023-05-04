@@ -3,15 +3,431 @@ import pandas as pd
 from io import BytesIO
 import numpy as np
 import template.test as test
-import template.constant as constant
 import requests
 import json
-from pylife.api_functions import map_data
-from pylife.api_functions import map_data_filt
 from pylife.api_functions import map_results
-from pylife.api_functions import get_sig_info
 from pylife.api_functions import get_result_info
 from pylife.useful import unwrap
+
+def get_bodybattery():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    
+    output["high"]  = ""
+    output["low"]   = ""
+    
+    if datas["body_battery"]["highest"] is not None:
+        output["high"]  = datas["body_battery"]["highest"]
+        output["low"]   = datas["body_battery"]["lowest"]
+    
+    return output
+
+def get_calories():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    
+    output["total"]    = ""
+    output["rest"]     = ""
+    output["active"]   = ""
+    
+    if datas["calories"]["total"] is not None:
+        output["total"]    = datas["calories"]["total"]
+        output["rest"]     = datas["calories"]["resting"]
+        output["active"]   = datas["calories"]["active"]
+    
+    return output
+
+def get_intensity():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["total"]       = ""
+    output["moderate"]    = ""
+    output["vigurous"]    = ""
+    
+    if datas["intensity_min"]["total"] is not None:
+        output["total"]       = datas["intensity_min"]["total"]
+        output["moderate"]    = datas["intensity_min"]["moderate"]
+        output["vigurous"]    = datas["intensity_min"]["vigurous"]
+    
+    return output
+
+def get_sleep():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+        
+    output["score"]             = ""
+    output["quality"]           = ""
+    output["duration"]          = ""
+    output["duration_deep"]     = ""
+    output["duration_light"]    = ""
+    output["duration_rem"]      = ""
+    output["duration_awake"]    = ""
+    output["percentage_deep"]   = ""
+    output["percentage_light"]  = ""
+    output["percentage_rem"]    = ""
+    output["percentage_awake"]  = ""
+    
+    if datas["sleep"]["score"] is not None:
+        output["score"]             = datas["sleep"]["score"]
+        output["quality"]           = datas["sleep"]["quality"]
+        output["duration"]          = datas["sleep"]["recorded_time"]
+        output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
+        output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
+        output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
+        output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
+        
+        output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
+    
+    return output
+
+def get_spo2():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["mean"]      = ""
+    output["min"]       = ""
+    output["values"]    = ""
+    
+    if datas["spo2"]["averege"] is not None:
+        output["mean"]      = datas["spo2"]["averege"]
+        output["min"]       = datas["spo2"]["lowest"]
+        output["values"]    = datas["spo2"]["all_values"]
+    
+    return output
+
+def get_stress():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["score"]             = ""
+    output["duration"]          = ""
+    output["duration_rest"]     = ""
+    output["duration_low"]      = ""
+    output["duration_medium"]   = ""
+    output["duration_high"]     = ""
+    output["percentage_rest"]   = ""
+    output["percentage_low"]    = ""
+    output["percentage_medium"] = ""
+    output["percentage_high"]   = ""
+    
+    if datas["stress"]["score"] is not None:
+        output["score"]             = datas["stress"]["score"]
+        output["duration"]          = datas["stress"]["recorded_time"]
+        output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
+        output["duration_low"]      = int(round(datas["stress"]["low"]/60))
+        output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
+        output["duration_high"]     = int(round(datas["stress"]["high"]/60))
+        
+        output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
+        output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
+        output["percentage_medium"] = int(round(datas["stress"]["medium"]/datas["stress"]["recorded_time"]*100))
+        output["percentage_high"]   = int(round(datas["stress"]["high"]/datas["stress"]["recorded_time"]*100))
+        
+    
+    return output
+
+def get_duration_chronolife():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    
+    # output["duration"]          = ""
+    # output["duration_day"]      = ""
+    # output["duration_night"]    = ""
+    # output["duration_rest"]     = "" 
+    # output["duration_activity"] = ""
+    
+    output["duration"]          = 17
+    output["duration_day"]      = 12
+    output["duration_night"]    = 5
+    output["duration_rest"]     = 16 
+    output["duration_activity"] = 1
+    
+    return output
+
+def get_duration_garmin():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["duration"]          = ""
+    # output["duration_day"]      = ""
+    # output["duration_night"]    = ""
+    # output["duration_rest"]     = "" 
+    # output["duration_activity"] = ""
+    
+    output["duration"]          = 2
+    output["duration_day"]      = 16
+    output["duration_night"]    = 6
+    output["duration_rest"]     = 16 
+    output["duration_activity"] = 6
+    
+    return output    
+
+def get_steps():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    
+    # output["number"]    = ""
+    # output["goal"]      = ""
+    # output["score"]     = ""
+    # output["distance"]  = ""
+    
+    output["number"]    = 1654
+    output["goal"]      = 6955
+    output["score"]     = int(output["number"]/output["goal"]*100)
+    output["distance"]  = 4.2
+    
+    return output
+
+def get_temperature():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    output["mean"]  = ""
+    output["min"]   = ""
+    output["max"]   = ""
+    
+    output["mean"]  = 35.4
+    output["min"]   = 33.4
+    output["max"]   = 37.1
+    
+    return output
+
+def get_bpm():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    
+    # output["mean"]  = ""
+    # output["min"]   = ""
+    # output["max"]   = ""
+    # output["rest"]  = ""
+    # output["high"]  = ""
+    
+    output["mean"]  = 67
+    output["min"]   = 59
+    output["max"]   = 123
+    output["rest"]  = 65
+    output["high"]  = 156
+    
+    return output
+
+def get_hrv():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["mean"]  = ""
+    # output["min"]   = ""
+    # output["max"]   = ""
+    # output["rest"]  = ""
+    # output["high"]  = ""
+    
+    output["mean"]  = 162
+    output["min"]   = 42
+    output["max"]   = 555
+    output["rest"]  = 150
+    output["high"]  = 111
+    
+    return output
+
+def get_qt():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["mean"]      = ""
+    # output["min"]       = ""
+    # output["max"]       = ""
+    # output["rest"]      = ""
+    # output["high"]      = ""
+    # output["threshold"] = ""
+    
+    output["mean"]      = 50
+    output["min"]       = 817
+    output["max"]       = 324
+    output["rest"]      = 324
+    output["high"]      = 324
+    output["threshold"] = 550
+    
+    if output["mean"] > output["threshold"]:
+        qt_alert_icon = st.session_state.alert
+    else:
+        qt_alert_icon = st.session_state.alert_no
+    st.session_state.qt_alert_icon          = qt_alert_icon
+    
+    return output
+
+def get_bradycardia():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["exists"]      = ""
+    # output["mean"]        = ""
+    # output["duration"]    = ""
+    # output["percentage"]  = ""
+    
+    output["exists"]      = False
+    output["mean"]        = 0
+    output["duration"]    = 0
+    output["percentage"]  = 0
+    
+    if output["exists"]:
+        bradycardia_alert_icon = st.session_state.alert
+    else:
+        bradycardia_alert_icon = st.session_state.alert_no
+    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
+    
+    return output
+    
+def get_tachycardia():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["exists"]      = ""
+    # output["mean"]        = ""
+    # output["duration"]    = ""
+    # output["percentage"]  = ""
+    output["exists"]      = False
+    output["mean"]        = 0
+    output["duration"]    = 0
+    output["percentage"]  = 0
+    
+    if output["exists"]:
+        tachycardia_alert_icon = st.session_state.alert
+    else:
+        tachycardia_alert_icon = st.session_state.alert_no
+    st.session_state.tachycardia_alert_icon = tachycardia_alert_icon
+    
+    return output
+
+def get_brpm():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["mean"]  = ""
+    # output["min"]   = ""
+    # output["max"]   = ""
+    # output["rest"]  = ""
+    # output["high"]  = ""
+    
+    output["mean"]  = 15
+    output["min"]   = 9
+    output["max"]   = 21
+    output["rest"]  = 12
+    output["high"]  = 22
+    
+    return output
+
+def get_brv():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["mean"]  = ""
+    # output["min"]   = ""
+    # output["max"]   = ""
+    # output["rest"]  = ""
+    # output["high"]  = ""
+    output["mean"]  = 1.2
+    output["min"]   = 0.2
+    output["max"]   = 2.0
+    output["rest"]  = 1.3
+    output["high"]  = 1.8
+    
+    return output
+
+def get_inexratio():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["mean"]  = ""
+    # output["min"]   = ""
+    # output["max"]   = ""
+    # output["rest"]  = ""
+    # output["high"]  = ""
+    output["mean"]  = 1.5
+    output["min"]   = 1.2
+    output["max"]   = 2.1
+    output["rest"]  = 1.3
+    output["high"]  = 2.3
+    
+    return output
+
+def get_bradypnea():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["exists"]      = ""
+    # output["mean"]        = ""
+    # output["duration"]    = ""
+    # output["percentage"]  = ""
+    output["exists"]      = True
+    output["mean"]        = 0
+    output["duration"]    = 0
+    output["percentage"]  = 0
+    
+    if output["exists"]:
+        bradycardia_alert_icon = st.session_state.alert
+    else:
+        bradycardia_alert_icon = st.session_state.alert_no
+    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
+    
+    return output
+    
+def get_tachypnea():
+    
+    # !!! TO BE UPDATED !!!
+    output = {}
+    # output["exists"]      = ""
+    # output["mean"]        = ""
+    # output["duration"]    = ""
+    # output["percentage"]  = ""
+    output["exists"]       = True
+    output["mean"]        = 0
+    output["duration"]    = 0
+    output["percentage"]  = 0
+    
+    if output["exists"]:
+        tachycardia_alert_icon = st.session_state.alert
+    else:
+        tachycardia_alert_icon = st.session_state.alert_no
+    st.session_state.tachycardia_alert_icon = tachycardia_alert_icon
+    
+    return output
+
+# @st.cache
+def convert_data_to_excel(data_acc, data_breath, data_ecg, data_temp):
+    # !!! TO BE UPDATED !!!
+    # Cache the conversion to prevent computation on every rerun
+    indicators = st.session_state.indicators.copy()
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    data_acc.to_excel(writer, index=False, sheet_name='Acceleration')
+    data_breath.to_excel(writer, index=False, sheet_name='Breath')
+    data_ecg.to_excel(writer, index=False, sheet_name='ECG')
+    data_temp.to_excel(writer, index=False, sheet_name='Skin Temperature')
+    if indicators is not None:
+        indicators = indicators.drop(columns=['sma_values'])
+        indicators.to_excel(writer, index=False, sheet_name='Indicators')
+    workbook = writer.book
+    worksheet = writer.sheets['Acceleration']
+    format1 = workbook.add_format({'num_format': '0.00'}) 
+    worksheet.set_column('A:A', None, format1)  
+    writer.save()
+    processed_data = output.getvalue()
+    return processed_data
 
 def get_myendusers():
     
@@ -39,394 +455,6 @@ def get_myendusers():
     st.session_state.myendusers = myendusers
     
     return message, status_code
-
-def get_bodybattery():
-    
-    datas = st.session_state.garmin_data
-    output = {}
-    output["high"]  = datas["body_battery"]["highest"]
-    output["low"]   = datas["body_battery"]["lowest"]
-    
-    return output
-
-def get_calories():
-    
-    datas = st.session_state.garmin_data
-    
-    output = {}
-    output["total"]    = datas["calories"]["total"]
-    output["rest"]     = datas["calories"]["resting"]
-    output["active"]   = datas["calories"]["active"]
-    
-    return output
-
-def get_intensity():
-    
-    datas = st.session_state.garmin_data
-    
-    output = {}
-    output["total"]       = datas["intensity_min"]["total"]
-    output["moderate"]    = datas["intensity_min"]["moderate"]
-    output["vigurous"]    = datas["intensity_min"]["vigurous"]
-    
-    return output
-
-def get_sleep():
-    
-    datas = st.session_state.garmin_data
-    
-    output = {}
-    output["score"]             = datas["sleep"]["score"]
-    output["quality"]           = datas["sleep"]["quality"]
-    output["duration"]          = datas["sleep"]["recorded_time"]
-    
-    output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
-    output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
-    output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
-    output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
-    
-    output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
-    output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
-    output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
-    output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
-    
-    return output
-
-def get_spo2():
-    
-    datas = st.session_state.garmin_data
-    
-    output = {}
-    output["mean"]      = datas["spo2"]["averege"]
-    output["min"]       = datas["spo2"]["lowest"]
-    output["values"]    = datas["spo2"]["all_values"]
-    
-    return output
-
-def get_stress():
-    
-    datas = st.session_state.garmin_data
-    
-    output = {}
-    output["score"]             = datas["stress"]["score"]
-    
-    output["duration"]          = datas["stress"]["recorded_time"]
-    
-    output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
-    output["duration_low"]      = int(round(datas["stress"]["low"]/60))
-    output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
-    output["duration_high"]     = int(round(datas["stress"]["high"]/60))
-    
-    output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
-    output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
-    output["percentage_medium"] = int(round(datas["stress"]["medium"]/datas["stress"]["recorded_time"]*100))
-    output["percentage_high"]   = int(round(datas["stress"]["high"]/datas["stress"]["recorded_time"]*100))
-    
-    return output
-
-def get_duration_chronolife():
-    
-    output = {}
-    output["duration"]          = 17
-    output["duration_day"]      = 12
-    output["duration_night"]    = 5
-    output["duration_rest"]     = 16 
-    output["duration_activity"] = 1
-    
-    return output
-
-def get_duration_garmin():
-    
-    output = {}
-    output["duration"]          = 22
-    output["duration_day"]      = 16
-    output["duration_night"]    = 6
-    output["duration_rest"]     = 16 
-    output["duration_activity"] = 6
-    
-    return output    
-
-def get_steps():
-    
-    output = {}
-    output["number"]    = 1654
-    output["goal"]      = 6955
-    output["score"]     = int(output["number"]/output["goal"]*100)
-    output["distance"]  = 4.2
-    
-    return output
-
-def get_temperature():
-    
-    output = {}
-    output["mean"]  = 35.4
-    output["min"]   = 33.4
-    output["max"]   = 37.1
-    
-    return output
-
-def get_bpm():
-    
-    output = {}
-    output["mean"]  = 67
-    output["min"]   = 59
-    output["max"]   = 123
-    output["rest"]  = 65
-    output["high"]  = 156
-    
-    return output
-
-def get_hrv():
-    
-    output = {}
-    output["mean"]  = 162
-    output["min"]   = 42
-    output["max"]   = 555
-    output["rest"]  = 150
-    output["high"]  = 111
-    
-    return output
-
-def get_qt():
-    
-    output = {}
-    output["mean"]      = 50
-    output["min"]       = 817
-    output["max"]       = 324
-    output["rest"]      = 324
-    output["high"]      = 324
-    output["threshold"] = 550
-    
-    if output["mean"] > output["threshold"]:
-        qt_alert_icon = st.session_state.alert
-    else:
-        qt_alert_icon = st.session_state.alert_no
-    st.session_state.qt_alert_icon          = qt_alert_icon
-    
-    return output
-
-def get_bradycardia():
-    
-    output = {}
-    output["exists"]      = False
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
-    
-    if output["exists"]:
-        bradycardia_alert_icon = st.session_state.alert
-    else:
-        bradycardia_alert_icon = st.session_state.alert_no
-    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
-    
-    return output
-    
-def get_tachycardia():
-    
-    output = {}
-    output["exists"]      = False
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
-    
-    if output["exists"]:
-        tachycardia_alert_icon = st.session_state.alert
-    else:
-        tachycardia_alert_icon = st.session_state.alert_no
-    st.session_state.tachycardia_alert_icon = tachycardia_alert_icon
-    
-    return output
-
-def get_brpm():
-    
-    output = {}
-    output["mean"]  = 15
-    output["min"]   = 9
-    output["max"]   = 21
-    output["rest"]  = 12
-    output["high"]  = 22
-    
-    return output
-
-def get_brv():
-    
-    output = {}
-    output["mean"]  = 1.2
-    output["min"]   = 0.2
-    output["max"]   = 2.0
-    output["rest"]  = 1.3
-    output["high"]  = 1.8
-    
-    return output
-
-def get_inexratio():
-    
-    output = {}
-    output["mean"]  = 1.5
-    output["min"]   = 1.2
-    output["max"]   = 2.1
-    output["rest"]  = 1.3
-    output["high"]  = 2.3
-    
-    return output
-
-def get_bradypnea():
-    
-    output = {}
-    output["exists"]      = True
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
-    
-    if output["exists"]:
-        bradycardia_alert_icon = st.session_state.alert
-    else:
-        bradycardia_alert_icon = st.session_state.alert_no
-    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
-    
-    return output
-    
-def get_tachypnea():
-    
-    output = {}
-    output["exists"]       = True
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
-    
-    if output["exists"]:
-        tachycardia_alert_icon = st.session_state.alert
-    else:
-        tachycardia_alert_icon = st.session_state.alert_no
-    st.session_state.tachycardia_alert_icon = tachycardia_alert_icon
-    
-    return output
-
-def get_smart_textile_indicators():
-    
-    indicators  = []
-    url         = st.session_state.url_data
-    api_key     = st.session_state.api_key
-    user        = st.session_state.end_user
-    types       = constant.TYPE()["INDICATORS"]
-    date        = st.session_state.date
-    
-    params = {
-           'user':      user, # sub-user username
-           'types':     types, 
-           'date':      date,
-         }
-    
-    # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).
-    reply = requests.get(url, headers={"X-API-Key": api_key}, params=params)
-    message, status_code = test.api_status(reply)
-    datas = []
-    if status_code == 200:
-                
-        json_list_of_records = json.loads(reply.text) 
-        for record in json_list_of_records:
-            datas.append(record)
-        
-        if len(datas) == 0:
-            status_code = 600
-            
-    if status_code == 200:
-        
-        # --- Map raw data 
-        indicators = {}
-        types_indicators    = constant.TYPE()["INDICATORS"].split(',')
-        results_mapped      = map_results(datas, types_indicators)
-        
-        for key_type in types_indicators:
-            indicators[key_type] = {}
-            for val_type in ["times", "values"]:
-                tmp = get_result_info(datas=results_mapped, result_type=key_type)
-                indicators[key_type][val_type] = tmp[val_type]
-        
-    st.session_state.smart_textile_indicators = indicators
-    
-def get_smart_textile_raw_data():
-    
-    raw_data    = []
-    url         = st.session_state.url_data
-    api_key     = st.session_state.api_key
-    user        = st.session_state.end_user
-    types       = constant.TYPE()["SIGNALS"]
-    date        = st.session_state.date
-    time_gte    = st.session_state.start_time + ":00"
-    time_lt     = st.session_state.end_time + ":00"
-    
-    params = {
-           'user':      user, # sub-user username
-           'types':     types, 
-           'date':      date,
-           'time_gte':  time_gte, # UTC
-           'time_lt':   time_lt,  # UTC
-         }
-    
-    # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).
-    reply = requests.get(url, headers={"X-API-Key": api_key}, params=params)
-    message, status_code = test.api_status(reply)
-    datas = []
-    if status_code == 200:
-                
-        json_list_of_records = json.loads(reply.text) 
-        for record in json_list_of_records:
-            datas.append(record)
-        
-        if len(datas) == 0:
-            status_code = 600
-    
-    if status_code == 200:
-        # --- Map raw data 
-        raw_data = {}
-        types_raw       = constant.TYPE()["RAW_SIGNALS"].split(',')
-        datas_mapped = map_data(datas, types_raw)
-        
-        for key_type in types_raw:
-            raw_data[key_type] = {}
-            for val_type in ["times", "sig"]:
-                tmp = get_sig_info(datas_mapped, key_type, verbose=0)
-                raw_data[key_type][val_type] = tmp[val_type]
-        
-        # --- Map filtered data 
-        types_filtered  = constant.TYPE()["FILTERED_SIGNALS"].split(',')
-        datas_filtered_mapped = map_data_filt(datas, types_filtered)
-        for key_type in types_filtered:
-            raw_data[key_type] = {}
-            for val_type in ["times", "sig"]:
-                tmp = get_sig_info(datas_filtered_mapped, key_type, verbose=0)
-                raw_data[key_type][val_type] = tmp[val_type]
-                
-    st.session_state.smart_textile_raw_data = raw_data
-    
-# @st.cache
-def convert_data_to_excel(data_acc, data_breath, data_ecg, data_temp):
-    # Cache the conversion to prevent computation on every rerun
-    indicators = st.session_state.indicators.copy()
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    data_acc.to_excel(writer, index=False, sheet_name='Acceleration')
-    data_breath.to_excel(writer, index=False, sheet_name='Breath')
-    data_ecg.to_excel(writer, index=False, sheet_name='ECG')
-    data_temp.to_excel(writer, index=False, sheet_name='Skin Temperature')
-    if indicators is not None:
-        indicators = indicators.drop(columns=['sma_values'])
-        indicators.to_excel(writer, index=False, sheet_name='Indicators')
-    workbook = writer.book
-    worksheet = writer.sheets['Acceleration']
-    format1 = workbook.add_format({'num_format': '0.00'}) 
-    worksheet.set_column('A:A', None, format1)  
-    writer.save()
-    processed_data = output.getvalue()
-    return processed_data
-
-def datetime2str(duration):
-    
-    duration = str(duration)[:-3]
-    duration = duration.replace(':', ' heures ')
-    duration = duration + ' min'
-    return duration
     
 def get_sessions(end_user, year, month):
     

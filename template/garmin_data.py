@@ -33,11 +33,13 @@ def get_garmin_data():
     # Convert the reply content into a json object
     datas = error_management(reply)
 
+    # result_dict = save_datas_in_dict(date, end_user, datas)
+    
     try:
         # Organize the data in a dictionary 
         result_dict = save_datas_in_dict(date, end_user, datas)
     except:
-        pass
+        result_dict = initialize_dictionary_with_template()
     
     st.session_state.garmin_data = result_dict
    
@@ -247,6 +249,9 @@ def add_body_battery(datas, body_battery_dict):
         body_battery_dict["lowest"] = min(values_df['values'])
 
 def add_sleep(date, user_id, datas, sleep_dict):
+    
+    sleep_dict["score"] = []
+    
     value_dict = get_sleep_data(date, user_id, datas)
     timestamp_end = value_dict['startTimeInSeconds'] + value_dict['durationInSeconds']
     sleep_dict["timestamp_end"] = datetime.fromtimestamp(timestamp_end)
@@ -325,15 +330,16 @@ def get_date_before_str(date:str) -> str:
 
 def get_sleep_of_day_before(date, date_before, user_id):
     
-    api_key     = st.session_state.api_key
-    url         = URL_GARMIN
+    api_key         = st.session_state.api_key
+    url_garmin      = st.session_state.url_garmin
+    url             = url_garmin
     
     value_dict = []
 
     # Build the query parameters object
     params = {
         'user'    : user_id,   
-        'types'   : TYPE_SLEEP,
+        'types'   : constant.TYPE()["SLEEP"],
         'date'    : date_before,
         }
     
@@ -343,7 +349,7 @@ def get_sleep_of_day_before(date, date_before, user_id):
     datas_day_before = error_management(reply)
     # Get the sleep of the day before
     for data in datas_day_before:
-        if data['type'] == TYPE_SLEEP:
+        if data['type'] == constant.TYPE()["SLEEP"]:
             timestamp_end = data['mtimestamp_end'][:10]
 
             # If timestamp_end = date, get value ductionary

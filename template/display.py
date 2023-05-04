@@ -5,12 +5,15 @@ import template.chart as chart
 import template.session as session 
 import template.test as test
 import template.data as data
+import template.chronolife_data as chronolife_data
 import template.garmin_data as garmin_data
 
 def run():
     """
     Main function of the layer display
     """
+    
+    # Call translate global variable
     translate = st.session_state.translate
     
     # Language
@@ -68,8 +71,8 @@ def run():
         if st.session_state.logout_submit:
             session.restart()
             
+        # # Button scroll to top
         # button_scroll_to_top()
-        
         
     footer()
 
@@ -84,47 +87,60 @@ def footer():
 
 def form_language():
     
-    lan_label_layout = st.sidebar.empty()
+    # Create layout for the label of the selectbox
+    language_label_layout = st.sidebar.empty()
+    
+    # Create selectbox language
     language = st.sidebar.selectbox("", ("FR", "EN"))
     
+    # Don't update language if the same language is selected
     if language != st.session_state.language:
+        # update language
         st.session_state.language = language
+        # translate
         session.set_translation()
+    
+    # update the label of the selectbox
     language = st.session_state.language
-    lan_label_layout.markdown(html.language_label(), unsafe_allow_html=True)
+    language_label_layout.markdown(html.language_label(), unsafe_allow_html=True)
+    
+    # Add an horizontal line
     st.sidebar.markdown("---")
         
         
 def profile():
+    
     st.sidebar.markdown(html.profile(), unsafe_allow_html=True)
+    # Add an horizontal line
     st.sidebar.markdown("---")
     
-def button_scroll_to_top():
-    st.markdown(html.button_scroll_to_top(), unsafe_allow_html=True)
+# def button_scroll_to_top():
+#     st.markdown(html.button_scroll_to_top(), unsafe_allow_html=True)
     
 def login():
     
     translate = st.session_state.translate
     
+    # Create form
     _,col_login,_=st.columns([2,3,2])
     layout_login = col_login.empty()
     login_form  = layout_login.form('login')
     
-    env         = login_form.selectbox("Env", ("preprod", "prod"))
-    username    = login_form.text_input(translate["username"], "Michel", placeholder="Ex: Chronnolife")
-    api_key     = login_form.text_input(translate["password"], "a8LeZpzQ9ck61ITF_8lBkw", placeholder="Ex: f9VBqQoTiU0mnAKoXK1lky", type="password")
-
-    if api_key:
-        st.session_state.api_key = api_key
-
-    button_login = login_form.form_submit_button(translate["login"])
-
+    env             = login_form.selectbox("Env", ("preprod", "prod"))
+    username        = login_form.text_input(translate["username"], "Michel", placeholder="Ex: Chronnolife")
+    api_key         = login_form.text_input(translate["password"], "a8LeZpzQ9ck61ITF_8lBkw", placeholder="Ex: f9VBqQoTiU0mnAKoXK1lky", type="password")
+    button_login    = login_form.form_submit_button(translate["login"])
+    
     if button_login:
         
+        # !!! Debug code !!! 
         if env == "preprod":
             st.session_state.prod = False
+    
+        # Set urls for API requests
         session.set_url()
         
+        # Test inputs
         username, message, error    = test.string(username, name="Username", layout=login_form)
         api_key, message, error     = test.string(api_key, name="Password", layout=login_form)
         
@@ -132,16 +148,17 @@ def login():
             st.session_state.username = username
             st.session_state.api_key = api_key
         
-        # % GET: Retrieve relevant properties of the specified user.
+        # User Authentication
         message, status_code_apikey = test.authentication2()
-        st.session_state.is_logged = False
+        
         if not error:
             if status_code_apikey == 200:
+                # Get the list of end users 
                 message, status_code_username = data.get_myendusers()
                 
                 if status_code_username == 200:
                     st.session_state.is_logged = True
-                    
+            
             if st.session_state.is_logged:
                 layout_login.empty()
             else:
@@ -252,12 +269,12 @@ def form_indicators():
         st.session_state.form_indicators_layout = form_indicators_layout
         st.session_state.form_indicators_submit = form_indicators_submit
         
-        data.get_smart_textile_indicators()
+        chronolife_data.get_smart_textile_indicators()
         garmin_data.get_garmin_data()
         
-        if len(st.session_state.smart_textile_indicators) > 0 or len(st.session_state.garmin_data) > 0:
+        # if len(st.session_state.smart_textile_indicators) > 0 or len(st.session_state.garmin_data) > 0:
+        if len(st.session_state.smart_textile_indicators) > 0:
             st.session_state.is_data = True
-            # form_indicators_layout.info("Data has been successfully requested")
         else:
             st.session_state.is_data = False
             form_indicators_layout.warning(translate["message_no_data"])
@@ -285,8 +302,6 @@ def smart_textile_raw_data():
     translate = st.session_state.translate
     
     st.markdown(html.smart_textile_raw_data_title(), unsafe_allow_html=True)
-    download_text_layout = st.empty()
-    download_button_layout = st.empty()
     form_smart_textile_raw_data()
     
     if st.session_state.form_raw_submit:
@@ -295,9 +310,10 @@ def smart_textile_raw_data():
             if error:
                 st.session_state.form_raw_layout.warning(translate["message_no_data"])
             else:    
+                download_text_layout = st.empty()
+                download_button_layout = st.empty()
                 download_text_layout.markdown(html.smart_textile_raw_data_download(), unsafe_allow_html=True)
                 smart_textile_raw_data_download_button = download_button_layout.button(translate["download"], key="download_smart_textile_raw_data")
-                # st.session_state.form_raw_layout.success("Smart Textile Data has been successfully requested")
                 
     st.markdown("---")
                 
@@ -311,7 +327,6 @@ def form_smart_textile_raw_data():
     form_raw_layout = st.form("raw_form")
     form_raw_layout.write(translate["smart_textile_raw_data_select_time"])
     col1, col2, col3, col4 = form_raw_layout.columns([3,3,3,6])
-    # start_time = form_raw_layout.time_input('Start Time (UTC)', datetime.time(9, 20))
     
     form_hour = col1.selectbox(
     translate["hour"],
@@ -414,7 +429,6 @@ def health_indicators_heart_hrv():
     col2.plotly_chart(fig, config=config, use_container_width=True)
     
 def health_indicators_heart_tachy_brady_qt():
-    
     st.markdown(html.health_indicators_heart_tachy_brady_qt(), unsafe_allow_html=True)
     
 def health_indicators_breath_brpm():

@@ -6,10 +6,11 @@ import streamlit as st
 # Initialize streamlit session 
 session.init()
 session.init_simul()
+
 # Styles
 css.run()
 
-
+# Translation (language)
 session.set_translation()
 
 # Display layers

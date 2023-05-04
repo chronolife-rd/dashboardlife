@@ -178,4 +178,6 @@ def translate():
     translate["definition_sleep_quality"]       = "..."
     translate["definition_skin_temperature"]    = "..."
     
+    translate["no_data"]                        = "Aucune Donnée"
+    
     return translate

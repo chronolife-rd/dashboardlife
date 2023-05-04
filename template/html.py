@@ -75,14 +75,14 @@ def profile():
     
     return html
 
-def button_scroll_to_top():
-    html = """
-    <div id="scrollUp" class="scrollUp">
-        <a href="#top"><img src='data:image/png;base64,""" + st.session_state.to_top + """'/></a>
-    </div>
-    """
+# def button_scroll_to_top():
+#     html = """
+#     <div id="scrollUp" class="scrollUp">
+#         <a href="#top"><img src='data:image/png;base64,""" + st.session_state.to_top + """'/></a>
+#     </div>
+#     """
     
-    return html
+#     return html
 
 def menu_overview():
     
