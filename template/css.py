@@ -35,11 +35,13 @@ def body():
                         background-image: url('data:image/png;base64,""" + st.session_state.background_wave + """');
                         background-size: cover;
                         margin-top: -100px;
-                        margin-bottom: -50px;
+                        margin-bottom: -100px;
                         padding-top: 0px;
-                        padding-bottom: 13%;
-                        border-radius: 30px;
+                        padding-bottom: 25%;
+                        /* border-radius: 30px; */
                         height: 250px;
+                        width: 120%;
+                        margin-left: -10%;
                     }
                     
                     .intro_style {
@@ -48,9 +50,9 @@ def body():
                     }
                     
                     .intro_logo {
-                        width: 150px;
+                        width: 20%;
                         margin-top: 20px;
-                        margin-right: 60px;
+                        margin-left: 4%;
                         }
                     
                     /* User icon section */
@@ -370,23 +372,16 @@ def body():
                         text-align: center;
                         }
                     
+                    /* Language Label */
+                    .language_label {
+                        margin-bottom: -60px;
+                        }
+                    
       </style>""", unsafe_allow_html=True)
       
 def footer():
     st.markdown("""
      <style>
-         /* a:link , a:visited {
-         color: blue;
-         background-color: transparent;
-         text-decoration: underline;
-         }
-
-        a:hover,  a:active {
-        color: red;
-        background-color: transparent;
-        text-decoration: underline;
-        } */
-
         .footer {
             position: fixed;
             left: 0;

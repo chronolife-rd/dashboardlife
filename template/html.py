@@ -21,12 +21,13 @@ def head():
     return html
 
 def header():
+    translate = st.session_state.translate
     
     html = """
     <div id="top" class='intro_section'>
         <p><img class='intro_logo' src='data:image/png;base64,""" + st.session_state.logo_clife_white + """'/></p>
         <center>
-        <p class='intro_style'><b>Smart Textile Dashboard</b></p>
+        <p class='intro_style'><b>""" + translate["header_title"] + """</b></p>
         </center>
     </div>
     """
@@ -41,6 +42,18 @@ def footer():
     html += VERSION 
     html +="""
         </p>
+    </div>
+    """
+    
+    return html
+
+def language_label():
+    translate = st.session_state.translate
+    
+    
+    html = """
+    <div>
+        <p class='language_label'><b>""" + translate["language_label"] + """</b></p>
     </div>
     """
     
@@ -72,11 +85,14 @@ def button_scroll_to_top():
     return html
 
 def menu_overview():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="menu">
         <p>
             <a href="#overview">
-                <span>Overview</span>
+                <span>""" + translate["overview"] + """</span>
             </a>
         </p>
     </div>
@@ -85,11 +101,13 @@ def menu_overview():
     return html
 
 def menu_smart_textile_raw_data():
+    translate = st.session_state.translate
+    
     html = """
     <div class="menu">
         <p>
             <a href="#smart_textile_raw_data">
-                <span>Smart Textile Raw Data</span>
+                <span>""" + translate["smart_textile_raw_data"] + """</span>
             </a>
         </p>
     </div>
@@ -98,11 +116,14 @@ def menu_smart_textile_raw_data():
     return html
 
 def menu_health_indicators():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="menu">
         <p>
             <a href="#health_indicators">
-                <span>Health Indicators</span>
+                <span>""" + translate["health_indicators"] + """</span>
             </a>
         </p>
     </div>
@@ -111,11 +132,14 @@ def menu_health_indicators():
     return html
 
 def menu_data_report():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="menu">
         <p>
             <a href="#data_report">
-                <span>Data Report</span>
+                <span>""" + translate["data_report"] + """</span>
             </a>
         </p>
     </div>
@@ -124,11 +148,14 @@ def menu_data_report():
     return html
 
 def menu_definitions():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="menu">
         <p>
             <a href="#definitions">
-                <span>Definitions</span>
+                <span>""" + translate["definitions"] + """</span>
             </a>
         </p>
     </div>
@@ -138,9 +165,11 @@ def menu_definitions():
 
 def overview_title():
     
+    translate = st.session_state.translate
+    
     html = """
         <div id="overview" class="main_title">
-            <p>Overview</p>
+            <p>""" + translate["overview"] + """</p>
         </div>
         <div>
     """
@@ -148,6 +177,8 @@ def overview_title():
     return html
 
 def overview_data_collection():
+    
+    translate = st.session_state.translate
     
     chronolife_data                 = data.get_duration_chronolife()
     chronolife_duration             = chronolife_data["duration"]
@@ -175,14 +206,14 @@ def overview_data_collection():
     
     html = """
         <div class="second_title">
-            <p>Data Collection</p>
+            <p>""" + translate["data_collection"] + """</p>
         </div>
         <div class="row">
             <div class='""" + col_section + """'>
                 <div class='overview_section'>
                     <div class="row">
                         <div class='""" + col_title + """'>
-                            <p class='indicator_name'>Smart Textile</p>
+                            <p class='indicator_name'>""" + translate["smart_textile"] + """</p>
                         </div>
                     </div>
                     <div class="row overview_sub_section_smart_textile">
@@ -192,43 +223,44 @@ def overview_data_collection():
                         <div class='""" + col_data + """'>
                             <div class="row data_collection">
                                 <div class='""" + col_duration + """'>
-                                    <p>Total data &ensp; <span class='collect_duration'>""" + str(chronolife_duration) + """ hours</span></p> 
+                                    <p>""" + translate["total_data"] + """ &ensp; <span class='collect_duration'>""" +\
+                                        str(chronolife_duration) + " " + translate["hours"] + """</span></p> 
                                 </div>
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.night + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Night</p>
+                                    <p>""" + translate["night"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_day) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_day) + " " + translate["hours"] + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Day</p>
+                                    <p>""" + translate["day"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_night) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_night) + " " + translate["hours"] + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Rest</p>
+                                    <p>""" + translate["rest"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_rest) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_rest) + " " + translate["hours"] + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.activity + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Activity</p>
+                                    <p>""" + translate["activity"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_activity) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_activity) + " " + translate["hours"] + """</p>
                                 </div> 
                             </div>
                         </div>
@@ -239,7 +271,7 @@ def overview_data_collection():
                 <div class='overview_section'> 
                     <div class="row">
                         <div class='""" + col_title + """'>
-                            <p class='indicator_name'>Garmin watch</p>
+                            <p class='indicator_name'>""" + translate["garmin_watch"] + """</p>
                         </div>
                     </div>
                     <div class="row overview_sub_section_garmin">
@@ -249,43 +281,44 @@ def overview_data_collection():
                         <div class='""" + col_data + """'>
                             <div class="row data_collection">
                                 <div class='""" + col_duration + """'>
-                                    <p>Total data &ensp; <span class='collect_duration'>""" + str(garmin_duration) + """ hours</span></p> 
+                                    <p>""" + translate["total_data"] + """ &ensp; <span class='collect_duration'>""" +\
+                                        str(garmin_duration) + " " + translate["hours"] + """</span></p> 
                                 </div>
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.night + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Night</p>
+                                    <p>""" + translate["night"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_day) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_day) + " " + translate["hours"] + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Day</p>
+                                    <p>""" + translate["day"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_night) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_night) + " " + translate["hours"] + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Rest</p>
+                                    <p>""" + translate["rest"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_rest) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_rest) + " " + translate["hours"] + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.activity + """'/> 
                                 </div>
                                 <div class='""" + col_key + """'>
-                                    <p>Activity</p>
+                                    <p>""" + translate["activity"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_activity) + """ hours</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_activity) + " " + translate["hours"] + """</p>
                                 </div> 
                             </div>
                         </div>
@@ -296,17 +329,9 @@ def overview_data_collection():
     """
     return html
 
-def overview_duration_title():
-    
-    html = """
-    <div class="second_title">
-        <p>Duration Of Data Collection</p>
-    </div>
-    """
-    
-    return html
-
 def overview_health_indicators():
+    
+    translate = st.session_state.translate
     
     # Heart bpm
     bpm         = data.get_bpm()
@@ -374,7 +399,7 @@ def overview_health_indicators():
     intensity           = data.get_intensity()
     intensity_total     = intensity["total"] 
     intensity_moderate  = intensity["moderate"]
-    intensity_vigorous  = intensity["vigorous"]
+    intensity_vigurous  = intensity["vigurous"]
     
     # Body Battery
     overview_bodybattery = data.get_bodybattery()
@@ -388,7 +413,7 @@ def overview_health_indicators():
     
     html = """
     <div class="second_title">
-        <p>Health Indicators Overview</p>
+        <p>""" + translate["health_indicators_overview"] + """</p>
     </div>
     <div class="row">
         <div class='""" + col_section + """'>
@@ -396,40 +421,40 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.heart_icon + """'/> 
-                        <p class='indicator_name'>Cardiology</p>
+                        <p class='indicator_name'>""" + translate["cardiology"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Tachycardia</p>
+                        <p>""" + translate["tachycardia"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p><img class=miniicon src='data:image/png;base64,""" + st.session_state.tachycardia_alert_icon + """'/></p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Bradycardia</p>
+                        <p>""" + translate["bradycardia"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p><img class=miniicon src='data:image/png;base64,""" + st.session_state.bradycardia_alert_icon + """'/> </p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>QT Length anomaly </p>
+                        <p>""" + translate["qt_anomaly"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p><img class=miniicon src='data:image/png;base64,""" + st.session_state.qt_alert_icon + """'/> </p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>HR high</p>
+                        <p>""" + translate["hr_high"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(bpm_high) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>HR resting</p>
+                        <p>""" + translate["hr_resting"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(bpm_rest) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>HRV resting</p>
+                        <p>""" + translate["hrv_resting"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(hrv_rest) + """ ms</p>
@@ -442,34 +467,34 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.breath_icon + """'/> 
-                        <p class='indicator_name'>Respiratory</p>
+                        <p class='indicator_name'>""" + translate["respiratory"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Tachypnea</p>
+                        <p>""" + translate["tachypnea"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p><img class=miniicon src='data:image/png;base64,""" + st.session_state.tachypnea_alert_icon + """'/> </p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Bradypnea</p>
+                        <p>""" + translate["bradypnea"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p><img class=miniicon src='data:image/png;base64,""" + st.session_state.bradypnea_alert_icon + """'/> </p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>BR high</p>
+                        <p>""" + translate["br_high"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brpm_high) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>BR resting</p>
+                        <p>""" + translate["br_resting"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brpm_rest) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>BRV resting</p>
+                        <p>""" + translate["brv_resting"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brv_rest) + """ s</p>
@@ -483,7 +508,7 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.pulseox_icon + """'/> 
-                        <p class='indicator_name'>Pulse Ox</p>
+                        <p class='indicator_name'>""" + translate["pulseox"] + """</p>
                     </div>
                     <div class="col-6">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.spo2_green + """'/>
@@ -506,24 +531,24 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.steps_icon + """'/> 
-                        <p class='indicator_name'>Steps</p>
+                        <p class='indicator_name'>""" + translate["steps"] + """</p>
                     </div>
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <p>Number</p>
+                                <p>""" + translate["number"] + """</p>
                             </div>    
                             <div class="col-12">
                                 <p class='steps_number'>""" + str(steps_number) + """</p>
                             </div>
                             <div class="col-12">
-                                <p>Goal</p>
+                                <p>""" + translate["goal"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p><b>""" + str(goal) + """</b></p>
                             </div>
                             <div class="col-12">
-                                <p>Distance</p>
+                                <p>""" + translate["distance"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p><b>""" + str(distance) + """ km</b></p>
@@ -543,35 +568,35 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.stress_icon + """'/> 
-                        <p class='indicator_name'>Stress</p>
+                        <p class='indicator_name'>""" + translate["stress"] + """</p>
                     </div>
                     <div class="col-7">
                         <div class="row">
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_rest + """'/> 
                                 <p>
-                                    Rest <br>
+                                    """ + translate["rest"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(stress_duration_rest) + """ min (""" + str(stress_percentage_rest) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_low + """'/>
                                 <p>
-                                    Low <br>
+                                    """ + translate["low"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(stress_duration_low) + """ min (""" + str(stress_percentage_low) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_medium + """'/>
                                 <p>
-                                    Medium <br>
+                                    """ + translate["medium"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(stress_duration_medium) + """ min (""" + str(stress_percentage_medium) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_high + """'/>
                                 <p>
-                                    High <br>
+                                    """ + translate["high"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(stress_duration_high) + """ min (""" + str(stress_percentage_high) + """%)</span>
                                 </p>
                             </div>
@@ -590,35 +615,35 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.sleep_icon + """'/> 
-                        <p class='indicator_name'>Sleep</p>
+                        <p class='indicator_name'>""" + translate["sleep"] + """</p>
                     </div>
                     <div class="col-7">
                         <div class="row">
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_deep + """'/>
                                 <p>
-                                    Deep <br>
+                                    """ + translate["deep"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(sleep_duration_deep) + """ min (""" + str(sleep_percentage_deep) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_light + """'/>
                                 <p>
-                                    Light <br>
+                                    """ + translate["light"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(sleep_duration_light) + """ min (""" + str(sleep_percentage_light) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_rem + """'/>
                                 <p>
-                                    REM <br>
+                                    """ + translate["rem"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(sleep_duration_rem) + """ min (""" + str(sleep_percentage_rem) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_awake + """'/>
                                 <p>
-                                    Awake <br>
+                                    """ + translate["awake"] + """ <br>
                                     <span class='""" + class_val + """'>""" + str(sleep_duration_awake) + """ min (""" + str(sleep_percentage_awake) + """%)</span>  
                                 </p>
                             </div>
@@ -637,12 +662,12 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.calories_icon + """'/> 
-                        <p class='indicator_name'>Calories</p>
+                        <p class='indicator_name'>""" + translate["calories"] + """</p>
                     </div>
                     <div class="col-12">
                         <div class="row">
                             <div class="col-12">
-                                <p>Number of total calories</p>
+                                <p>""" + translate["calories_total"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p class='total_calories'>""" + str(calories_total) + """ kcals</p>
@@ -652,7 +677,7 @@ def overview_health_indicators():
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <p>Active</p>
+                                <p>""" + translate["calories_active"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p class='""" + class_val + """'>""" + str(calories_rest) + """ kcals</p>
@@ -662,7 +687,7 @@ def overview_health_indicators():
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <p>Resting</p>
+                                <p>""" + translate["calories_resting"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p class='""" + class_val + """'>""" + str(calories_active) + """ kcals</p>
@@ -677,12 +702,12 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.intensity_icon + """'/> 
-                        <p class='indicator_name'>Intensity Minutes</p>
+                        <p class='indicator_name'>""" + translate["intensity"] + """</p>
                     </div>
                     <div class="col-12">
                         <div class="row">
                             <div class="col-12">
-                                <p>Total Intensity Minutes</p>
+                                <p>""" + translate["intensity_total"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p class='total_intensity_minutes'>""" + str(intensity_total) + """ min</p>
@@ -692,7 +717,7 @@ def overview_health_indicators():
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <p>Moderate</p>
+                                <p>""" + translate["intensity_moderate"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p class='""" + class_val + """'>""" + str(intensity_moderate) + """ min</p>
@@ -702,10 +727,10 @@ def overview_health_indicators():
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <p>Vigorous</p>
+                                <p>""" + translate["intensity_vigurous"] + """</p>
                             </div>
                             <div class="col-12">
-                                <p class='""" + class_val + """'>""" + str(intensity_vigorous) + """ min</p>
+                                <p class='""" + class_val + """'>""" + str(intensity_vigurous) + """ min</p>
                             </div>
                         </div>
                     </div>
@@ -717,12 +742,12 @@ def overview_health_indicators():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.bodybattery_icon + """'/> 
-                        <p class='indicator_name'>Body Battery</p>
+                        <p class='indicator_name'>""" + translate["bodybattery"] + """</p>
                     </div>
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <p>High</p>
+                                <p>""" + translate["high"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p class='body_battery_scores'>""" + str(body_bat_high) + """%</p>
@@ -732,7 +757,7 @@ def overview_health_indicators():
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <p>Low</p>
+                                <p>""" + translate["low"] + """</p>
                             </div>
                             <div class="col-12">
                                 <p class='body_battery_scores'>""" + str(body_bat_low) + """%</p>
@@ -751,9 +776,11 @@ def overview_health_indicators():
     
 def smart_textile_raw_data_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div id="smart_textile_raw_data" class="main_title">
-        <p>Smart <span class="orange_text">Textile</span> Raw Data</p>
+        <p>""" + translate["smart_textile_raw_data_title"] + """</p>
     </div>
     """
     
@@ -761,9 +788,11 @@ def smart_textile_raw_data_title():
 
 def smart_textile_raw_data_download():
     
+    translate = st.session_state.translate
+    
     html = """
     <div>
-        <p>Download the Smart Textile Raw Data (XLS)</p>
+        <p>""" + translate["smart_textile_raw_data_download"] + """</p> 
     </div>
     """
 
@@ -771,9 +800,11 @@ def smart_textile_raw_data_download():
 
 def health_indicators_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div id="health_indicators" class="main_title">
-        <p>Health Indicators</p>
+        <p>""" + translate["health_indicators"] + """</p>
     </div>
     """
     
@@ -781,9 +812,11 @@ def health_indicators_title():
 
 def health_indicators_download():
     
+    translate = st.session_state.translate
+    
     html = """
     <div>
-        <p>Download the daily health indicators (XLS)</p>
+        <p>""" + translate["health_indicators_download"] + """</p>
     </div>
     """
     
@@ -792,16 +825,20 @@ def health_indicators_download():
 
 def health_indicators_heart_bpm_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.heart_icon + """'/> 
-        <p>Heart Beat Per Minute (BPM)</p>
+        <p>""" + translate["health_indicators_heart_bpm_title"] + """</p>
     </div>
     """
     
     return html
 
 def health_indicators_heart_bpm_results():
+    
+    translate = st.session_state.translate
     
     bpm         = data.get_bpm()
     bpm_mean    = bpm["mean"]
@@ -810,11 +847,11 @@ def health_indicators_heart_bpm_results():
     
     html = """
     <div class=col1_indicators>
-        <p>Median</p>
+        <p>""" + translate["median"] + """</p>
         <p class="indicator_main_value">""" + str(bpm_mean) + """ bpm</p>
-        <p>Min</p>
+        <p>""" + translate["min"] + """</p>
         <p class="indicator_value">""" + str(bpm_min) + """ bpm</p>
-        <p>Max</p>
+        <p>""" + translate["max"] + """</p>
         <p class="indicator_value">""" + str(bpm_max) + """ bpm</p>
     </div>
     """
@@ -823,16 +860,20 @@ def health_indicators_heart_bpm_results():
 
 def health_indicators_heart_hrv_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.heart_icon + """'/> 
-        <p>Heart Rate Variability (HRV)</p>
+        <p>""" + translate["health_indicators_heart_hrv_title"] + """</p>
     </div>
     """
     
     return html
 
 def health_indicators_heart_hrv_results():
+    
+    translate = st.session_state.translate
     
     hrv         = data.get_hrv()
     hrv_mean    = hrv["mean"]
@@ -841,11 +882,11 @@ def health_indicators_heart_hrv_results():
     
     html = """
     <div class=col1_indicators>
-        <p>Median</p>
+        <p>""" + translate["median"] + """</p>
         <p class="indicator_main_value">""" + str(hrv_mean) + """ bpm</p>
-        <p>Min</p>
+        <p>""" + translate["min"] + """</p>
         <p class="indicator_value">""" + str(hrv_min) + """ bpm</p>
-        <p>Max</p>
+        <p>""" + translate["max"] + """</p>
         <p class="indicator_value">""" + str(hrv_max) + """ bpm</p>
     </div>
     """
@@ -853,6 +894,8 @@ def health_indicators_heart_hrv_results():
     return html
 
 def health_indicators_heart_tachy_brady_qt():
+    
+    translate = st.session_state.translate
     
     tachycardia         = data.get_tachycardia()
     tachy_mean          = tachycardia["mean"]
@@ -882,22 +925,22 @@ def health_indicators_heart_tachy_brady_qt():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.tachycardia_alert_icon + """'/> 
-                        <p class='indicator_name'>Tachycardia</p>
+                        <p class='indicator_name'>""" + translate["tachycardia"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>HR</p>
+                        <p>""" + translate["hr"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(tachy_mean) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Duration</p>
+                        <p>""" + translate["duration"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(tachy_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Proportion</p>
+                        <p>""" + translate["proportion"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(tachy_percentage) + """ %</p>
@@ -910,22 +953,22 @@ def health_indicators_heart_tachy_brady_qt():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.tachycardia_alert_icon + """'/> 
-                        <p class='indicator_name'>Bradycardia</p>
+                        <p class='indicator_name'>""" + translate["bradycardia"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>HR</p>
+                        <p>""" + translate["hr"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brady_mean) + """ bpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Duration</p>
+                        <p>""" + translate["duration"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brady_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Proportion</p>
+                        <p>""" + translate["proportion"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brady_percentage) + """ %</p>
@@ -938,22 +981,22 @@ def health_indicators_heart_tachy_brady_qt():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.qt_alert_icon + """'/> 
-                        <p class='indicator_name'>QT length</p>
+                        <p class='indicator_name'>""" + translate["qt_length"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Median</p>
+                        <p>""" + translate["median"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(qt_mean) + """ ms</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Min</p>
+                        <p>""" + translate["min"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(qt_min) + """ ms</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Max</p>
+                        <p>""" + translate["max"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(qt_max) + """ ms</p>
@@ -968,16 +1011,20 @@ def health_indicators_heart_tachy_brady_qt():
 
 def health_indicators_breath_brpm_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.breath_icon + """'/> 
-        <p>Breath Rate Per Minute (BRPM)</p>
+        <p>""" +  translate["health_indicators_breath_brpm_title"] + """</p>
     </div>
     """
     
     return html
 
 def health_indicators_breath_brpm_results():
+    
+    translate = st.session_state.translate
     
     brpm         = data.get_brpm()
     brpm_mean    = brpm["mean"]
@@ -986,11 +1033,11 @@ def health_indicators_breath_brpm_results():
     
     html = """
     <div class=col1_indicators>
-        <p>Median</p>
+        <p>""" + translate["median"] + """</p>
         <p class="indicator_main_value">""" + str(brpm_mean) + """ brpm</p>
-        <p>Min</p>
+        <p>""" + translate["min"] + """</p>
         <p class="indicator_value">""" + str(brpm_min) + """ brpm</p>
-        <p>Max</p>
+        <p>""" + translate["max"] + """</p>
         <p class="indicator_value">""" + str(brpm_max) + """ brpm</p>
     </div>
     """
@@ -999,16 +1046,20 @@ def health_indicators_breath_brpm_results():
 
 def health_indicators_breath_brv_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.breath_icon + """'/> 
-        <p>Breath Rate Variability (BRV)</p>
+        <p>""" + translate["health_indicators_breath_brv_title"] + """</p>
     </div>
     """
     
     return html
 
 def health_indicators_breath_brv_results():
+    
+    translate = st.session_state.translate
     
     brv         = data.get_brv()
     brv_mean    = brv["mean"]
@@ -1017,11 +1068,11 @@ def health_indicators_breath_brv_results():
     
     html = """
     <div class=col1_indicators>
-        <p>Median</p>
+        <p>""" + translate["median"] + """</p>
         <p class="indicator_main_value">""" + str(brv_mean) + """ s</p>
-        <p>Min</p>
+        <p>""" + translate["min"] + """</p>
         <p class="indicator_value">""" + str(brv_min) + """ s</p>
-        <p>Max</p>
+        <p>""" + translate["max"] + """</p>
         <p class="indicator_value">""" + str(brv_max) + """ s</p>
     </div>
     """
@@ -1029,6 +1080,8 @@ def health_indicators_breath_brv_results():
     return html
 
 def health_indicators_breath_tachy_brady_inexratio():
+    
+    translate = st.session_state.translate
     
     tachypnea = data.get_tachypnea()
     tachy_mean          = tachypnea["mean"]
@@ -1058,22 +1111,22 @@ def health_indicators_breath_tachy_brady_inexratio():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.tachypnea_alert_icon + """'/> 
-                        <p class='indicator_name'>Tachypnea</p>
+                        <p class='indicator_name'>"""+ translate["tachypnea"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>BR</p>
+                        <p>"""+ translate["br"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(tachy_mean) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Duration</p>
+                        <p>"""+ translate["duration"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(tachy_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Proportion</p>
+                        <p>"""+ translate["proportion"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(tachy_percentage) + """ %</p>
@@ -1086,22 +1139,22 @@ def health_indicators_breath_tachy_brady_inexratio():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.tachypnea_alert_icon + """'/> 
-                        <p class='indicator_name'>Bradypnea</p>
+                        <p class='indicator_name'>"""+ translate["bradypnea"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>BR</p>
+                        <p>"""+ translate["br"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brady_mean) + """ brpm</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Duration</p>
+                        <p>"""+ translate["duration"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brady_duration) + """ min</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Proportion</p>
+                        <p>"""+ translate["proportion"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(brady_percentage) + """ %</p>
@@ -1114,22 +1167,22 @@ def health_indicators_breath_tachy_brady_inexratio():
                 <div class="row">
                     <div class='""" + col_title + """'>
                         <img class=icon src='data:image/png;base64,""" + st.session_state.qt_alert_icon + """'/> 
-                        <p class='indicator_name'>In/Out Length Ratio </p>
+                        <p class='indicator_name'>"""+ translate["inout_length_ratio"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Median</p>
+                        <p>"""+ translate["median"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(inexratio_mean) + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Min</p>
+                        <p>"""+ translate["min"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(inexratio_min) + """</p>
                     </div>
                     <div class='""" + col_key + """'>
-                        <p>Max</p>
+                        <p>"""+ translate["max"] + """</p>
                     </div>
                     <div class='""" + col_val + """'>
                         <p class='""" + class_val + """'>""" + str(inexratio_max) + """</p>
@@ -1144,16 +1197,20 @@ def health_indicators_breath_tachy_brady_inexratio():
 
 def health_indicators_stress_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.stress_icon + """'/> 
-        <p>Stress</p>
+        <p>""" + translate["stress"] + """</p>
     </div>
     """
     
     return html
 
 def health_indicators_stress_results():
+    
+    translate = st.session_state.translate
     
     stress         = data.get_stress()
     stress_duration_rest        = stress["duration_rest"]
@@ -1177,28 +1234,28 @@ def health_indicators_stress_results():
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_rest + """'/> 
                             <p>
-                                Rest <br>
+                                """ + translate["rest"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(stress_duration_rest) + """ min (""" + str(stress_percentage_rest) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_low + """'/>
                             <p>
-                                Low <br>
+                                """ + translate["low"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(stress_duration_low) + """ min (""" + str(stress_percentage_low) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_medium + """'/>
                             <p>
-                                Medium <br>
+                                """ + translate["medium"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(stress_duration_medium) + """ min (""" + str(stress_percentage_medium) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_high + """'/>
                             <p>
-                                High <br>
+                                """ + translate["high"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(stress_duration_high) + """ min (""" + str(stress_percentage_high) + """%)</span>
                             </p>
                         </div>
@@ -1218,10 +1275,12 @@ def health_indicators_stress_results():
 
 def health_indicators_pulseox_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.pulseox_icon + """'/> 
-        <p>Pulse Oxygen</p>
+        <p>""" + translate["pulseox"] + """</p>
     </div>
     """
     
@@ -1255,10 +1314,12 @@ def health_indicators_pulseox_results():
 
 def health_indicators_bodybattery_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.bodybattery_icon + """'/> 
-        <p>Body Battery</p>
+        <p>""" + translate["bodybattery"] + """</p>
     </div>
     """
     
@@ -1266,15 +1327,17 @@ def health_indicators_bodybattery_title():
 
 def health_indicators_bodybattery_results():
     
+    translate = st.session_state.translate
+    
     bodybattery         = data.get_bodybattery()
     bodybattery_high    = bodybattery["high"]
     bodybattery_low     = bodybattery["low"]
     
     html = """
     <div class=col1_indicators>
-        <p>High</p>
+        <p>""" + translate["high"] + """</p>
         <p class="indicator_main_value">""" + str(bodybattery_high) + """ </p>
-        <p>Low</p>
+        <p>""" + translate["low"] + """</p>
         <p class="indicator_value">""" + str(bodybattery_low) + """</p>
     </div>
     """
@@ -1283,16 +1346,20 @@ def health_indicators_bodybattery_results():
 
 def health_indicators_sleep_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.sleep_icon + """'/> 
-        <p>Sleep</p>
+        <p>""" + translate["sleep"] + """</p>
     </div>
     """
     
     return html
 
 def health_indicators_sleep_results():
+    
+    translate = st.session_state.translate
     
     sleep         = data.get_sleep()
     sleep_duration_deep     = sleep["duration_deep"]
@@ -1316,28 +1383,28 @@ def health_indicators_sleep_results():
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_deep + """'/>
                             <p>
-                                Deep <br>
+                                """ + translate["deep"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(sleep_duration_deep) + """ min (""" + str(sleep_percentage_deep) + """%)</span> 
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_light + """'/>
                             <p>
-                                Light <br>
+                                """ + translate["light"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(sleep_duration_light) + """ min (""" + str(sleep_percentage_light) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_rem + """'/>
                             <p>
-                                REM <br>
+                                """ + translate["rem"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(sleep_duration_rem) + """ min (""" + str(sleep_percentage_rem) + """%)</span>
                             </p>
                         </div>
                         <div class="col-12">
                             <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_awake + """'/>
                             <p>
-                                Awake <br>
+                                """ + translate["awake"] + """ <br>
                                 <span class='""" + class_val + """'>""" + str(sleep_duration_awake) + """ min (""" + str(sleep_percentage_awake) + """%)</span> 
                             </p>
                         </div>
@@ -1357,16 +1424,20 @@ def health_indicators_sleep_results():
 
 def health_indicators_temperature_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <img class=icon src='data:image/png;base64,""" + st.session_state.temperature_icon + """'/> 
-        <p>Skin Temperature (T°C)</p>
+        <p>""" + translate["health_indicators_temperature_title"] + """</p>
     </div>
     """
     
     return html
 
 def health_indicators_temperature_results():
+    
+    translate = st.session_state.translate
     
     temperature         = data.get_temperature()
     temperature_mean    = temperature["mean"]
@@ -1375,11 +1446,11 @@ def health_indicators_temperature_results():
     
     html = """
     <div class=col1_indicators>
-        <p>Median</p>
+        <p>""" + translate["median"] + """</p>
         <p class="indicator_main_value">""" + str(temperature_mean) + """ °C</p>
-        <p>Min</p>
+        <p>""" + translate["min"] + """</p>
         <p class="indicator_value">""" + str(temperature_min) + """ °C</p>
-        <p>Max</p>
+        <p>""" + translate["max"] + """</p>
         <p class="indicator_value">""" + str(temperature_max) + """ °C</p>
     </div>
     """
@@ -1388,9 +1459,11 @@ def health_indicators_temperature_results():
 
 def data_report_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div id="data_report" class="main_title">
-        <p>Data Report</p>
+        <p>""" + translate["data_report"] + """</p>
     </div>
     """
     
@@ -1399,9 +1472,11 @@ def data_report_title():
 
 def data_report_download():
     
+    translate = st.session_state.translate
+    
     html = """
     <div>
-        <p>Download the daily data report (PDF):</p>
+        <p>""" + translate["data_report_download"] + """</p>
     </div>
     """
     
@@ -1409,9 +1484,11 @@ def data_report_download():
 
 def definitions_title():
     
+    translate = st.session_state.translate
+    
     html = """
     <div id="definitions" class="main_title">
-        <p>Definitions</p>
+        <p>""" + translate["definitions"] + """</p>
     </div>
     """
     
@@ -1419,30 +1496,32 @@ def definitions_title():
 
 def definitions_period_and_activity():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Period & Activity</p>
+        <p>""" + translate["period_and_activity"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-5">
                 <div class="col-lg-12">
                     <img class=definitions_miniicon src='data:image/png;base64,""" + st.session_state.night + """'/> 
-                    <p><b>Night</b>: From 0am to 6am</p>
+                    <p><b>""" + translate["night"] + """</b>: """ + translate["definition_activity_night"] + """</p>
                 </div>
                 <div class='col-lg-12'>
                     <img class=definitions_miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
-                    <p><b>Day</b>: From 6am to 0pm</p>
+                    <p><b>""" + translate["day"] + """</b>: """ + translate["definition_activity_day"] + """</p>
                 </div>
             </div>
             <div class="col-lg-7">
                 <div class="col-lg-12">
                     <img class=definitions_miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
-                    <p><b>Rest</b>: Resting or low activity during the day</p>
+                    <p><b>""" + translate["rest"] + """</b>: """ + translate["definition_activity_rest"] + """</p>
                 </div>
                 <div class="col-lg-12">
                     <img class=definitions_miniicon src='data:image/png;base64,""" + st.session_state.activity + """'/> 
-                    <p><b>Activity</b>: Moderate or high motion detection</p>
+                    <p><b>""" + translate["activity"] + """</b>: """ + translate["definition_activity_activity"] + """</p>
                 </div>
             </div>
         </div>
@@ -1453,20 +1532,22 @@ def definitions_period_and_activity():
    
 def definitions_alert():
     
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Alert Notification</p>
+        <p>""" + translate["alert"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-12">
                 <div class="col-lg-12">
                     <img class=definitions_miniicon src='data:image/png;base64,""" + st.session_state.alert + """'/> 
-                    <p>A red check box is used to notify at least one alerts</p>
+                    <p>""" + translate["definition_alert_red"] + """</p>
                 </div>
                 <div class='col-lg-12'>
                     <img class=definitions_miniicon src='data:image/png;base64,""" + st.session_state.alert_no + """'/> 
-                    <p>A green check box is used to specify that no alerts were identified</p>
+                    <p>""" + translate["definition_alert_green"] + """</p>
                 </div>
             </div>
         </div>
@@ -1476,53 +1557,55 @@ def definitions_alert():
     return html
 
 def definitions_heart():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Cardiac Indicators</p>
+        <p>""" + translate["cardiology"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-12">
                 <p>
-                    <b>Heart Rate (HR)</b>
+                    <b>""" + translate["health_indicators_heart_bpm_title"] + """</b>
                     <br>
-                    Number of Heart Beats Per Minute
+                    """ + translate["definition_bpm"] + """
                 </p>
                 <p>
-                    <b>HR Resting</b>
+                    <b>""" + translate["hr_resting"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_hr_resting"] + """
                 </p>
                 <p>
-                    <b>HR High</b>
+                    <b>""" + translate["hr_high"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_hr_high"] + """
                 </p>
                 <p>
-                    <b>Heart Rate Variability (HRV)</b>
+                    <b>""" + translate["health_indicators_heart_hrv_title"] + """</b>
                     <br>
-                    Standard deviation of RR intervals on 5min segments
+                    """ + translate["definition_hrv"] + """
                 </p>
                 <p>
-                    <b>HRV Resting</b>
+                    <b>""" + translate["hrv_resting"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_hrv_resting"] + """
                 </p>
                 <p>
-                    <b>QT Length</b>
+                    <b>""" + translate["qt_length"] + """</b>
                     <br>
-                    Time between Q and T waves in milliseconds, normalised by Framingham formula:
-                    1000* (QT/1000 + 0.154*(1-RR))
+                    """ + translate["definition_qt_length"] + """
                 </p>
                 <p>
-                    <b>Tachycardia</b>
+                    <b>""" + translate["tachycardia"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_tachycardia"] + """
                 </p>
                 <p>
-                    <b>Bradycardia</b>
+                    <b>""" + translate["bradycardia"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_bradycardia"] + """
                 </p>
             </div>
         </div>
@@ -1532,6 +1615,9 @@ def definitions_heart():
     return html
 
 def definitions_breath():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
         <p>Respiratory Indicators</p>
@@ -1540,44 +1626,44 @@ def definitions_breath():
         <div class="row">
             <div class="col-lg-12">
                 <p>
-                    <b>Breath Rate (BR)</b>
+                    <b>""" + translate["health_indicators_breath_brpm_title"] + """</b>
                     <br>
-                    Number of Respiratory Cycles Per Minute
+                    """ + translate["definition_brpm"] + """
                 </p>
                 <p>
-                    <b>BR Resting</b>
+                    <b>""" + translate["br_resting"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_br_resting"] + """
                 </p>
                 <p>
-                    <b>BR High</b>
+                    <b>""" + translate["br_high"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_br_high"] + """
                 </p>
                 <p>
-                    <b>Breath Rate Variability (BRV)</b>
+                    <b>""" + translate["health_indicators_breath_brv_title"] + """</b>
                     <br>
-                    Breath Rate Variability. Standard deviation of breath rate
+                    """ + translate["definition_brv"] + """
                 </p>
                 <p>
-                    <b>BRV Resting</b>
+                    <b>""" + translate["brv_resting"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_brv_resting"] + """
                 </p>
                 <p>
-                    <b>Tachypnea</b>
+                    <b>""" + translate["tachypnea"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_tachypnea"] + """
                 </p>
                 <p>
-                    <b>Bradypnea</b>
+                    <b>""" + translate["bradypnea"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_bradypnea"] + """
                 </p>
                 <p>
-                    <b>Breath In / Out Ratio</b>
+                    <b>""" + translate["inout_length_ratio"] + """</b>
                     <br>
-                    ................
+                    """ + translate["definition_inout_length_ratio"] + """
                 </p>
             </div>
         </div>
@@ -1587,17 +1673,20 @@ def definitions_breath():
     return html
 
 def definitions_stress():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Stress</p>
+        <p>""" + translate["stress"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-12">
                 <p>
-                    <b>bleble</b>
+                    <b>""" + translate["stress_score"] + """</b>
                     <br>
-                    ...
+                    """ + translate["definition_stress_score"] + """
                 </p>
             </div>
         </div>
@@ -1607,17 +1696,20 @@ def definitions_stress():
     return html
 
 def definitions_pulseox():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Pulse Ox</p>
+        <p>""" + translate["pulseox"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-12">
                 <p>
-                    <b>bleble</b>
+                    <b>""" + translate["spo2"] + """</b>
                     <br>
-                    ...
+                    """ + translate["definition_spo2"] + """
                 </p>
             </div>
         </div>
@@ -1627,17 +1719,20 @@ def definitions_pulseox():
     return html
 
 def definitions_bodybattery():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Body Battery</p>
+        <p>""" + translate["bodybattery"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-12">
                 <p>
-                    <b>bleble</b>
+                    <b>""" + translate["bodybattery"] + """</b>
                     <br>
-                    ...
+                    """ + translate["definition_bodybattery"] + """
                 </p>
             </div>
         </div>
@@ -1647,17 +1742,20 @@ def definitions_bodybattery():
     return html
 
 def definitions_sleep():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Sleep</p>
+        <p>""" + translate["sleep"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-12">
                 <p>
-                    <b>bleble</b>
+                    <b>""" + translate["sleep_quality"] + """</b>
                     <br>
-                    ...
+                    """ + translate["definition_sleep_quality"] + """
                 </p>
             </div>
         </div>
@@ -1667,17 +1765,20 @@ def definitions_sleep():
     return html
     
 def definitions_temp():
+    
+    translate = st.session_state.translate
+    
     html = """
     <div class="second_title">
-        <p>Skin Temperature</p>
+        <p>""" + translate["temperature"] + """</p>
     </div>
     <div class='definitions_section'>
         <div class="row">
             <div class="col-lg-12">
                 <p>
-                    <b>bleble</b>
+                    <b>""" + translate["health_indicators_temperature_title"] + """</b>
                     <br>
-                    ...
+                    """ + translate["definition_skin_temperature"] + """
                 </p>
             </div>
         </div>

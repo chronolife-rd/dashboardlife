@@ -1,16 +1,9 @@
-from report.excel import excel_result_split
 import streamlit as st
 import pandas as pd
 from io import BytesIO
 import numpy as np
 import template.test as test
-from template.constant import TYPE_RAW_SIGNALS
-from template.constant import TYPE_FILTERED_SIGNALS
-from template.constant import URL_DATA
-from template.constant import URL_USER
-from template.constant import TYPE_SIGNALS
-from template.constant import TYPE_INDICATORS
-from template.constant import MONTHS
+import template.constant as constant
 import requests
 import json
 from pylife.api_functions import map_data
@@ -24,8 +17,8 @@ def get_myendusers():
     
     username    = st.session_state.username
     api_key     = st.session_state.api_key
-    
-    url = URL_USER + "/{userId}".format(userId=username)
+    url_user    = st.session_state.url_user
+    url = url_user + "/{userId}".format(userId=username)
 
     reply = requests.get(url, headers={"X-API-Key": api_key})
     message, status_code = test.api_status(reply)
@@ -42,10 +35,94 @@ def get_myendusers():
             except:
                 pass
         myendusers = myendusers_new
-    else: 
-        st.error(message)
     
     st.session_state.myendusers = myendusers
+    
+    return message, status_code
+
+def get_bodybattery():
+    
+    datas = st.session_state.garmin_data
+    output = {}
+    output["high"]  = datas["body_battery"]["highest"]
+    output["low"]   = datas["body_battery"]["lowest"]
+    
+    return output
+
+def get_calories():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["total"]    = datas["calories"]["total"]
+    output["rest"]     = datas["calories"]["resting"]
+    output["active"]   = datas["calories"]["active"]
+    
+    return output
+
+def get_intensity():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["total"]       = datas["intensity_min"]["total"]
+    output["moderate"]    = datas["intensity_min"]["moderate"]
+    output["vigurous"]    = datas["intensity_min"]["vigurous"]
+    
+    return output
+
+def get_sleep():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["score"]             = datas["sleep"]["score"]
+    output["quality"]           = datas["sleep"]["quality"]
+    output["duration"]          = datas["sleep"]["recorded_time"]
+    
+    output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
+    output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
+    output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
+    output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
+    
+    output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
+    output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
+    output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
+    output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
+    
+    return output
+
+def get_spo2():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["mean"]      = datas["spo2"]["averege"]
+    output["min"]       = datas["spo2"]["lowest"]
+    output["values"]    = datas["spo2"]["all_values"]
+    
+    return output
+
+def get_stress():
+    
+    datas = st.session_state.garmin_data
+    
+    output = {}
+    output["score"]             = datas["stress"]["score"]
+    
+    output["duration"]          = datas["stress"]["recorded_time"]
+    
+    output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
+    output["duration_low"]      = int(round(datas["stress"]["low"]/60))
+    output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
+    output["duration_high"]     = int(round(datas["stress"]["high"]/60))
+    
+    output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
+    output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
+    output["percentage_medium"] = int(round(datas["stress"]["medium"]/datas["stress"]["recorded_time"]*100))
+    output["percentage_high"]   = int(round(datas["stress"]["high"]/datas["stress"]["recorded_time"]*100))
+    
+    return output
 
 def get_duration_chronolife():
     
@@ -79,81 +156,12 @@ def get_steps():
     
     return output
 
-def get_sleep():
-    
-    output = {}
-    output["score"]             = 92
-    output["duration"]          = 7*60
-    output["percentage_deep"]   = 30
-    output["percentage_light"]  = 50
-    output["percentage_rem"]    = 15
-    output["percentage_awake"]  = 5
-    output["duration_deep"]     = int(output["percentage_deep"]/100*output["duration"])
-    output["duration_light"]    = int(output["percentage_light"]/100*output["duration"])
-    output["duration_rem"]      = int(output["percentage_rem"]/100*output["duration"])
-    output["duration_awake"]    = int(output["percentage_awake"]/100*output["duration"])
-    
-    return output
-
 def get_temperature():
     
     output = {}
     output["mean"]  = 35.4
     output["min"]   = 33.4
     output["max"]   = 37.1
-    
-    return output
-
-def get_bodybattery():
-    
-    output = {}
-    output["high"]  = 95
-    output["low"]   = 5
-    
-    return output
-
-def get_spo2():
-    
-    output = {}
-    output["mean"]  = 95
-    output["min"]   = 80
-    
-    return output
-
-def get_stress():
-    
-    output = {}
-    output["mean"]              = 34
-    output["min"]               = 10
-    output["max"]               = 65
-    
-    output["duration"]          = 7*60
-    output["percentage_rest"]   = 30
-    output["percentage_low"]    = 50
-    output["percentage_medium"] = 15
-    output["percentage_high"]   = 5
-    output["duration_rest"]     = int(output["percentage_rest"]/100*output["duration"])
-    output["duration_low"]      = int(output["percentage_low"]/100*output["duration"])
-    output["duration_medium"]   = int(output["percentage_medium"]/100*output["duration"])
-    output["duration_high"]     = int(output["percentage_high"]/100*output["duration"])
-    
-    return output
-
-def get_calories():
-    
-    output = {}
-    output["total"]    = 4234
-    output["rest"]     = 817
-    output["active"]   = output["total"] - output["rest"]
-    
-    return output
-
-def get_intensity():
-    
-    output = {}
-    output["total"]       = 45
-    output["moderate"]    = 20
-    output["vigorous"]    = 13
     
     return output
 
@@ -297,10 +305,10 @@ def get_tachypnea():
 def get_smart_textile_indicators():
     
     indicators  = []
-    url         = URL_DATA
+    url         = st.session_state.url_data
     api_key     = st.session_state.api_key
     user        = st.session_state.end_user
-    types       = TYPE_INDICATORS
+    types       = constant.TYPE()["INDICATORS"]
     date        = st.session_state.date
     
     params = {
@@ -326,7 +334,7 @@ def get_smart_textile_indicators():
         
         # --- Map raw data 
         indicators = {}
-        types_indicators    = TYPE_INDICATORS.split(',')
+        types_indicators    = constant.TYPE()["INDICATORS"].split(',')
         results_mapped      = map_results(datas, types_indicators)
         
         for key_type in types_indicators:
@@ -340,10 +348,10 @@ def get_smart_textile_indicators():
 def get_smart_textile_raw_data():
     
     raw_data    = []
-    url         = URL_DATA
+    url         = st.session_state.url_data
     api_key     = st.session_state.api_key
     user        = st.session_state.end_user
-    types       = TYPE_SIGNALS
+    types       = constant.TYPE()["SIGNALS"]
     date        = st.session_state.date
     time_gte    = st.session_state.start_time + ":00"
     time_lt     = st.session_state.end_time + ":00"
@@ -372,7 +380,7 @@ def get_smart_textile_raw_data():
     if status_code == 200:
         # --- Map raw data 
         raw_data = {}
-        types_raw       = TYPE_RAW_SIGNALS.split(',')
+        types_raw       = constant.TYPE()["RAW_SIGNALS"].split(',')
         datas_mapped = map_data(datas, types_raw)
         
         for key_type in types_raw:
@@ -382,7 +390,7 @@ def get_smart_textile_raw_data():
                 raw_data[key_type][val_type] = tmp[val_type]
         
         # --- Map filtered data 
-        types_filtered  = TYPE_FILTERED_SIGNALS.split(',')
+        types_filtered  = constant.TYPE()["FILTERED_SIGNALS"].split(',')
         datas_filtered_mapped = map_data_filt(datas, types_filtered)
         for key_type in types_filtered:
             raw_data[key_type] = {}
@@ -421,13 +429,21 @@ def datetime2str(duration):
     return duration
     
 def get_sessions(end_user, year, month):
+    
+    translate = st.session_state.translate
+    
     """
     """
     
-    url         = URL_DATA
+    url         = st.session_state.url_data
     api_key     = st.session_state.api_key
-    
-    from_date = str(year) + "-" + MONTHS[month]
+
+    year = str(year)     
+    if month < 10:
+        month = "0" + str(month)
+    else:
+        month = str(month)
+    from_date = year + "-" + month
     to_date = np.datetime64(from_date) + np.timedelta64(1, 'M')
     to_date = np.datetime64(str(to_date) + "-01") - np.timedelta64(1, 'D')
     from_date += "-01"
@@ -531,7 +547,7 @@ def get_sessions(end_user, year, month):
 
     # %
     data    = [user_ids_s, days_s, starts_s, ends_s, durations_s]
-    columns = ['End User', 'Date', 'Start (UTC)', 'Stop (UTC)', 'Duration']
+    columns = [translate["enduser_id"], translate["date"], translate["start"], translate["stop"], translate["duration"]]
 
     df = pd.DataFrame(np.array(data).T, columns=columns)
     
