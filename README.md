@@ -25,7 +25,7 @@
           <li>Get the list of end users in the scope of the Dashoard user account</li>
           <li>Get the table of the sessions. <span style="color: orange;">Warning: Garmin sessions must be added!</span></li>
       </ul>
-  <li>
+    </li>
 </ul>
 
 <h3>pylife/</h3>
