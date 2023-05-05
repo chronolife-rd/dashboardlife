@@ -4,7 +4,8 @@ import template.html as html
 import template.chart as chart 
 import template.session as session 
 import template.test as test
-import data.data_controller as data
+import template.data_controller as data
+import template.download as download
 # import template.data.chronolife_data as chronolife_data
 # import template.data.garmin_data as garmin_data
 
@@ -311,10 +312,15 @@ def smart_textile_raw_data():
             if error:
                 st.session_state.form_raw_layout.warning(translate["message_no_data"])
             else:    
-                download_text_layout = st.empty()
-                download_button_layout = st.empty()
-                download_text_layout.markdown(html.smart_textile_raw_data_download(), unsafe_allow_html=True)
-                smart_textile_raw_data_download_button = download_button_layout.button(translate["download"], key="download_smart_textile_raw_data")
+                # Convert raw data to excel 
+                data = download.raw_data_to_excel()
+                st.markdown(html.smart_textile_raw_data_download(), unsafe_allow_html=True)
+                # Download Health indicators data
+                st.download_button(
+                    label=translate["download"],
+                    data=data,
+                    file_name=('Smart_Textile_Raw_Data.xlsx'),
+                ) 
                 
     st.markdown("---")
                 
@@ -367,7 +373,16 @@ def health_indicators():
     
     st.markdown(html.health_indicators_title(), unsafe_allow_html=True)
     st.markdown(html.health_indicators_download(), unsafe_allow_html=True)
-    health_indicator_download_button = st.button(translate["download"], key="download_health_indicators")
+    
+    # Convert health indicators dataframe to excel 
+    data = download.health_indicators_to_excel()
+    
+    # Download Health indicators data
+    st.download_button(
+        label=translate["download"],
+        data=data,
+        file_name=('Health_indicators.xlsx'),
+    ) 
     tab_heart, tab_breath, tab_stress, tab_pulseox, tab_bodybattery, tab_sleep, tab_temp = st.tabs([translate["cardiology"], 
                                                                                                   translate["respiratory"], 
                                                                                                   translate["stress"],
@@ -410,7 +425,7 @@ def health_indicators():
         health_indicators_temperature()
         
     st.markdown("---")
-
+    
 def health_indicators_heart_bpm():
     st.markdown(html.health_indicators_heart_bpm_title(), unsafe_allow_html=True)
     col1, col2 = st.columns([1,2])
@@ -505,7 +520,15 @@ def data_report():
 
     st.markdown(html.data_report_title(), unsafe_allow_html=True)
     st.markdown(html.data_report_download(), unsafe_allow_html=True)
-    data_report_download_button = st.button(translate['download'], key="download_data_report")
+    
+    # Convert raw data to excel 
+    data = download.data_report_pdf()
+    # Download Health indicators data
+    st.download_button(
+        label=translate["download"],
+        data=data,
+        file_name=('Data_Report.pdf'),
+    ) 
     
     st.markdown("---")
     

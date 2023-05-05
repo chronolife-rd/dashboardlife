@@ -1,10 +1,13 @@
 import streamlit as st
 
+
+PDF_FILE = "data/pdf_results/result.pdf"
+
 def TYPE():
     TYPE = {}
-    TYPE["ECG"]                 = "ecg"
-    TYPE["BREATH_THORACIC"]     = "breath_1"
-    TYPE["BREATH_ABDOMINAL"]    = "breath_2"
+    TYPE["ECG"]                 = "ecg_filtered"
+    TYPE["BREATH_THORACIC"]     = "breath_1_filtered"
+    TYPE["BREATH_ABDOMINAL"]    = "breath_2_filtered"
     TYPE["ACCELERATION_X"]      = "accx"
     TYPE["ACCELERATION_Y"]      = "accy"
     TYPE["ACCELERATION_Z"]      = "accz"

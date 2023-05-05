@@ -25,6 +25,10 @@ def get_health_indicators():
     date        = st.session_state.date
     prod        = st.session_state.prod
     
+    garmin_data = []
+    cst_data    = []
+    commun_data = []
+    
     # Start timer    
     user_id_cst = "7k6Hs3"
     date_cst = "2022-09-09"
@@ -50,34 +54,34 @@ def get_health_indicators():
     begin = time.time()
     user_id_garmin = "6o2Fzp" 
     date_garmin = '2023-05-02'
+    
+    # garmin_data = get_garmin_data(
+    #     user_id = end_user, 
+    #     date = date,
+    #     prod = prod
+    #     )
 
-    garmin_data = get_garmin_data(
-        user_id = end_user, 
-        date = date,
-        prod = prod
-        )
+    # # Time intervals
+    # garmin_time_intervals = garmin_data['duration']['collected']
 
-    # Time intervals
-    garmin_time_intervals = garmin_data['duration']['collected']
+    # # End timer
+    # end = time.time()
+    # print('Time taken to get Garmin data:',round((end-begin)/60,2),'min')
 
-    # End timer
-    end = time.time()
-    print('Time taken to get Garmin data:',round((end-begin)/60,2),'min')
+    # # % -------------------------- Construct PDF --------------------------------
+    # # Format CST's text that will be added to pdf 
+    # cst_data_pdf = cst_data_for_pdf(user_id_cst, date_cst, cst_data)
 
-    # % -------------------------- Construct PDF --------------------------------
-    # Format CST's text that will be added to pdf 
-    cst_data_pdf = cst_data_for_pdf(user_id_cst, date_cst, cst_data)
+    # # Format Garmin's text that will be added to pdf 
+    # garmin_data_pdf = garmin_data_for_pdf(garmin_data)
 
-    # Format Garmin's text that will be added to pdf 
-    garmin_data_pdf = garmin_data_for_pdf(garmin_data)
+    # # %
+    # # Compute commun indicators: cardio, respiration and steps
+    # commun_data, commun_data_pdf, steps_dict = commun_data_for_pdf(cst_data, garmin_data) 
 
-    # %
-    # Compute commun indicators: cardio, respiration and steps
-    commun_data, commun_data_pdf, steps_dict = commun_data_for_pdf(cst_data, garmin_data) 
-
-    # Plot and save graphs
-    plot_images(garmin_data, steps_dict, cst_time_intervals, 
-                garmin_time_intervals, date_cst)
+    # # Plot and save graphs
+    # plot_images(garmin_data, steps_dict, cst_time_intervals, 
+    #             garmin_time_intervals, date_cst)
     
     st.session_state.garmin_indicators      = garmin_data
     st.session_state.chronolife_indicators  = cst_data
@@ -93,9 +97,10 @@ def get_bodybattery():
     output["high"]  = ""
     output["low"]   = ""
     
-    if datas["body_battery"]["highest"] is not None:
-        output["high"]  = datas["body_battery"]["highest"]
-        output["low"]   = datas["body_battery"]["lowest"]
+    if len(datas) > 0:
+        if datas["body_battery"]["highest"] is not None:
+            output["high"]  = datas["body_battery"]["highest"]
+            output["low"]   = datas["body_battery"]["lowest"]
     
     return output
 
@@ -109,10 +114,11 @@ def get_calories():
     output["rest"]     = ""
     output["active"]   = ""
     
-    if datas["calories"]["total"] is not None:
-        output["total"]    = datas["calories"]["total"]
-        output["rest"]     = datas["calories"]["resting"]
-        output["active"]   = datas["calories"]["active"]
+    if len(datas) > 0:
+        if datas["calories"]["total"] is not None:
+            output["total"]    = datas["calories"]["total"]
+            output["rest"]     = datas["calories"]["resting"]
+            output["active"]   = datas["calories"]["active"]
     
     return output
 
@@ -125,10 +131,11 @@ def get_intensity():
     output["moderate"]    = ""
     output["vigurous"]    = ""
     
-    if datas["intensity_min"]["total"] is not None:
-        output["total"]       = datas["intensity_min"]["total"]
-        output["moderate"]    = datas["intensity_min"]["moderate"]
-        output["vigurous"]    = datas["intensity_min"]["vigurous"]
+    if len(datas) > 0:
+        if datas["intensity_min"]["total"] is not None:
+            output["total"]       = datas["intensity_min"]["total"]
+            output["moderate"]    = datas["intensity_min"]["moderate"]
+            output["vigurous"]    = datas["intensity_min"]["vigurous"]
     
     return output
 
@@ -150,19 +157,20 @@ def get_sleep():
     output["percentage_rem"]    = ""
     output["percentage_awake"]  = ""
     
-    if datas["sleep"]["score"] is not None:
-        output["score"]             = datas["sleep"]["score"]
-        output["quality"]           = datas["sleep"]["quality"]
-        output["duration"]          = datas["sleep"]["recorded_time"]
-        output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
-        output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
-        output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
-        output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
-        
-        output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
-        output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
-        output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
-        output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
+    if len(datas) > 0:
+        if datas["sleep"]["score"] is not None:
+            output["score"]             = datas["sleep"]["score"]
+            output["quality"]           = datas["sleep"]["quality"]
+            output["duration"]          = datas["sleep"]["recorded_time"]
+            output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
+            output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
+            output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
+            output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
+            
+            output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
+            output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
+            output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
+            output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
     
     return output
 
@@ -175,10 +183,11 @@ def get_spo2():
     output["min"]       = ""
     output["values"]    = ""
     
-    if datas["spo2"]["averege"] is not None:
-        output["mean"]      = datas["spo2"]["averege"]
-        output["min"]       = datas["spo2"]["lowest"]
-        output["values"]    = datas["spo2"]["all_values"]
+    if len(datas) > 0:
+        if datas["spo2"]["averege"] is not None:
+            output["mean"]      = datas["spo2"]["averege"]
+            output["min"]       = datas["spo2"]["lowest"]
+            output["values"]    = datas["spo2"]["all_values"]
     
     return output
 
@@ -198,20 +207,20 @@ def get_stress():
     output["percentage_medium"] = ""
     output["percentage_high"]   = ""
     
-    if datas["stress"]["score"] is not None:
-        output["score"]             = datas["stress"]["score"]
-        output["duration"]          = datas["stress"]["recorded_time"]
-        output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
-        output["duration_low"]      = int(round(datas["stress"]["low"]/60))
-        output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
-        output["duration_high"]     = int(round(datas["stress"]["high"]/60))
+    if len(datas) > 0:
+        if datas["stress"]["score"] is not None:
+            output["score"]             = datas["stress"]["score"]
+            output["duration"]          = datas["stress"]["recorded_time"]
+            output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
+            output["duration_low"]      = int(round(datas["stress"]["low"]/60))
+            output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
+            output["duration_high"]     = int(round(datas["stress"]["high"]/60))
+            
+            output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
+            output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
+            output["percentage_medium"] = int(round(datas["stress"]["medium"]/datas["stress"]["recorded_time"]*100))
+            output["percentage_high"]   = int(round(datas["stress"]["high"]/datas["stress"]["recorded_time"]*100))
         
-        output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
-        output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
-        output["percentage_medium"] = int(round(datas["stress"]["medium"]/datas["stress"]["recorded_time"]*100))
-        output["percentage_high"]   = int(round(datas["stress"]["high"]/datas["stress"]["recorded_time"]*100))
-        
-    
     return output
 
 def get_duration_chronolife():
@@ -481,28 +490,6 @@ def get_tachypnea():
     st.session_state.tachycardia_alert_icon = tachycardia_alert_icon
     
     return output
-
-# @st.cache
-def convert_data_to_excel(data_acc, data_breath, data_ecg, data_temp):
-    # !!! TO BE UPDATED !!!
-    # Cache the conversion to prevent computation on every rerun
-    indicators = st.session_state.indicators.copy()
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    data_acc.to_excel(writer, index=False, sheet_name='Acceleration')
-    data_breath.to_excel(writer, index=False, sheet_name='Breath')
-    data_ecg.to_excel(writer, index=False, sheet_name='ECG')
-    data_temp.to_excel(writer, index=False, sheet_name='Skin Temperature')
-    if indicators is not None:
-        indicators = indicators.drop(columns=['sma_values'])
-        indicators.to_excel(writer, index=False, sheet_name='Indicators')
-    workbook = writer.book
-    worksheet = writer.sheets['Acceleration']
-    format1 = workbook.add_format({'num_format': '0.00'}) 
-    worksheet.set_column('A:A', None, format1)  
-    writer.save()
-    processed_data = output.getvalue()
-    return processed_data
 
 def get_myendusers():
     
