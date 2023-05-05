@@ -1,6 +1,6 @@
 def translate():
     translate = {}
-    translate['loading']                    = "Loading..."
+    
     translate['choose_language']            = "Choose language"
     translate["header_title"]               = "Smart Textile Dashboard"
     translate["language_label"]             = "Language"

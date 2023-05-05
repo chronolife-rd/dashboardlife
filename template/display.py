@@ -377,7 +377,7 @@ def form_smart_textile_raw_data():
     form_raw_layout = st.empty()
     form_raw_layout = st.form("raw_form")
     form_raw_layout.write(translate["smart_textile_raw_data_select_time"])
-    col1, col2, col3, col4 = form_raw_layout.columns([3,3,3,6])
+    col1, col2, col3, col4 = form_raw_layout.columns([3,3,6,3])
     
     form_hour = col1.selectbox(
     translate["hour"],
