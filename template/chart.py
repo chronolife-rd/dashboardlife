@@ -1,8 +1,8 @@
 import streamlit as st
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
-import template.data as data
-import template.chronolife_data as chronolife_data
+import data.data_controller as data
+import tmp.chronolife_data as chronolife_data
 import template.constant as constant 
 from pylife.useful import unwrap
 from scipy.signal import medfilt
@@ -682,8 +682,8 @@ def sleep_donut():
         plt.text(0, -.5, quality, fontsize=20, color=constant.COLORS()["text"],
                  horizontalalignment='center')
     
-    plt.savefig("images/sleep_donut.png", transparent=True)
-    st.session_state.sleep_donut = img_to_bytes('images/sleep_donut.png')
+    plt.savefig("template/images/sleep_donut.png", transparent=True)
+    st.session_state.sleep_donut = img_to_bytes('template/images/sleep_donut.png')
     
 def spo2_donut():
     
@@ -743,8 +743,8 @@ def spo2_donut():
         plt.polar(rad, 1, '.', color="white")
     plt.axis('off')
     
-    plt.savefig("images/spo2_donut.png", transparent=True)
-    st.session_state.spo2_donut = img_to_bytes('images/spo2_donut.png')
+    plt.savefig("template/images/spo2_donut.png", transparent=True)
+    st.session_state.spo2_donut = img_to_bytes('template/images/spo2_donut.png')
     
 def steps_donut():
     
@@ -779,8 +779,8 @@ def steps_donut():
     p=plt.gcf()
     p.gca().add_artist(my_circle)
     
-    plt.savefig("images/steps_donut.png", transparent=True)
-    st.session_state.steps_donut = img_to_bytes('images/steps_donut.png')
+    plt.savefig("template/images/steps_donut.png", transparent=True)
+    st.session_state.steps_donut = img_to_bytes('template/images/steps_donut.png')
     
 def stress_donut():
     
@@ -828,5 +828,5 @@ def stress_donut():
         plt.text(0, -.3, translate["overall"], fontsize=30, color=constant.COLORS()["text"],
                  horizontalalignment='center')
     
-    plt.savefig("images/stress_donut.png", transparent=True)
-    st.session_state.stress_donut = img_to_bytes('images/stress_donut.png')
+    plt.savefig("template/images/stress_donut.png", transparent=True)
+    st.session_state.stress_donut = img_to_bytes('template/images/stress_donut.png')

@@ -71,9 +71,6 @@ def init():
     if 'al' not in st.session_state:
             st.session_state.al = None
     
-    if 'indicators' not in st.session_state:
-            st.session_state.indicators = None
-            
     if 'end_users_list' not in st.session_state:
             st.session_state.end_users_list = None
             
@@ -105,106 +102,106 @@ def init():
             st.session_state.smart_textile_raw_data = None
             
     if 'background_wave' not in st.session_state:
-        st.session_state.background_wave = img_to_bytes('images/background_wave.png')
+        st.session_state.background_wave = img_to_bytes('template/images/background_wave.png')
             
     if 'logo_clife_white' not in st.session_state:
-        st.session_state.logo_clife_white = img_to_bytes('images/logo_clife_white.png')
+        st.session_state.logo_clife_white = img_to_bytes('template/images/logo_clife_white.png')
     
     if 'night' not in st.session_state:
-        st.session_state.night = img_to_bytes('images/night.png')
+        st.session_state.night = img_to_bytes('template/images/night.png')
 
     if 'day' not in st.session_state:
-        st.session_state.day = img_to_bytes('images/day.png')
+        st.session_state.day = img_to_bytes('template/images/day.png')
 
     if 'rest' not in st.session_state:
-        st.session_state.rest = img_to_bytes('images/rest.png')
+        st.session_state.rest = img_to_bytes('template/images/rest.png')
 
     if 'activity' not in st.session_state:
-        st.session_state.activity = img_to_bytes('images/activity.png')
+        st.session_state.activity = img_to_bytes('template/images/activity.png')
 
     if 'tshirt_right' not in st.session_state:
-        st.session_state.tshirt_right = img_to_bytes('images/tshirt_right.png')
+        st.session_state.tshirt_right = img_to_bytes('template/images/tshirt_right.png')
     
     if 'garrmin' not in st.session_state:
-        st.session_state.garrmin = img_to_bytes('images/garrmin.png')
+        st.session_state.garrmin = img_to_bytes('template/images/garrmin.png')
     
     if 'alert' not in st.session_state:
-        st.session_state.alert = img_to_bytes('images/alert.png')
+        st.session_state.alert = img_to_bytes('template/images/alert.png')
     
     if 'alert_no' not in st.session_state:
-        st.session_state.alert_no = img_to_bytes('images/alert_no.png')
+        st.session_state.alert_no = img_to_bytes('template/images/alert_no.png')
     
     if 'heart_icon' not in st.session_state:
-        st.session_state.heart_icon = img_to_bytes('images/heart.png')
+        st.session_state.heart_icon = img_to_bytes('template/images/heart.png')
     
     if 'breath_icon' not in st.session_state:
-        st.session_state.breath_icon = img_to_bytes('images/breath.png')
+        st.session_state.breath_icon = img_to_bytes('template/images/breath.png')
     
     if 'steps_icon' not in st.session_state:
-        st.session_state.steps_icon = img_to_bytes('images/steps.png')
+        st.session_state.steps_icon = img_to_bytes('template/images/steps.png')
 
     if 'stress_icon' not in st.session_state:
-        st.session_state.stress_icon = img_to_bytes('images/stress.png')
+        st.session_state.stress_icon = img_to_bytes('template/images/stress.png')
     
     if 'stress_rest' not in st.session_state:
-        st.session_state.stress_rest = img_to_bytes('images/stress_rest.png')
+        st.session_state.stress_rest = img_to_bytes('template/images/stress_rest.png')
     
     if 'stress_low' not in st.session_state:
-        st.session_state.stress_low = img_to_bytes('images/stress_low.png')
+        st.session_state.stress_low = img_to_bytes('template/images/stress_low.png')
     
     if 'stress_medium' not in st.session_state:
-        st.session_state.stress_medium = img_to_bytes('images/stress_medium.png')
+        st.session_state.stress_medium = img_to_bytes('template/images/stress_medium.png')
         
     if 'stress_high' not in st.session_state:
-        st.session_state.stress_high = img_to_bytes('images/stress_high.png')
+        st.session_state.stress_high = img_to_bytes('template/images/stress_high.png')
         
     if 'pulseox_icon' not in st.session_state:
-        st.session_state.pulseox_icon = img_to_bytes('images/pulseox.png')
+        st.session_state.pulseox_icon = img_to_bytes('template/images/pulseox.png')
         
     if 'spo2_green' not in st.session_state:
-        st.session_state.spo2_green = img_to_bytes('images/spo2_green.png')
+        st.session_state.spo2_green = img_to_bytes('template/images/spo2_green.png')
 
     if 'spo2_yellow' not in st.session_state:
-        st.session_state.spo2_yellow = img_to_bytes('images/spo2_yellow.png')
+        st.session_state.spo2_yellow = img_to_bytes('template/images/spo2_yellow.png')
 
     if 'spo2_orange' not in st.session_state:
-        st.session_state.spo2_orange = img_to_bytes('images/spo2_orange.png')
+        st.session_state.spo2_orange = img_to_bytes('template/images/spo2_orange.png')
     
     if 'spo2_red' not in st.session_state:
-        st.session_state.spo2_red = img_to_bytes('images/spo2_red.png')
+        st.session_state.spo2_red = img_to_bytes('template/images/spo2_red.png')
         
     if 'sleep_icon' not in st.session_state:
-        st.session_state.sleep_icon = img_to_bytes('images/sleep.png')
+        st.session_state.sleep_icon = img_to_bytes('template/images/sleep.png')
     
     if 'sleep_deep' not in st.session_state:
-        st.session_state.sleep_deep = img_to_bytes('images/sleep_deep.png')
+        st.session_state.sleep_deep = img_to_bytes('template/images/sleep_deep.png')
         
     if 'sleep_light' not in st.session_state:
-        st.session_state.sleep_light = img_to_bytes('images/sleep_light.png')    
+        st.session_state.sleep_light = img_to_bytes('template/images/sleep_light.png')    
         
     if 'sleep_rem' not in st.session_state:
-        st.session_state.sleep_rem = img_to_bytes('images/sleep_rem.png')
+        st.session_state.sleep_rem = img_to_bytes('template/images/sleep_rem.png')
     
     if 'sleep_awake' not in st.session_state:
-        st.session_state.sleep_awake = img_to_bytes('images/sleep_awake.png')
+        st.session_state.sleep_awake = img_to_bytes('template/images/sleep_awake.png')
         
     if 'calories_icon' not in st.session_state:
-        st.session_state.calories_icon = img_to_bytes('images/calories.png')
+        st.session_state.calories_icon = img_to_bytes('template/images/calories.png')
     
     if 'intensity_icon' not in st.session_state:
-        st.session_state.intensity_icon = img_to_bytes('images/intensity_minutes.png')
+        st.session_state.intensity_icon = img_to_bytes('template/images/intensity_minutes.png')
     
     if 'bodybattery_icon' not in st.session_state:
-        st.session_state.bodybattery_icon = img_to_bytes('images/body_battery.png')
+        st.session_state.bodybattery_icon = img_to_bytes('template/images/body_battery.png')
         
     if 'temperature_icon' not in st.session_state:
-        st.session_state.temperature_icon = img_to_bytes('images/temperature.png')
+        st.session_state.temperature_icon = img_to_bytes('template/images/temperature.png')
         
     if 'to_top' not in st.session_state:
-        st.session_state.to_top = img_to_bytes('images/to_top.png')
+        st.session_state.to_top = img_to_bytes('template/images/to_top.png')
         
     if 'user_icon' not in st.session_state:
-        st.session_state.user_icon = img_to_bytes('images/user.png')
+        st.session_state.user_icon = img_to_bytes('template/images/user.png')
         
     if 'stress_donut' not in st.session_state:
         st.session_state.stress_donut = None
@@ -218,9 +215,15 @@ def init():
     if 'steps_donut' not in st.session_state:
         st.session_state.steps_donut = None
         
-    if 'garmin_data' not in st.session_state:
-        st.session_state.garmin_data = []
-        
+    if 'garmin_indicators' not in st.session_state:
+        st.session_state.garmin_indicators = []
+    
+    if 'chronolife_indicators' not in st.session_state:
+            st.session_state.chronolife_indicators = []
+            
+    if 'commun_indicators' not in st.session_state:
+            st.session_state.commun_indicators = []
+            
     if 'translate' not in st.session_state:
         st.session_state.translate = ''
         

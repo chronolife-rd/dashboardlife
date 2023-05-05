@@ -4,9 +4,9 @@ import template.html as html
 import template.chart as chart 
 import template.session as session 
 import template.test as test
-import template.data as data
-import template.chronolife_data as chronolife_data
-import template.garmin_data as garmin_data
+import data.data_controller as data
+# import template.data.chronolife_data as chronolife_data
+# import template.data.garmin_data as garmin_data
 
 def run():
     """
@@ -252,7 +252,7 @@ def form_indicators():
     # Date picker
     date = c1.date_input(translate["date"], max_value=datetime.datetime.now(), key="ksd")
     # User ID input
-    end_user = c2.text_input(translate["enduser_id"],"6o2Fzp") #5P4svk, 6o2Fzp
+    end_user = c2.text_input(translate["enduser_id"],"5Nwwut") #5P4svk, 6o2Fzp, 5Nwwut
     
     # Show button
     form_indicators_submit = form_indicators_layout.form_submit_button(translate["submit"])
@@ -269,11 +269,12 @@ def form_indicators():
         st.session_state.form_indicators_layout = form_indicators_layout
         st.session_state.form_indicators_submit = form_indicators_submit
         
-        chronolife_data.get_smart_textile_indicators()
-        garmin_data.get_garmin_data()
+        # chronolife_data.get_chronolife_indicators()
+        # garmin_data.get_garmin_indicators()
+        data.get_health_indicators()
         
-        # if len(st.session_state.smart_textile_indicators) > 0 or len(st.session_state.garmin_data) > 0:
-        if len(st.session_state.smart_textile_indicators) > 0:
+        # if len(st.session_state.chronolife_indicators) > 0 or len(st.session_state.garmin_indicators) > 0:
+        if len(st.session_state.chronolife_indicators) > 0:
             st.session_state.is_data = True
         else:
             st.session_state.is_data = False

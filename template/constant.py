@@ -1,14 +1,10 @@
-import os
-from PIL import Image
 import streamlit as st
-
-URL_ROOT    = "https://preprod.chronolife.net/api/2"
 
 def TYPE():
     TYPE = {}
-    TYPE["ECG"]                 = "ecg_filtered"
-    TYPE["BREATH_THORACIC"]     = "breath_1_filtered"
-    TYPE["BREATH_ABDOMINAL"]    = "breath_2_filtered"
+    TYPE["ECG"]                 = "ecg"
+    TYPE["BREATH_THORACIC"]     = "breath_1"
+    TYPE["BREATH_ABDOMINAL"]    = "breath_2"
     TYPE["ACCELERATION_X"]      = "accx"
     TYPE["ACCELERATION_Y"]      = "accy"
     TYPE["ACCELERATION_Z"]      = "accz"
@@ -20,10 +16,10 @@ def TYPE():
                                                TYPE["BREATH_ABDOMINAL"])
     TYPE["SIGNALS"]            = (TYPE["RAW_SIGNALS"] + "," + 
                                                TYPE["FILTERED_SIGNALS"])
-    TYPE["HEARTBEAT"]          = "heartbeat"
-    TYPE["INDICATORS"]         = (TYPE["HEARTBEAT"])
+    # TYPE["HEARTBEAT"]          = "heartbeat"
+    TYPE["CHRONOLIFE_INDICATORS"]         = 'heartbeat,HRV,respiratory_rate,averaged_activity,steps_number' 
     
-    TYPE["GARMIN"]             = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pulseox'
+    TYPE["GARMIN_INDICATORS"]             = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pulseox'
     TYPE["SLEEP"]              = 'sleeps'
     
     return TYPE

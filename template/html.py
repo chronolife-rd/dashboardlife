@@ -1,8 +1,7 @@
 import streamlit as st
-import template.data as data
+import data.data_controller as data
 import template.chart as chart
 from template.version import VERSION
-from template.util import img_to_bytes
 
 def head():
     
