@@ -12,8 +12,14 @@
 <h3>.streamlit/config.toml</h3>
 <p>Global config of streamlit</p>
 
+<h3>garmin_automatic_reports/</h3>
+<p>Copy of the github repository "garmin_automatic_reports" maintained by the Data Scientist team to request Chronolife and Garmin indicators using the REST API</p>
+
 <h3>data/</h3>
-<p>Copy of the github repository "garmin_automatic_reports" maintained by the Data Scientist team to request data using the REST API</p>
+<ul>
+  <li>cst_raw_data.py : request CST raw data using the REST API</li>
+  <li>data.py : data controller comming from the <i>garmin_automatic_reports/</i> folder</li>
+</ul>
 
 <h3>pylife/</h3>
 <p>Copy of the github repository "pylife" maintained by the Data Scientist team to manage data (to be cleaned by the Data Science team)</p>
@@ -25,7 +31,6 @@
   <li>languages/ : manage languages</li>
   <li>contant.py : store all constants of the project</li>
   <li>css.py : custom styles</li>
-  <li>data_controller.py : control data comming from the <i>data/</i> folder</li>
   <li>display.py : main file for displaying with streamlit methods </li>
   <li>download.py : parse data and create downloadable file for streamlit </li>
   <li>html.py : custom html </li>
