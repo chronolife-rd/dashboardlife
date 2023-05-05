@@ -10,15 +10,13 @@ import template.download as download
 # import template.data.garmin_data as garmin_data
 
 def run():
-    """
-    Main function of the layer display
-    """
+    """ Main function of the layer display """
     
     # Call translate global variable
     translate = st.session_state.translate
     
     # Language
-    form_language()
+    set_language()
     
     # Head (html balise)
     head()
@@ -39,10 +37,10 @@ def run():
         myendusers()
         
         # Enduser sessions form
-        form_enduser_sessions()
+        form_sessions()
         
         # Indicators form
-        form_indicators()
+        form_data()
         
         if st.session_state.is_data:
             with st.spinner(translate["spinner_loading"]):
@@ -78,15 +76,19 @@ def run():
     footer()
 
 def head():
+    """ Call CSS head """
     st.markdown(html.head(), unsafe_allow_html=True)
     
 def header():
+    """ Display header """
     st.markdown(html.header(), unsafe_allow_html=True)
     
 def footer():
+    """ Display footer """
     st.markdown(html.footer(), unsafe_allow_html=True)
 
-def form_language():
+def set_language():
+    """ Manage language """
     
     # Create layout for the label of the selectbox
     language_label_layout = st.sidebar.empty()
@@ -110,15 +112,14 @@ def form_language():
         
         
 def profile():
+    """ Display profile in sidebar """
     
     st.sidebar.markdown(html.profile(), unsafe_allow_html=True)
     # Add an horizontal line
     st.sidebar.markdown("---")
     
-# def button_scroll_to_top():
-#     st.markdown(html.button_scroll_to_top(), unsafe_allow_html=True)
-    
 def login():
+    """ Display profile in sidebar """
     
     translate = st.session_state.translate
     
@@ -134,7 +135,7 @@ def login():
     
     if button_login:
         
-        # !!! Debug code !!! 
+        # !!! TO BE UPDATED !!!
         if env == "preprod":
             st.session_state.prod = False
     
@@ -160,27 +161,31 @@ def login():
                 if status_code_username == 200:
                     st.session_state.is_logged = True
             
+            # Hide login form after connection or display error message
             if st.session_state.is_logged:
                 layout_login.empty()
             else:
                 login_form.error(message)
                 
 def logout():
-    
+    """ Display logout button """
     translate = st.session_state.translate
     
+    # Display logout button
     layout_logout = st.sidebar.empty()
     logout_submit = layout_logout.button(translate["logout"])
-    
     st.session_state.logout_submit = logout_submit
 
 def myendusers():
+    """ Display endusers """
     
     translate = st.session_state.translate
     
-    # ----- Parameters selection -----
+    # Create expander
     _, col_form, _= st.columns([1,4,1])
     expander_endusers = col_form.expander(translate["my_endusers_title"], expanded=False)
+    
+    # Display endusers on 3 columns
     c1,c2,c3 = expander_endusers.columns(3)
     cnt=1
     if len(st.session_state.myendusers) > 0:
@@ -192,84 +197,102 @@ def myendusers():
             elif cnt==3:
                 col=c3
                 cnt=0
-            col.markdown("""
-                          <span class="enduser">""" + end_user_id + """</span>
-                          """, unsafe_allow_html=True)
-            
+            col.markdown("""<span class="enduser">""" + end_user_id + """</span>""", unsafe_allow_html=True)
             cnt+=1
     else:
-        expander_endusers.info("No end user found")
+        expander_endusers.info(translate["no_enduser"])
                 
-def form_enduser_sessions():
+def form_sessions():
+    """ Display and process sessions """
     
     translate = st.session_state.translate
     
-    _, col_form, _= st.columns([1,4,1])
-    title = translate["form_sessions_title"]  
-    sessions_exp = col_form.expander(title, expanded=False)
-    form_sessions = sessions_exp.form("form_sessions")
+    # Create expander
+    _, col_form, _  = st.columns([1,4,1])
+    title           = translate["form_sessions_title"]  
+    sessions_exp    = col_form.expander(title, expanded=False)
+    form_sessions   = sessions_exp.form("form_sessions")
+    
+    # ----- Create Session form ----- 
     c1, c2, c3 = form_sessions.columns(3)
     
-    today = datetime.datetime.now()
-    year0 = 2020
-    years = range(year0, today.year+1)
-    year = c1.selectbox(translate["year"], years, index=years.index(today.year))
-    
-    months                  = translate["months"] 
-    month                   = c2.selectbox(translate["month"], months, index=today.month-1)
+    # Current Date 
+    today   = datetime.datetime.now()
+    # Minimum year in selectbox
+    year0   = 2020
+    # Years in selectbox
+    years   = range(year0, today.year+1)
+    year    = c1.selectbox(translate["year"], years, index=years.index(today.year))
+    # Selectbox for months
+    month                   = c2.selectbox(translate["month"], translate["months"], index=today.month-1)
+    # End user input
     end_user                = c3.text_input(translate["enduser_id"])
+    # Submit button
     form_sessions_submit    = form_sessions.form_submit_button(translate["search"])
     
     if form_sessions_submit:
         with st.spinner((translate["spinner_getting_sessions"])):
+            # Test end user input
             message, error = test.end_user(end_user, form_sessions)
             if error:
                 form_sessions.error(message)
                 return
-            month_index = translate["months"].index(month)+1
-            enduser_sessions = data.get_sessions(year=year, month=month_index, end_user=end_user)
-            enduser_sessions = enduser_sessions.set_axis(range(1, 1+len(enduser_sessions)), axis='index') # begin index at 1
+            
+            # Get selected month index for datetime conversion
+            month_index         = translate["months"].index(month)+1
+            # Get sessions
+            enduser_sessions    = data.get_sessions(year=year, month=month_index, end_user=end_user)
+            # Reset table indexes beginning to 1 instead of 0
+            enduser_sessions    = enduser_sessions.set_axis(range(1, 1+len(enduser_sessions)), axis='index') # begin index at 1
+            # Save enduser sessions
             st.session_state.enduser_sessions = enduser_sessions 
-    
+            
+        # Display enduser sessions or error message
         if enduser_sessions is not None:
             if len(enduser_sessions) > 0:
                 sessions_exp.write(enduser_sessions)
             else:
                 sessions_exp.info(translate["message_no_session"])
 
-
-def form_indicators():
+def form_data():
+    """ Display and process data """
     
     translate = st.session_state.translate
     
-    # ----- Parameters selection -----
+    # Create expander
     _, col_form, _= st.columns([1,4,1])
     title = translate["form_indicator_title"] 
     sessions_exp = col_form.expander(title, expanded=False)
-    form_indicators_layout = sessions_exp.form("data_form")
     
-    c1, c2 = form_indicators_layout.columns(2)
-    
+    # Create data form
+    form_data_layout = sessions_exp.form("data_form")
+    c1, c2 = form_data_layout.columns(2)
     # Date picker
     date = c1.date_input(translate["date"], max_value=datetime.datetime.now(), key="ksd")
     # User ID input
     end_user = c2.text_input(translate["enduser_id"],"5Nwwut") #5P4svk, 6o2Fzp, 5Nwwut
     
-    # Show button
-    form_indicators_submit = form_indicators_layout.form_submit_button(translate["submit"])
+    # Submit button
+    form_data_submit = form_data_layout.form_submit_button(translate["submit"])
     
-    if form_indicators_submit:
+    if form_data_submit:
+        # Test end user
+        message, error = test.end_user(end_user, form_data_layout)
         
-        message, error = test.end_user(end_user, form_indicators_layout)
+        # Display error
         if error:
-            form_indicators_layout.error(message)
+            form_data_layout.error(message)
             return
-
+        
+        # Save variables
         st.session_state.date                   = date.strftime("%Y-%m-%d")
         st.session_state.end_user               = end_user
-        st.session_state.form_indicators_layout = form_indicators_layout
-        st.session_state.form_indicators_submit = form_indicators_submit
+        st.session_state.form_data_layout       = form_data_layout
+        st.session_state.form_data_submit       = form_data_submit
         
+        
+        # !!! TO BE UPDATED !!!
+        # ---- Manage is_data flag -----
         # chronolife_data.get_chronolife_indicators()
         # garmin_data.get_garmin_indicators()
         data.get_health_indicators()
@@ -279,9 +302,11 @@ def form_indicators():
             st.session_state.is_data = True
         else:
             st.session_state.is_data = False
-            form_indicators_layout.warning(translate["message_no_data"])
+            form_data_layout.warning(translate["message_no_data"])
 
 def menu():
+    """ Display vertical menu """
+    
     st.sidebar.markdown(html.menu_overview(), unsafe_allow_html=True)
     st.sidebar.markdown(html.menu_smart_textile_raw_data(), unsafe_allow_html=True)
     st.sidebar.markdown(html.menu_health_indicators(), unsafe_allow_html=True)
@@ -289,42 +314,61 @@ def menu():
     st.sidebar.markdown(html.menu_definitions(), unsafe_allow_html=True)
 
 def overview():
+    """ Display overview section """
+    
+    # Display title
     st.markdown(html.overview_title(), unsafe_allow_html=True)
+    
+    # Display data collection sub section
     st.markdown(html.overview_data_collection(), unsafe_allow_html=True)
     
+    # Display duration chart
     fig = chart.duration()
     config = {'displayModeBar': True}
     st.plotly_chart(fig, config=config, use_container_width=True)
     
+    # Display health indicators overview sub section
     st.markdown(html.overview_health_indicators(), unsafe_allow_html=True)
+    
     st.markdown("---")
     
 def smart_textile_raw_data():
+    """ Display smart textile raw data section """
     
     translate = st.session_state.translate
     
+    # Display title
     st.markdown(html.smart_textile_raw_data_title(), unsafe_allow_html=True)
+    
+    # Display form
     form_smart_textile_raw_data()
     
+    # Display raw data
     if st.session_state.form_raw_submit:
         with st.spinner(translate["spinner_smart_textile_raw_data"]):
+            # Display raw data charts
             error = chart.smart_textile_raw_data()
+            
+            # Display download button or warning message
             if error:
                 st.session_state.form_raw_layout.warning(translate["message_no_data"])
+            
             else:    
+                
+                st.markdown(html.smart_textile_raw_data_download(), unsafe_allow_html=True)
+                
                 # Convert raw data to excel 
                 data = download.raw_data_to_excel()
-                st.markdown(html.smart_textile_raw_data_download(), unsafe_allow_html=True)
-                # Download Health indicators data
-                st.download_button(
-                    label=translate["download"],
-                    data=data,
-                    file_name=('Smart_Textile_Raw_Data.xlsx'),
-                ) 
                 
+                # Download Health indicators data
+                st.download_button(label=translate["download"],
+                                   data=data,
+                                   file_name=('Smart_Textile_Raw_Data.xlsx'),
+                                   ) 
     st.markdown("---")
                 
 def form_smart_textile_raw_data():
+    """ Display raw data form """
     
     translate = st.session_state.translate
     
@@ -368,6 +412,7 @@ def form_smart_textile_raw_data():
     st.session_state.form_raw_submit = form_raw_submit
     
 def health_indicators():
+    """ Display health indicators section """
     
     translate = st.session_state.translate
     
@@ -427,6 +472,7 @@ def health_indicators():
     st.markdown("---")
     
 def health_indicators_heart_bpm():
+    """ Display bpm in health indicators section """
     st.markdown(html.health_indicators_heart_bpm_title(), unsafe_allow_html=True)
     col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_heart_bpm_results(), unsafe_allow_html=True)
@@ -436,6 +482,7 @@ def health_indicators_heart_bpm():
     col2.plotly_chart(fig, config=config, use_container_width=True)
 
 def health_indicators_heart_hrv():
+    """ Display hrv in health indicators section """
     st.markdown(html.health_indicators_heart_hrv_title(), unsafe_allow_html=True)
     col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_heart_hrv_results(), unsafe_allow_html=True)
@@ -445,9 +492,11 @@ def health_indicators_heart_hrv():
     col2.plotly_chart(fig, config=config, use_container_width=True)
     
 def health_indicators_heart_tachy_brady_qt():
+    """ Display alerts and data for tachy/brady and QT in health indicators section """
     st.markdown(html.health_indicators_heart_tachy_brady_qt(), unsafe_allow_html=True)
     
 def health_indicators_breath_brpm():
+    """ Display brpm in health indicators section """
     st.markdown(html.health_indicators_breath_brpm_title(), unsafe_allow_html=True)
     col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_breath_brpm_results(), unsafe_allow_html=True)
@@ -457,6 +506,7 @@ def health_indicators_breath_brpm():
     col2.plotly_chart(fig, config=config, use_container_width=True)
 
 def health_indicators_breath_brv():
+    """ Display brv in health indicators section """
     st.markdown(html.health_indicators_breath_brv_title(), unsafe_allow_html=True)
     col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_breath_brv_results(), unsafe_allow_html=True)
@@ -466,10 +516,11 @@ def health_indicators_breath_brv():
     col2.plotly_chart(fig, config=config, use_container_width=True)
     
 def health_indicators_breath_tachy_brady_inexratio():
-    
+    """ Display alerts and data for tachy/brady and ratio breath in/out in health indicators section """
     st.markdown(html.health_indicators_breath_tachy_brady_inexratio(), unsafe_allow_html=True)
     
 def health_indicators_temperature():
+    """ Display temperature in health indicators section """
     st.markdown(html.health_indicators_temperature_title(), unsafe_allow_html=True)
     col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_temperature_results(), unsafe_allow_html=True)
@@ -479,6 +530,7 @@ def health_indicators_temperature():
     col2.plotly_chart(fig, config=config, use_container_width=True)
     
 def health_indicators_stress():
+    """ Display stress in health indicators section """
     st.markdown(html.health_indicators_stress_title(), unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     col1.markdown(html.health_indicators_stress_results(), unsafe_allow_html=True)
@@ -488,6 +540,7 @@ def health_indicators_stress():
     col2.plotly_chart(fig, config=config, use_container_width=True)
     
 def health_indicators_pulseox():
+    """ Display pulseox in health indicators section """
     st.markdown(html.health_indicators_pulseox_title(), unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     col1.markdown(html.health_indicators_pulseox_results(), unsafe_allow_html=True)
@@ -497,6 +550,7 @@ def health_indicators_pulseox():
     col2.plotly_chart(fig, config=config, use_container_width=True)
 
 def health_indicators_bodybattery():
+    """ Display body battery in health indicators section """
     st.markdown(html.health_indicators_bodybattery_title(), unsafe_allow_html=True)
     col1, col2 = st.columns([1,2])
     col1.markdown(html.health_indicators_bodybattery_results(), unsafe_allow_html=True)
@@ -506,6 +560,7 @@ def health_indicators_bodybattery():
     col2.plotly_chart(fig, config=config, use_container_width=True)
     
 def health_indicators_sleep():
+    """ Display sleep in health indicators section """
     st.markdown(html.health_indicators_sleep_title(), unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     col1.markdown(html.health_indicators_sleep_results(), unsafe_allow_html=True)
@@ -515,7 +570,7 @@ def health_indicators_sleep():
     col2.plotly_chart(fig, config=config, use_container_width=True)
 
 def data_report():
-    
+    """ Display data report section """
     translate = st.session_state.translate
 
     st.markdown(html.data_report_title(), unsafe_allow_html=True)
@@ -533,7 +588,7 @@ def data_report():
     st.markdown("---")
     
 def definitions():
-    
+    """ Display definitions section """
     translate = st.session_state.translate
     
     st.markdown(html.definitions_title(), unsafe_allow_html=True)

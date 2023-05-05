@@ -179,5 +179,6 @@ def translate():
     translate["definition_skin_temperature"]    = "..."
     
     translate["no_data"]                        = "Aucune Donnée"
+    translate["no_enduser"]                     = "Aucun utilisateur"
     
     return translate
