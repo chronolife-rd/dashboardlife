@@ -16,9 +16,16 @@
 <p>Copy of the github repository "garmin_automatic_reports" maintained by the Data Scientist team to request Chronolife and Garmin indicators using the REST API</p>
 
 <h3>data/</h3>
+<p><i>Note: One may consider to optimize the architecture of this folder</i></p>
 <ul>
   <li>cst_raw_data.py : request CST raw data using the REST API</li>
-  <li>data.py : data controller comming from the <i>garmin_automatic_reports/</i> folder</li>
+  <li>data.py : 
+      <ul>
+          <li>Data controller comming from the <i>garmin_automatic_reports/</i> folder</li>
+          <li>Get the list of end users in the scope of the Dashoard user account</li>
+          <li>Get the table of the sessions. <span style="color: orange;">Warning: Garmin sessions must be added!</span></li>
+      </ul>
+  <li>
 </ul>
 
 <h3>pylife/</h3>
