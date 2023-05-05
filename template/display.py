@@ -4,7 +4,7 @@ import template.html as html
 import template.chart as chart 
 import template.session as session 
 import template.test as test
-import template.data_controller as data
+import data.data as data
 import template.download as download
 # import template.data.chronolife_data as chronolife_data
 # import template.data.garmin_data as garmin_data

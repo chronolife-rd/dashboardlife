@@ -9,14 +9,13 @@ from pylife.api_functions import map_results
 from pylife.api_functions import get_result_info
 from pylife.useful import unwrap
 import time
-from data.api2_get_cst_data import get_cst_data
-from data.api2_get_garmin_data import get_garmin_data
+from garmin_automatic_reports.api2_get_cst_data import get_cst_data
+from garmin_automatic_reports.api2_get_garmin_data import get_garmin_data
 
-# from template.data.generate_pdf import generate_pdf
-from data.garmin_data_for_pdf import garmin_data_for_pdf
-from data.cst_data_for_pdf import cst_data_for_pdf
-from data.commun_data_for_pdf import commun_data_for_pdf
-from data.plot_images import plot_images
+from garmin_automatic_reports.garmin_data_for_pdf import garmin_data_for_pdf
+from garmin_automatic_reports.cst_data_for_pdf import cst_data_for_pdf
+from garmin_automatic_reports.commun_data_for_pdf import commun_data_for_pdf
+from garmin_automatic_reports.plot_images import plot_images
 
 
 def get_health_indicators():

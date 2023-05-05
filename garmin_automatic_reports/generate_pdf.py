@@ -6,8 +6,8 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4
 from PyPDF2 import PdfFileWriter, PdfFileReader, PdfMerger
 
-from config import PATH_PDF, PATH_SAVE_IMG
-from config import GarminIndicator, CstIndicator, CommunIndicator, Alert, ImageForPdf
+from garmin_automatic_reports.config import PATH_PDF, PATH_SAVE_IMG
+from garmin_automatic_reports.config import GarminIndicator, CstIndicator, CommunIndicator, Alert, ImageForPdf
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------

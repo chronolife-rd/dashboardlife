@@ -1,5 +1,5 @@
 import streamlit as st
-import template.data_controller as data
+import data.data as data
 import template.chart as chart
 from template.version import VERSION
 

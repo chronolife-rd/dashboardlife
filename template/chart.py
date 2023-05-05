@@ -1,8 +1,8 @@
 import streamlit as st
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
-import template.data_controller as data
-import tmp.chronolife_data as chronolife_data
+import data.data as data
+import data.cst_raw_data as cst_raw_data
 import template.constant as constant 
 from pylife.useful import unwrap
 from scipy.signal import medfilt
@@ -524,7 +524,7 @@ def duration():
 
 def smart_textile_raw_data(layout=False):
 
-    chronolife_data.get_smart_textile_raw_data()
+    cst_raw_data.get_raw_data()
     
     error = False
     if len(st.session_state.smart_textile_raw_data) == 0:

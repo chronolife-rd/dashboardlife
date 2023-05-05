@@ -5,8 +5,8 @@ import requests
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from data.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
-from data.config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD, GARMIN_SIGNAL_TYPES
+from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
+from garmin_automatic_reports.config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD, GARMIN_SIGNAL_TYPES
 
 # Constants
 date = '2023-05-04'

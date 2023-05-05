@@ -5,7 +5,7 @@ Created on Thu Apr 27 17:29:37 2023
 @author: aterman
 """
 import numpy as np
-from data.config import DELTA_TIME
+from garmin_automatic_reports.config import DELTA_TIME
 
 # ---------- Functions for computing durations of wearing the device ----------
 

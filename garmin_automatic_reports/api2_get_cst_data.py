@@ -6,9 +6,9 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta
 
-from data.useful_functions import find_time_intervals, sum_time_intervals
-from data.config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD, CST_SIGNAL_TYPES
-from data.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
+from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals
+from garmin_automatic_reports.config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD, CST_SIGNAL_TYPES
+from garmin_automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
 
 user_id = "5Nwwut"
 date = "2023-05-04"
