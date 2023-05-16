@@ -5,17 +5,13 @@ import requests
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
-from garmin_automatic_reports.config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD, GARMIN_SIGNAL_TYPES
-
-# Constants
-date = '2023-05-04'
-user_id = "6o2Fzp" 
+from useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
+from config import GARMIN_SIGNAL_TYPES
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
 # Request user's data from servers
-def get_garmin_data(user_id, date, prod):
+def get_garmin_data(user_id, date, api, url):
 
     # Build the query parameters object
     params = {
@@ -25,23 +21,18 @@ def get_garmin_data(user_id, date, prod):
          }
     
     # Request data from servers
-    reply = request_data_from_servers(params, prod)
+    reply = request_data_from_servers(params, api, url)
     # Convert the reply content into a json object
     datas = error_management(date, reply)
     # Organize the data in a dictionary 
-    result_dict = save_datas_in_dict(date, user_id, datas, prod)
+    result_dict = save_datas_in_dict(date, user_id, datas, api, url)
 
     return result_dict
    
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
-def request_data_from_servers(params, prod):
-    if prod == True :
-        api = API_KEY_PROD
-        url = URL_GARMIN_PROD
-    else :
-        api = API_KEY_PREPROD
-        url = URL_GARMIN_PREPROD
+def request_data_from_servers(params, api, url):
+
         
     # Perform the POST request authenticated with YOUR API key (NOT the one of
     # the sub-user!).
@@ -73,33 +64,320 @@ def error_management(date, reply):
     
     return datas
 
-def save_datas_in_dict(date, user_id, datas, prod) -> dict :
+def save_datas_in_dict(date, user_id, datas, api, url) -> dict :
     # Save the results in a dictionary
     results_dict = initialize_dictionary_with_template()
     # User id
     results_dict['user_id']  = user_id
     # Activity 
     add_activity(datas, results_dict['activity'])
-    # Calories 
-    add_calories(datas, results_dict['calories'])
-    # Intensity minutes
-    add_intensity_minutes(datas, results_dict['intensity_min'])
-    # Stress
-    add_stress(datas, results_dict['stress'])
-    # Cardio 
-    add_cardio(datas, results_dict['cardio'])
-    # Breath
-    add_breath(datas, results_dict['breath'])
-    # Spo2 
-    add_spo2(datas, results_dict['spo2'])
     # Body battery
     add_body_battery(datas, results_dict["body_battery"])
-    # Sleep
-    add_sleep(date, user_id, datas, results_dict['sleep'], prod)
+    # Breath
+    add_breath(datas, results_dict['breath'])
+    # Calories 
+    add_calories(datas, results_dict['calories'])
+    # Cardio 
+    add_cardio(datas, results_dict['cardio'])
     # Compute durations
     add_durations(date, results_dict)
+    # Intensity minutes
+    add_intensity_minutes(datas, results_dict['intensity_min'])
+    # Sleep
+    add_sleep(date, user_id, datas, results_dict['sleep'], api, url)
+
+    # Spo2 
+    add_spo2(datas, results_dict['spo2'])
+    # Stress
+    add_stress(datas, results_dict['stress'])
 
     return copy.deepcopy(results_dict)
+
+def add_activity(datas, activity_dict):
+    if datas_exist(datas, result_type = 'dailies'):
+        activity_dict["goal"] = get_garmin_result_info(datas, result_type =\
+                            'dailies', output_type = 'stepsGoal')   
+        activity_dict["steps"] = get_garmin_result_info(datas, result_type =\
+                            'dailies', output_type = 'steps')   
+        activity_dict["distance"] = get_garmin_result_info(datas, result_type =\
+                            'dailies', output_type = 'distanceInMeters')  
+
+        activity_dict['intensity'] = get_garmin_activity_indicator(datas,
+                            result_type = 'epochs')
+
+def add_body_battery(datas, body_battery_dict):
+    if datas_exist(datas, result_type = 'stressDetails'):
+        start_time = get_garmin_result_info(datas=datas, result_type =\
+                            'stressDetails', output_type = 'mtimestamp')
+        values = get_garmin_result_info(datas=datas, result_type =\
+                        'stressDetails', output_type = 'timeOffsetBodyBatteryValues')
+        values_df = convert_dict_to_df(values, start_time)
+        body_battery_dict["all_values"] = values_df
+        if len(values):
+            body_battery_dict["highest"] = max(values_df['values'])
+            body_battery_dict["lowest"] = min(values_df['values'])
+
+def add_breath(datas, breath_dict):
+    if datas_exist(datas, result_type = 'allDayRespiration'):
+        result_type = 'allDayRespiration'
+        output_type = 'timeOffsetEpochToBreaths'
+        df_output = pd.DataFrame()
+        for data in datas:
+            if data['type'] == result_type:
+                start_time = data['value']['mtimestamp']
+                values_dict = data['value'][output_type]
+                df_temp = convert_dict_to_df(values_dict, start_time)
+                df_output = pd.concat([df_output, df_temp])
+        df_output.sort_values(by='times', inplace=True)
+        df_output = df_output.reset_index(drop = True)         
+        breath_dict['rate'] = df_output
+        
+def add_calories(datas, calories_dict):
+    if datas_exist(datas, result_type = 'dailies'):
+        calories_dict["resting"] = get_garmin_result_info(datas, result_type =\
+                            'dailies', output_type = 'bmrKilocalories')
+        calories_dict["active"] = get_garmin_result_info(datas, result_type =\
+                            'dailies', output_type = 'activeKilocalories')
+        calories_dict["total"] = calories_dict["resting"]+calories_dict["active"]
+
+def add_cardio(datas, cardio_dict):
+    if datas_exist(datas, result_type = 'dailies'):
+        start_time = get_garmin_result_info(datas=datas, result_type =\
+                            'dailies', output_type = 'mtimestamp')
+        cardio_data = get_garmin_result_info(datas=datas, result_type =\
+                            'dailies', output_type = 'timeOffsetHeartRateSamples')
+    
+        cardio_dict['rate'] = convert_dict_to_df(cardio_data, start_time)
+    
+def add_durations(date, results_dict):
+    # Times constants
+    YEAR = int(date[:4])
+    M = int(date[5:7])
+    D = int(date[8:10])
+    NIGHT_LIMIT = datetime(YEAR, M, D, 6, 0, 0)
+
+    ref_df = results_dict['cardio']['rate']
+
+    day_times    = ref_df.loc[ref_df["times"] > NIGHT_LIMIT,
+                               "times"].reset_index(drop=True)
+    night_times  = ref_df.loc[ref_df["times"] < NIGHT_LIMIT, 
+                                    "times"].reset_index(drop=True)
+    
+    time_intervals = find_time_intervals(ref_df['times'])
+    day_time_intervals = find_time_intervals(day_times)
+    night_time_intervals = find_time_intervals(night_times)
+
+    duration_dict = results_dict["duration"]
+    duration_dict["intervals"] = time_intervals
+    duration_dict["collected"] = sum_time_intervals(time_intervals)
+    duration_dict["day"] = sum_time_intervals(day_time_intervals)
+    duration_dict["night"] = sum_time_intervals(night_time_intervals)
+
+    df = results_dict['activity']['intensity'] 
+    rest_duration_df = df.loc[df['intensity'] == 'SEDENTARY', 'duration']
+    medium_duration_df = df.loc[df['intensity'] == 'ACTIVE', 'duration']
+    high_duration_df = df.loc[df['intensity'] == 'HIGHLY_ACTIVE', 'duration']
+
+    duration_dict["rest"] = timedelta_formatter(sum(rest_duration_df))
+    duration_dict["active"] = timedelta_formatter(sum(medium_duration_df) \
+                                                  + sum(high_duration_df))
+
+def add_intensity_minutes(datas, intensity_min_dict):
+    if datas_exist(datas, result_type = 'dailies'):
+        intensity_min_dict["moderate"] = get_garmin_result_info(datas, result_type =\
+                        'dailies', output_type = 'moderateIntensityDurationInSeconds')
+        intensity_min_dict["vigurous"] = get_garmin_result_info(datas, result_type =\
+                        'dailies', output_type = 'vigorousIntensityDurationInSeconds')
+        intensity_min_dict["total"] = intensity_min_dict["moderate"] +\
+                                    intensity_min_dict["vigurous"] 
+
+def add_sleep(date, user_id, datas, sleep_dict, api, url):
+    value_dict = get_sleep_data(date, user_id, datas, api, url)
+    timestamp_end = value_dict['startTimeInSeconds'] + value_dict['durationInSeconds']
+    sleep_dict["timestamp_end"] = datetime.fromtimestamp(timestamp_end)
+    sleep_dict["sleep_map"] = value_dict['sleepLevelsMap']
+    sleep_dict["score"] = value_dict['overallSleepScore']['value']   
+    sleep_dict["quality"] = value_dict['overallSleepScore']['qualifierKey']            
+    sleep_dict["deep"] = value_dict['deepSleepDurationInSeconds']
+    sleep_dict["light"] = value_dict['lightSleepDurationInSeconds']
+    sleep_dict["rem"] = value_dict['remSleepInSeconds']
+    sleep_dict["awake"] = value_dict[ 'awakeDurationInSeconds']
+    sleep_dict["recorded_time"] = sleep_dict["deep"] + sleep_dict["light"] +\
+                                  sleep_dict["rem"] + sleep_dict["awake"]
+
+def add_spo2(datas, spo2_dict):
+    if datas_exist(datas, result_type = 'pulseox'):
+        start_time = get_garmin_result_info(datas, result_type =\
+                            'pulseox', output_type = 'mtimestamp')
+        
+        values = get_garmin_result_info(datas, result_type =\
+                            'pulseox', output_type = 'timeOffsetSpo2Values')
+        values_df = convert_dict_to_df(values, start_time)
+
+        spo2_dict["all_values"] = values_df
+        spo2_dict["averege"] = round(np.mean(values_df['values']))
+        spo2_dict["lowest"] = min(values_df['values'])
+
+def add_stress(datas, stress_dict):
+    start_time = get_garmin_result_info(datas, result_type =\
+                        'stressDetails', output_type = 'mtimestamp')
+    values = get_garmin_result_info(datas, result_type =\
+                        'stressDetails', output_type = 'timeOffsetStressLevelValues')
+    stress_dict["all_values"] = convert_dict_to_df(values, start_time)
+    stress_dict["score"] = get_garmin_result_info(datas, result_type =\
+                        'dailies', output_type = 'averageStressLevel')
+    stress_dict["rest"] = get_garmin_result_info(datas, result_type =\
+                        'dailies', output_type = 'restStressDurationInSeconds')
+    stress_dict["low"] = get_garmin_result_info(datas, result_type =\
+                        'dailies', output_type = 'lowStressDurationInSeconds')
+    stress_dict["medium"] = get_garmin_result_info(datas, result_type =\
+                        'dailies', output_type = 'mediumStressDurationInSeconds')
+    stress_dict["high"] = get_garmin_result_info(datas, result_type =\
+                        'dailies', output_type = 'highStressDurationInSeconds')
+    stress_dict["recorded_time"] = stress_dict["rest"] + stress_dict["low"] +\
+                                   stress_dict["medium"] + stress_dict["high"]
+
+def datas_exist(datas, result_type):
+    output = False
+    for data in datas:
+        if data['type'] == result_type:
+            output = True
+            break
+    return output
+
+def get_garmin_result_info(datas, result_type, output_type):
+    output = 0
+    for data in datas:
+        if data['type'] == result_type:
+            value_dict = data['value']
+            if output_type in value_dict:
+                output = value_dict[output_type] 
+    return output
+
+def get_garmin_activity_indicator(datas, result_type):
+    i = 0
+    df_output = pd.DataFrame(columns = ['times', 'intensity', 'duration', 'steps', 'distance'])
+    for data in datas:
+        if data['type'] == result_type:
+            garmin_data = data['value']
+            start_time = garmin_data['mtimestamp']
+            start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
+
+            list_of_dict = garmin_data['value']
+            for dict_i in list_of_dict:
+                intensity = dict_i['intensity']
+                steps = dict_i['steps']
+                duration_in_s = dict_i['activeTimeInSeconds']
+                distance_in_m =  dict_i['distanceInMeters']
+                df_temp = pd.DataFrame({
+                    'times': start_time,
+                    'intensity': intensity, 
+                    'duration': duration_in_s,
+                    'steps' : steps,
+                    'distance' : distance_in_m
+                    }, index = [i])
+                df_output = pd.concat([df_output, df_temp])
+                i +=1
+    df_output.sort_values(by='times', inplace=True)
+    df_output = df_output.reset_index(drop = True)  
+
+    return  df_output
+    
+def get_sleep_data(date, user_id, datas, api, url) -> dict:
+    result_type = 'sleeps'
+    value_dict = init_sleep_dict_tamplate()
+    there_is_sleeps_batch = False
+
+    # Hypothesis: sleep batches are in chronological order
+    for data in datas:
+        # If this is a 'sleeps' batch 
+        if data['type'] == result_type:
+            there_is_sleeps_batch = True
+            # Get the timestamp_end of the sleep batch
+            timestamp_end = data['mtimestamp_end'][:10]
+            # If timestamp_end = date
+            if timestamp_end == date:
+                # Get value dictionary that contains all sleep info
+                value_dict = data['value']
+                # Break loop
+                break
+
+            # if timestamp_end != date, request data for the day before
+            else:
+                date_before = change_date(date, sign = -1)
+                value_dict = get_sleep_of_day_before(date, date_before, user_id, api, url)
+
+    # If there is no sleep batch in datas, get the datas of day before
+    if there_is_sleeps_batch == False:
+        date_before = change_date(date, sign = -1)
+        value_dict = get_sleep_of_day_before(date, date_before, user_id, api, url)
+
+    return copy.deepcopy(value_dict)
+
+def change_date(date:str, sign:int) -> str:
+    date_today = datetime.strptime(date, "%Y-%m-%d")
+    new_date = date_today + sign*timedelta(days=1)
+    new_date =  datetime.strftime(new_date, "%Y-%m-%d")
+    return new_date
+
+def get_sleep_of_day_before(date, date_before, user_id, api, url):
+    value_dict = init_sleep_dict_tamplate()
+    result_type = 'sleeps'
+
+    # Build the query parameters object
+    params = {
+        'user'    : user_id,   
+        'types'   : result_type,
+        'date'    : date_before,
+        }
+    # Request data from servers
+    reply = request_data_from_servers(params, api, url)
+    # Convert the reply content into a json object
+    datas_day_before = error_management(date, reply)
+    # Get the sleep of the day before
+    for data in datas_day_before:
+        if data['type'] == result_type:
+            timestamp_end = data['mtimestamp_end'][:10]
+
+            # If timestamp_end = date, get value ductionary
+            if timestamp_end == date:
+                value_dict = data['value']
+
+    return copy.deepcopy(value_dict)
+
+def init_sleep_dict_tamplate():
+    output = {
+        'startTimeInSeconds' : 0,
+        'durationInSeconds' : 0,
+        'sleepLevelsMap' : 0,
+        'overallSleepScore' : {
+            'value' : 0,
+            'qualifierKey' : 'no data',
+        },
+        'deepSleepDurationInSeconds' : 0,
+        'lightSleepDurationInSeconds' : 0,
+        'remSleepInSeconds' : 0,
+        'awakeDurationInSeconds' : 0,
+    }
+    return output
+
+def convert_dict_to_df(signal_data, start_time) -> pd.DataFrame:
+    start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
+    output = pd.DataFrame.from_dict(signal_data, orient='index', columns=['values'])
+
+    # Get the offsets
+    offsets = output.index
+    # Add times column to the dataframe
+    output['times'] = np.nan
+    # Reset the index
+    output = output.reset_index(drop = True)
+
+    for i in range(len(offsets)):
+        offset = timedelta(seconds = int(offsets[i]))
+        output.loc[i, 'times'] = start_time + offset
+    output.reset_index(drop=True)
+    
+    return copy.deepcopy(output)
 
 def initialize_dictionary_with_template() -> dict :  
     activity_dict = {
@@ -128,7 +406,7 @@ def initialize_dictionary_with_template() -> dict :
         'intervals' : None, 
         'collected' : None,
         'day' : None, 
-        'noght' : None,
+        'night' : None,
         'rest' : None,
         'active' : None
     }
@@ -178,259 +456,21 @@ def initialize_dictionary_with_template() -> dict :
                     }
     return copy.deepcopy(dict_template)
 
-def add_activity(datas, activity_dict):
-    activity_dict["goal"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'stepsGoal')   
-    activity_dict["steps"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'steps')   
-    activity_dict["distance"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'distanceInMeters')  
-
-    activity_dict['intensity'] = get_garmin_activity_indicator(datas,
-                        result_type = 'epochs')
-
-def add_body_battery(datas, body_battery_dict):
-    start_time = get_garmin_result_info(datas=datas, result_type =\
-                        'stressDetails', output_type = 'mtimestamp')
-    values = get_garmin_result_info(datas=datas, result_type =\
-                    'stressDetails', output_type = 'timeOffsetBodyBatteryValues')
-    values_df = convert_dict_to_df(values, start_time)
-    body_battery_dict["all_values"] = values_df
-    if len(values):
-        body_battery_dict["highest"] = max(values_df['values'])
-        body_battery_dict["lowest"] = min(values_df['values'])
-
-def add_breath(datas, breath_dict):
-    result_type = 'allDayRespiration'
-    output_type = 'timeOffsetEpochToBreaths'
-    df_output = pd.DataFrame()
-    for data in datas:
-        if data['type'] == result_type:
-            start_time = data['value']['mtimestamp']
-            values_dict = data['value'][output_type]
-            df_temp = convert_dict_to_df(values_dict, start_time)
-            df_output = pd.concat([df_output, df_temp])
-    df_output.sort_values(by='times', inplace=True)
-    df_output = df_output.reset_index(drop = True)         
-    breath_dict['rate'] = df_output
-    
-def add_calories(datas, calories_dict):
-    calories_dict["resting"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'bmrKilocalories')
-    calories_dict["active"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'activeKilocalories')
-    calories_dict["total"] = calories_dict["resting"]+calories_dict["active"]
-
-def add_cardio(datas, cardio_dict):
-    start_time = get_garmin_result_info(datas=datas, result_type =\
-                        'dailies', output_type = 'mtimestamp')
-    cardio_data = get_garmin_result_info(datas=datas, result_type =\
-                        'dailies', output_type = 'timeOffsetHeartRateSamples')
- 
-    cardio_dict['rate'] = convert_dict_to_df(cardio_data, start_time)
-    
-def add_durations(date, results_dict):
-    # Times constants
-    YEAR = int(date[:4])
-    M = int(date[5:7])
-    D = int(date[8:10])
-    NIGHT_LIMIT = datetime(YEAR, M, D, 6, 0, 0)
-
-    ref_df = results_dict['cardio']['rate']
-
-    day_times    = ref_df.loc[ref_df["times"] > NIGHT_LIMIT,
-                               "times"].reset_index(drop=True)
-    night_times  = ref_df.loc[ref_df["times"] < NIGHT_LIMIT, 
-                                    "times"].reset_index(drop=True)
-    
-    time_intervals = find_time_intervals(ref_df['times'])
-    day_time_intervals = find_time_intervals(day_times)
-    night_time_intervals = find_time_intervals(night_times)
-
-    duration_dict = results_dict["duration"]
-    duration_dict["intervals"] = time_intervals
-    duration_dict["collected"] = sum_time_intervals(time_intervals)
-    duration_dict["day"] = sum_time_intervals(day_time_intervals)
-    duration_dict["night"] = sum_time_intervals(night_time_intervals)
-
-    df = results_dict['activity']['intensity'] 
-    rest_duration_df = df.loc[df['intensity'] == 'SEDENTARY', 'duration']
-    medium_duration_df = df.loc[df['intensity'] == 'ACTIVE', 'duration']
-    high_duration_df = df.loc[df['intensity'] == 'HIGHLY_ACTIVE', 'duration']
-
-    duration_dict["rest"] = timedelta_formatter(sum(rest_duration_df))
-    duration_dict["active"] = timedelta_formatter(sum(medium_duration_df) \
-                                                  + sum(high_duration_df))
-
-def add_intensity_minutes(datas, intensity_min_dict):
-    intensity_min_dict["moderate"] = get_garmin_result_info(datas, result_type =\
-                    'dailies', output_type = 'moderateIntensityDurationInSeconds')
-    intensity_min_dict["vigurous"] = get_garmin_result_info(datas, result_type =\
-                    'dailies', output_type = 'vigorousIntensityDurationInSeconds')
-    intensity_min_dict["total"] = intensity_min_dict["moderate"] +\
-                                  intensity_min_dict["vigurous"] 
-
-def add_sleep(date, user_id, datas, sleep_dict, prod):
-    value_dict = get_sleep_data(date, user_id, datas, prod)
-    timestamp_end = value_dict['startTimeInSeconds'] + value_dict['durationInSeconds']
-    sleep_dict["timestamp_end"] = datetime.fromtimestamp(timestamp_end)
-    sleep_dict["sleep_map"] = value_dict['sleepLevelsMap']
-    sleep_dict["score"] = value_dict['overallSleepScore']['value']   
-    sleep_dict["quality"] = value_dict['overallSleepScore']['qualifierKey']            
-    sleep_dict["deep"] = value_dict['deepSleepDurationInSeconds']
-    sleep_dict["light"] = value_dict['lightSleepDurationInSeconds']
-    sleep_dict["rem"] = value_dict['remSleepInSeconds']
-    sleep_dict["awake"] = value_dict[ 'awakeDurationInSeconds']
-    sleep_dict["recorded_time"] = sleep_dict["deep"] + sleep_dict["light"] +\
-                                  sleep_dict["rem"] + sleep_dict["awake"]
-
-def add_spo2(datas, spo2_dict):
-    start_time = get_garmin_result_info(datas=datas, result_type =\
-                        'pulseox', output_type = 'mtimestamp')
-    values = get_garmin_result_info(datas=datas, result_type =\
-                        'pulseox', output_type = 'timeOffsetSpo2Values')
-    values_df = convert_dict_to_df(values, start_time)
-
-    spo2_dict["all_values"] = values_df
-    spo2_dict["averege"] = round(np.mean(values_df['values']))
-    spo2_dict["lowest"] = min(values_df['values'])
-
-def add_stress(datas, stress_dict):
-    start_time = get_garmin_result_info(datas=datas, result_type =\
-                        'stressDetails', output_type = 'mtimestamp')
-    values = get_garmin_result_info(datas=datas, result_type =\
-                        'stressDetails', output_type = 'timeOffsetStressLevelValues')
-    stress_dict["all_values"] = convert_dict_to_df(values, start_time)
-    stress_dict["score"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'averageStressLevel')
-    stress_dict["rest"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'restStressDurationInSeconds')
-    stress_dict["low"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'lowStressDurationInSeconds')
-    stress_dict["medium"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'mediumStressDurationInSeconds')
-    stress_dict["high"] = get_garmin_result_info(datas, result_type =\
-                        'dailies', output_type = 'highStressDurationInSeconds')
-    stress_dict["recorded_time"] = stress_dict["rest"] + stress_dict["low"] +\
-                                   stress_dict["medium"] + stress_dict["high"]
-
-def get_garmin_result_info(datas, result_type, output_type):
-    output = []
-    for data in datas:
-        if data['type'] == result_type:
-            output = data['value'][output_type]
-    return output
-
-def get_garmin_activity_indicator(datas, result_type):
-    i = 0
-    df_output = pd.DataFrame(columns = ['times', 'intensity', 'duration', 'steps', 'distance'])
-    for data in datas:
-        if data['type'] == result_type:
-            garmin_data = data['value']
-            start_time = garmin_data['mtimestamp']
-            start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
-
-            list_of_dict = garmin_data['value']
-            for dict_i in list_of_dict:
-                intensity = dict_i['intensity']
-                steps = dict_i['steps']
-                duration_in_s = dict_i['activeTimeInSeconds']
-                distance_in_m =  dict_i['distanceInMeters']
-                df_temp = pd.DataFrame({
-                    'times': start_time,
-                    'intensity': intensity, 
-                    'duration': duration_in_s,
-                    'steps' : steps,
-                    'distance' : distance_in_m
-                    }, index = [i])
-                df_output = pd.concat([df_output, df_temp])
-                i +=1
-    df_output.sort_values(by='times', inplace=True)
-    df_output = df_output.reset_index(drop = True)  
-
-    return  df_output
-    
-def get_sleep_data(date, user_id, datas, prod) -> dict:
-    result_type = 'sleeps'
-    value_dict = []
-    there_is_sleeps_batch = False
-
-    # Hypothesis: sleep batches are in chronological order
-    for data in datas:
-        # If this is a 'sleeps' batch 
-        if data['type'] == result_type:
-            there_is_sleeps_batch = True
-            # Get the timestamp_end of the sleep batch
-            timestamp_end = data['mtimestamp_end'][:10]
-            # If timestamp_end = date
-            if timestamp_end == date:
-                # Get value dictionary that contains all sleep info
-                value_dict = data['value']
-                # Break loop
-                break
-
-            # if timestamp_end != date, request data for the day before
-            else:
-                date_before = change_date(date, sign = -1)
-                value_dict = get_sleep_of_day_before(date, date_before, user_id, prod)
-
-    # If there is no sleep batch in datas, get the datas of day before
-    if there_is_sleeps_batch == False:
-        date_before = change_date(date, sign = -1)
-        value_dict = get_sleep_of_day_before(date, date_before, user_id, prod)
-
-    return copy.deepcopy(value_dict)
-
-def change_date(date:str, sign:int) -> str:
-    date_today = datetime.strptime(date, "%Y-%m-%d")
-    new_date = date_today + sign*timedelta(days=1)
-    new_date =  datetime.strftime(new_date, "%Y-%m-%d")
-    return new_date
-
-def get_sleep_of_day_before(date, date_before, user_id, prod):
-    value_dict = []
-    result_type = 'sleeps'
-
-    # Build the query parameters object
-    params = {
-        'user'    : user_id,   
-        'types'   : result_type,
-        'date'    : date_before,
-        }
-    # Request data from servers
-    reply = request_data_from_servers(params, prod)
-    # Convert the reply content into a json object
-    datas_day_before = error_management(date, reply)
-    # Get the sleep of the day before
-    for data in datas_day_before:
-        if data['type'] == result_type:
-            timestamp_end = data['mtimestamp_end'][:10]
-
-            # If timestamp_end = date, get value ductionary
-            if timestamp_end == date:
-                value_dict = data['value']
-
-    return copy.deepcopy(value_dict)
-
-def convert_dict_to_df(signal_data, start_time) -> pd.DataFrame:
-    start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
-    output = pd.DataFrame.from_dict(signal_data, orient='index', columns=['values'])
-
-    # Get the offsets
-    offsets = output.index
-    # Add times column to the dataframe
-    output['times'] = np.nan
-    # Reset the index
-    output = output.reset_index(drop = True)
-
-    for i in range(len(offsets)):
-        offset = timedelta(seconds = int(offsets[i]))
-        output.loc[i, 'times'] = start_time + offset
-    output.reset_index(drop=True)
-    
-    return copy.deepcopy(output)
-    
-
 # %% ---------------------------- Test function ------------------------------ 
 # ----------------------------------------------------------------------------
-# results_dict =  get_garmin_data(user_id, date)
+# from config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD
+# prod = False
+# # Michel
+# user_id = "5Nwwut" 
+# date = "2023-05-04" 
+# #/ Adriana
+# # user_id = "6o2Fzp"
+# # date = "2023-05-10"
+
+#/ if prod == True :
+#     api = API_KEY_PROD
+#     url = URL_GARMIN_PROD
+# else :
+#     api = API_KEY_PREPROD
+#     url = URL_GARMIN_PREPROD
+# datas, results_dict =  get_garmin_data(user_id, date, api, url)

@@ -2,34 +2,30 @@
 # Imports
 import json
 import copy
+import math
 import requests
 import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
 
-from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals
-from garmin_automatic_reports.config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD, CST_SIGNAL_TYPES
-from garmin_automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
-
-user_id = "5Nwwut"
-date = "2023-05-04"
-prod = False
-
+from useful_functions import find_time_intervals, sum_time_intervals, unwrap
+from config import CST_SIGNAL_TYPES
+from config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
     
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
 # Request user's data from servers
 
-def get_cst_data(user_id, date, prod):
-    print("CST signals:", CST_SIGNAL_TYPES)
+def get_cst_data(user_id, date, api, url):
 
     # We have to request data from date-1 and date+1, because we don't know 
     # the offset (if there is no data in requested date (utc))
     date_after = change_date(date, sign = +1)
     date_before = change_date(date, sign = -1)
     
-    datas = get_datas(user_id, date, CST_SIGNAL_TYPES, prod)
-    datas_before = get_datas(user_id, date_before, CST_SIGNAL_TYPES, prod)
-    datas_after = get_datas(user_id, date_after, CST_SIGNAL_TYPES, prod)
+    datas = get_datas(user_id, date, CST_SIGNAL_TYPES, api, url)
+    datas_before = get_datas(user_id, date_before, CST_SIGNAL_TYPES, api, url)
+    datas_after = get_datas(user_id, date_after, CST_SIGNAL_TYPES, api, url)
     
     datas_3_days = datas + datas_before + datas_after
 
@@ -37,13 +33,14 @@ def get_cst_data(user_id, date, prod):
     results_dict = initialize_dictionary_with_template()
     results_dict['user_id']  = user_id
     add_cardio(date, datas_3_days, results_dict['cardio'])
-    add_breath(date, datas_3_days, results_dict['breath_1'])
-    add_breath(date, datas_3_days, results_dict['breath_2'])                              # TO CHNAGE WHEN breath_2 is ready
+    add_breath(date, datas_3_days, results_dict['breath'])                  
     add_activity(date, datas_3_days, results_dict['activity'])
     add_durations(date, results_dict)
     
     # Add activity level to each indicator
     results_dict_2 = add_activity_to_indicators(copy.deepcopy(results_dict))
+
+    # Add anomalie (alerts)
     add_anomalies(results_dict_2)
       
     return results_dict_2
@@ -56,13 +53,7 @@ def change_date(date:str, sign = -1) -> str:
     new_date =  datetime.strftime(new_date, "%Y-%m-%d")
     return new_date
 
-def get_datas(user_id, date, signal_types, prod):
-    if prod == True :
-        api = API_KEY_PROD
-        url = URL_CST_PROD
-    else :
-        api = API_KEY_PREPROD
-        url = URL_CST_PREPROD
+def get_datas(user_id, date, signal_types, api, url):
     params = {
         'user'    : user_id,  
         'types'   : signal_types,
@@ -75,7 +66,8 @@ def get_datas(user_id, date, signal_types, prod):
     return datas
 
 def request_data_from_servers(params, api_key, url):
-    # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).
+    # Perform the POST request authenticated with YOUR API key (NOT the one of 
+    # the sub-user!).
     reply = requests.get(url, headers={"X-API-Key": api_key}, params=params)
     
     return reply
@@ -105,37 +97,35 @@ def error_management(date, reply) :
     return datas
 
 def initialize_dictionary_with_template() -> dict :  
-    anomalies_dict = initialize_alerts_with_template()
-
-    cardio_dict = {
-        'rate' : None, 
-        'rate_var' : None,
-        }
-    breath_dict = {
-        'rate' : None, 
-        'rate_var' : None,
-        }
     activity_dict = {
         'steps' : None,
         'averaged_activity' : None,
         'distance' : None,
         }
+    anomalies_dict = initialize_alerts_with_template()
+    breath_dict = {
+        'rate' : None, 
+        'rate_var' : None,
+        'inspi_expi' : None,
+        }
+    cardio_dict = {
+        'rate' : None, 
+        'rate_var' : None,
+         }
     duration_dict = {
         'intervals' : None, 
         'collected' : None,
         'day' : None, 
-        'noght' : None,
+        'night' : None,
         'rest' : None,
         'active' : None,
         }
-    
     dict_template = {
                     'user_id' : None,
-                    'anomalies': copy.deepcopy(anomalies_dict),
-                    'cardio'  : copy.deepcopy(cardio_dict),
-                    'breath_1': copy.deepcopy(breath_dict),
-                    'breath_2': copy.deepcopy(breath_dict),
                     'activity': copy.deepcopy(activity_dict),
+                    'anomalies': copy.deepcopy(anomalies_dict),
+                    'breath': copy.deepcopy(breath_dict),
+                    'cardio'  : copy.deepcopy(cardio_dict),
                     'duration': copy.deepcopy(duration_dict),
                     }
     return copy.deepcopy(dict_template)
@@ -161,20 +151,26 @@ def initialize_alerts_with_template() -> dict :
 def add_cardio(date, datas, cardio_dict):
     rate = get_cst_result_info(date, datas, result_type='heartbeat')
     rate_var = get_cst_result_info(date, datas, result_type='HRV')
+    qt = get_cst_result_info_segment(date, datas, result_type='qt_c_framingham_per_seg')
 
     cardio_dict['rate'] = rate
     cardio_dict['rate_var'] = rate_var
+    cardio_dict['qt'] = qt
 
 def add_breath(date, datas, breath_dict):
-    rate = get_cst_result_info(date, datas, result_type='respiratory_rate')
+    rate = get_cst_result_info(date, datas, result_type='breath_2_brpm')
+    rate_var = get_cst_result_info(date, datas, result_type='breath_2_brv')
+    inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi') # TO CHANGE!!!
 
     breath_dict['rate'] = rate
+    breath_dict['rate_var'] = rate_var
+    breath_dict['inspi_expi'] = inspi_expi
 
 def add_activity(date, datas, activity_dict) : 
     averaged_activity = get_cst_result_info(date, datas, result_type='averaged_activity')
     steps_number = get_cst_result_info(date, datas, result_type='steps_number')
 
-    # Compose the distance dataframe # TO CHANGE !!! 
+    # Compose the distance dataframe  
     times = steps_number["times"]
     values = steps_number["values"]*0.76
     distance = pd.DataFrame({'times' : times, 'values' : values})
@@ -191,15 +187,14 @@ def add_activity_to_indicators(results_dict) -> dict:
     sig_indicators = results_dict["cardio"]
     sig_indicators["rate"] = merge_on_times(sig_indicators["rate"], averaged_activity_df)
     sig_indicators["rate_var"] = merge_on_times(sig_indicators["rate_var"], averaged_activity_df)
+    sig_indicators["qt"] = merge_on_times(sig_indicators["qt"], averaged_activity_df)
     
-    # Breath_1 indicators TO CHANGE !!
-    sig_indicators = results_dict["breath_1"]
+    # Breath 
+    sig_indicators = results_dict["breath"]
     sig_indicators["rate"] = merge_on_times(sig_indicators["rate"], averaged_activity_df)
-    
-    # Breath 2 does not have indicators yet TO CHANGE !!
-    sig_indicators = results_dict["breath_2"]
-    sig_indicators["rate"] = merge_on_times(sig_indicators["rate"], averaged_activity_df)
-  
+    sig_indicators["rate_var"] = merge_on_times(sig_indicators["rate_var"], averaged_activity_df)
+    sig_indicators["inspi_expi"] = merge_on_times(sig_indicators["inspi_expi"], averaged_activity_df)
+
     return copy.deepcopy(results_dict)
 
 def add_durations(date, results_dict):
@@ -227,6 +222,7 @@ def add_durations(date, results_dict):
     activity_time_intervals = find_time_intervals(active_times)
     
     duration_dict = results_dict["duration"]
+    duration_dict["intervals"] = time_intervals
     duration_dict["collected"] = sum_time_intervals(time_intervals)
     duration_dict["day"] = sum_time_intervals(day_time_intervals)
     duration_dict["night"] = sum_time_intervals(night_time_intervals)
@@ -254,7 +250,7 @@ def add_anomalies(results_dict):
 
     # ------------------- detect anomaly ----------------------
     # Cardio Tachy/Brady
-    df_aux = results_dict['breath_1']['rate']
+    df_aux = results_dict['breath']['rate']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
     value = round(max(values))
     
@@ -274,7 +270,12 @@ def add_anomalies(results_dict):
         alerts_dict["bradycardia"]["path"]  = RED_ALERT
     
     # Cardio QTc length TO CHANGE TO CHANGE when indicator is updateted !!!
-    alerts_dict["qt"]["path"]  = RED_ALERT
+    df_aux = results_dict['cardio']['qt']
+    values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
+    value_max = round(max(values))
+    value_min = round(min(values))
+    if(value_max > 500 or value_min < 350):
+        alerts_dict["qt"]["path"]  = RED_ALERT
 
 def merge_on_times(df_1, df_2):
     df_result = pd.merge(df_1, df_2, how="outer", on="times")
@@ -318,6 +319,45 @@ def get_cst_result_info(date, datas, result_type):
 
     return output
 
+def get_cst_result_info_segment(date, datas, result_type):
+    times = []
+    values = []
+    output = pd.DataFrame({
+    'times' : times,
+    'values' : values,
+    })
+
+    for data in datas:
+        if result_type == data['type']:
+            timestamp = get_timestamp(data['_id'])
+            times.append(timestamp)
+            segment_values = unwrap(data['values'])
+            if np.size(segment_values) > 1:         # Nan values have size = 1       
+                mean_value = round(np.mean(segment_values))
+            else: mean_value = math.nan
+            values.append(mean_value)
+
+    output['times'] = times
+    output['values'] = values
+    output.sort_values(by = 'times', inplace = True) 
+
+    # Get output where times = date
+    YEAR = int(date[:4])
+    M = int(date[5:7])
+    D = int(date[8:10])
+    start_date = datetime(YEAR, M, D, 0, 0, 0)
+    end_date = datetime(YEAR, M, D, 23, 59, 59)
+    mask = (output['times'] > start_date) & (output['times'] <= end_date)
+    output = output.loc[mask]
+    output = output.reset_index(drop=True)
+
+    # Round times to minutes
+    output['times'] = output["times"].dt.round("min")
+    # Format type from pandas._libs.tslibs.timestamps.Timestamp to datetime
+    output['times'] = output["times"]
+
+    return output
+
 def get_timestamp(id_:str):
     output = 0
     timestamp = id_[:id_.index(".")]
@@ -326,6 +366,16 @@ def get_timestamp(id_:str):
 
     return output
 
-# %% ------------- Test the main function--------------------------------------
-results_dict = get_cst_data(user_id, date, prod)
+# %% ------------- Test the main function-------------------------------------
+# from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
+# prod = False
+# user_id = "5Nwwut" # "7k6Hs3"
+# date = "2023-05-04" # "2022-09-09"
+# if prod == True :
+#     api = API_KEY_PROD
+#     url = URL_CST_PROD
+# else :
+#     api = API_KEY_PREPROD
+#     url = URL_CST_PREPROD
 
+#/ results_dict = get_cst_data(user_id, date, api, url)

@@ -9,12 +9,11 @@ from pylife.api_functions import map_results
 from pylife.api_functions import get_result_info
 from pylife.useful import unwrap
 import time
+
+# Imports for requesting data and genereting reports
 from garmin_automatic_reports.api2_get_cst_data import get_cst_data
 from garmin_automatic_reports.api2_get_garmin_data import get_garmin_data
-
-from garmin_automatic_reports.garmin_data_for_pdf import garmin_data_for_pdf
-from garmin_automatic_reports.cst_data_for_pdf import cst_data_for_pdf
-from garmin_automatic_reports.commun_data_for_pdf import commun_data_for_pdf
+from garmin_automatic_reports.compute_commun_for_html import get_commun_indicators
 from garmin_automatic_reports.plot_images import plot_images
 
 
@@ -22,128 +21,88 @@ def get_health_indicators():
     
     end_user    = st.session_state.end_user
     date        = st.session_state.date
-    prod        = st.session_state.prod
+    api         = st.session_state.api_key 
+    url_cst     = st.session_state.url_data 
+    url_garmin  = st.session_state.url_garmin
     
     garmin_data = []
     cst_data    = []
     commun_data = []
-    
-    # Start timer    
-    user_id_cst = "7k6Hs3"
-    date_cst = "2022-09-09"
-    begin = time.time()
 
+    # Get CST (Chronolife Smart Textile) data
     cst_data = get_cst_data(
         user_id = end_user, 
-        date    = date,
-        prod    = prod
+        date = date,
+        api = api,
+        url = url_cst,
         )
-
-    # Time intervals
-    cst_time_intervals = cst_data['duration']['collected']
-    # Alerts
-    alerts_dict = cst_data['anomalies']
-
-    # End timer
-    end = time.time()
-    print('Time taken to get CST data:',round((end-begin)/60,2),'min')
-
-    # ----------------------------- Garmin -----------------------------------
-    # Start timer    
-    begin = time.time()
-    user_id_garmin = "6o2Fzp" 
-    date_garmin = '2023-05-02'
     
-    # garmin_data = get_garmin_data(
-    #     user_id = end_user, 
-    #     date = date,
-    #     prod = prod
-    #     )
-
-    # # Time intervals
-    # garmin_time_intervals = garmin_data['duration']['collected']
-
-    # # End timer
-    # end = time.time()
-    # print('Time taken to get Garmin data:',round((end-begin)/60,2),'min')
-
-    # # % -------------------------- Construct PDF --------------------------------
-    # # Format CST's text that will be added to pdf 
-    # cst_data_pdf = cst_data_for_pdf(user_id_cst, date_cst, cst_data)
-
-    # # Format Garmin's text that will be added to pdf 
-    # garmin_data_pdf = garmin_data_for_pdf(garmin_data)
-
-    # # %
-    # # Compute commun indicators: cardio, respiration and steps
-    # commun_data, commun_data_pdf, steps_dict = commun_data_for_pdf(cst_data, garmin_data) 
-
-    # # Plot and save graphs
-    # plot_images(garmin_data, steps_dict, cst_time_intervals, 
-    #             garmin_time_intervals, date_cst)
+    # Get Garmin data
+    garmin_data = get_garmin_data(
+        user_id = end_user, 
+        date = date,
+        api = api,
+        url = url_garmin
+        )
     
+    # Compute commun data
+    commun_data, commun_indicators,\
+    steps_dict = get_commun_indicators(cst_data, garmin_data) 
+
     st.session_state.garmin_indicators      = garmin_data
     st.session_state.chronolife_indicators  = cst_data
-    st.session_state.commun_indicators      = commun_data
-    
-    
+    st.session_state.commun_data            = commun_data       # New
+    st.session_state.commun_indicators      = commun_indicators # New
+    st.session_state.steps_dict             = steps_dict        # New
+
 def get_bodybattery():
-    
     datas = st.session_state.garmin_indicators
-    
+
     output = {}
-    
     output["high"]  = ""
     output["low"]   = ""
     
-    if len(datas) > 0:
-        if datas["body_battery"]["highest"] is not None:
-            output["high"]  = datas["body_battery"]["highest"]
-            output["low"]   = datas["body_battery"]["lowest"]
+    if len(datas) > 0 and datas["body_battery"]["highest"] is not None:
+        output["high"] = datas["body_battery"]["highest"]
+        output["low"]  = datas["body_battery"]["lowest"]
     
     return output
 
 def get_calories():
-    
     datas = st.session_state.garmin_indicators
     
     output = {}
-    
     output["total"]    = ""
-    output["rest"]     = ""
+    output["rest"]  = ""
     output["active"]   = ""
     
-    if len(datas) > 0:
-        if datas["calories"]["total"] is not None:
-            output["total"]    = datas["calories"]["total"]
-            output["rest"]     = datas["calories"]["resting"]
-            output["active"]   = datas["calories"]["active"]
-    
+    if len(datas) > 0 and datas["calories"]["total"] is not None:
+        output["total"]    = datas["calories"]["total"]
+        output["rest"]  = datas["calories"]["resting"]
+        output["active"]   = datas["calories"]["active"]
+
     return output
 
+
 def get_intensity():
-    
     datas = st.session_state.garmin_indicators
     
     output = {}
-    output["total"]       = ""
-    output["moderate"]    = ""
-    output["vigurous"]    = ""
+    output["total"]    ,= ""
+    output["moderate"]  = ""
+    output["vigurous"]  = ""
     
-    if len(datas) > 0:
-        if datas["intensity_min"]["total"] is not None:
-            output["total"]       = datas["intensity_min"]["total"]
-            output["moderate"]    = datas["intensity_min"]["moderate"]
-            output["vigurous"]    = datas["intensity_min"]["vigurous"]
+    if len(datas) > 0 and datas["intensity_min"]["total"] is not None:
+            output["total"]    = datas["intensity_min"]["total"]
+            output["moderate"] = datas["intensity_min"]["moderate"]
+            output["vigurous"] = datas["intensity_min"]["vigurous"]
     
     return output
 
 def get_sleep():
-    
     datas = st.session_state.garmin_indicators
     
     output = {}
-        
     output["score"]             = ""
     output["quality"]           = ""
     output["duration"]          = ""
@@ -156,42 +115,39 @@ def get_sleep():
     output["percentage_rem"]    = ""
     output["percentage_awake"]  = ""
     
-    if len(datas) > 0:
-        if datas["sleep"]["score"] is not None:
-            output["score"]             = datas["sleep"]["score"]
-            output["quality"]           = datas["sleep"]["quality"]
-            output["duration"]          = datas["sleep"]["recorded_time"]
-            output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
-            output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
-            output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
-            output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
-            
-            output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
-            output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
-            output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
-            output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
-    
+    if len(datas) > 0 and datas["sleep"]["score"] is not None:
+        output["score"]             = datas["sleep"]["score"]
+        output["quality"]           = datas["sleep"]["quality"]
+        output["duration"]          = datas["sleep"]["recorded_time"]
+        output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
+        output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
+        output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
+        output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
+        
+        output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
+
     return output
 
+
 def get_spo2():
-    
     datas = st.session_state.garmin_indicators
     
     output = {}
-    output["mean"]      = ""
-    output["min"]       = ""
-    output["values"]    = ""
+    output["mean"]    = ""
+    output["min"]     = ""
+    output["values"]  = ""
     
-    if len(datas) > 0:
-        if datas["spo2"]["averege"] is not None:
-            output["mean"]      = datas["spo2"]["averege"]
-            output["min"]       = datas["spo2"]["lowest"]
-            output["values"]    = datas["spo2"]["all_values"]
+    if len(datas) > 0 and datas["spo2"]["averege"] is not None:
+            output["mean"]    = datas["spo2"]["averege"]
+            output["min"]     = datas["spo2"]["lowest"]
+            output["values"]  = datas["spo2"]["all_values"]
     
     return output
 
 def get_stress():
-    
     datas = st.session_state.garmin_indicators
     
     output = {}
@@ -206,73 +162,73 @@ def get_stress():
     output["percentage_medium"] = ""
     output["percentage_high"]   = ""
     
-    if len(datas) > 0:
-        if datas["stress"]["score"] is not None:
-            output["score"]             = datas["stress"]["score"]
-            output["duration"]          = datas["stress"]["recorded_time"]
-            output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
-            output["duration_low"]      = int(round(datas["stress"]["low"]/60))
-            output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
-            output["duration_high"]     = int(round(datas["stress"]["high"]/60))
-            
-            output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
-            output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
-            output["percentage_medium"] = int(round(datas["stress"]["medium"]/datas["stress"]["recorded_time"]*100))
-            output["percentage_high"]   = int(round(datas["stress"]["high"]/datas["stress"]["recorded_time"]*100))
+    if len(datas) > 0 and datas["stress"]["recorded_time"] is not None:
+        output["score"]             = datas["stress"]["score"]
+        output["duration"]          = datas["stress"]["recorded_time"]
+        output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
+        output["duration_low"]      = int(round(datas["stress"]["low"]/60))
+        output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
+        output["duration_high"]     = int(round(datas["stress"]["high"]/60))
         
+        output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
+        output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
+        output["percentage_medium"] = int(round(datas["stress"]["medium"]/datas["stress"]["recorded_time"]*100))
+        output["percentage_high"]   = int(round(datas["stress"]["high"]/datas["stress"]["recorded_time"]*100))
+    
     return output
 
 def get_duration_chronolife():
+    datas = st.session_state.chronolife_indicators
+
+    output = {}    
+    output["duration"]          = ""
+    output["duration_day"]      = ""
+    output["duration_night"]    = ""
+    output["duration_rest"]     = "" 
+    output["duration_activity"] = ""
     
-    # !!! TO BE UPDATED !!!
-    output = {}
-    
-    # output["duration"]          = ""
-    # output["duration_day"]      = ""
-    # output["duration_night"]    = ""
-    # output["duration_rest"]     = "" 
-    # output["duration_activity"] = ""
-    
-    output["duration"]          = 17
-    output["duration_day"]      = 12
-    output["duration_night"]    = 5
-    output["duration_rest"]     = 16 
-    output["duration_activity"] = 1
+    if len(datas) > 0 and datas["duration"]["collected"] is not None:
+        output["duration"]          = datas["duration"]["collected"] 
+        output["duration_day"]      = datas["duration"]["day"]
+        output["duration_night"]    = datas["duration"]["night"] 
+        output["duration_rest"]     = datas["duration"]["rest"] 
+        output["duration_activity"] = datas["duration"]["active"] 
     
     return output
 
 def get_duration_garmin():
+    datas = st.session_state.garmin_indicators
+
+    output = {}    
+    output["duration"]          = ""
+    output["duration_day"]      = ""
+    output["duration_night"]    = ""
+    output["duration_rest"]     = "" 
+    output["duration_activity"] = ""
     
-    # !!! TO BE UPDATED !!!
-    output = {}
-    # output["duration"]          = ""
-    # output["duration_day"]      = ""
-    # output["duration_night"]    = ""
-    # output["duration_rest"]     = "" 
-    # output["duration_activity"] = ""
-    
-    output["duration"]          = 2
-    output["duration_day"]      = 16
-    output["duration_night"]    = 6
-    output["duration_rest"]     = 16 
-    output["duration_activity"] = 6
+    if len(datas) > 0 and datas["duration"]["collected"] is not None:
+        output["duration"]          = datas["duration"]["collected"] 
+        output["duration_day"]      = datas["duration"]["day"]
+        output["duration_night"]    = datas["duration"]["night"] 
+        output["duration_rest"]     = datas["duration"]["rest"] 
+        output["duration_activity"] = datas["duration"]["active"] 
     
     return output    
 
 def get_steps():
-    
-    # !!! TO BE UPDATED !!!
+    datas = st.session_state.commun_indicators
+  
     output = {}
-    
-    # output["number"]    = ""
-    # output["goal"]      = ""
-    # output["score"]     = ""
-    # output["distance"]  = ""
-    
-    output["number"]    = 1654
-    output["goal"]      = 6955
-    output["score"]     = int(output["number"]/output["goal"]*100)
-    output["distance"]  = 4.2
+    output["number"]    = ""
+    output["goal"]      = ""
+    output["score"]     = ""
+    output["distance"]  = ""
+
+    if len(datas) > 0 and datas["activity"]["distance"] is not None:
+        output["number"]    = datas["activity"]["steps"] 
+        output["goal"]      = datas["activity"]["goal"] 
+        output["distance"]  = datas["activity"]["distance"] 
+        output["score"]     = int(output["number"]/output["goal"]*100)
     
     return output
 
@@ -280,9 +236,9 @@ def get_temperature():
     
     # !!! TO BE UPDATED !!!
     output = {}
-    output["mean"]  = ""
-    output["min"]   = ""
-    output["max"]   = ""
+    #/ output["mean"]  = ""
+    # output["min"]   = ""
+    # output["max"]   = ""
     
     output["mean"]  = 35.4
     output["min"]   = 33.4
@@ -290,62 +246,84 @@ def get_temperature():
     
     return output
 
+
 def get_bpm():
+    datas = st.session_state.commun_indicators
+
+    output = {}
+    output["rest"]  = ""
+    output["high"]     = ""
+
+    if len(datas) > 0 and datas["cardio"]["rate_high"] is not None:
+        output["resting"]  = datas["cardio"]["rate_resting"] 
+        output["high"]     = datas["cardio"]["rate_high"] 
     
+    return output
+
+def get_bpm():
+    datas = st.session_state.commun_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
+    output["mean"]  = ""
+    output["min"]   = ""
+    output["max"]   = ""
+    output["rest"]  = ""
+    output["high"]  = ""
     
-    # output["mean"]  = ""
-    # output["min"]   = ""
-    # output["max"]   = ""
-    # output["rest"]  = ""
-    # output["high"]  = ""
-    
-    output["mean"]  = 67
-    output["min"]   = 59
-    output["max"]   = 123
-    output["rest"]  = 65
-    output["high"]  = 156
+    if len(datas) > 0 and datas["cardio"]["rate_high"] is not None:
+        output["mean"]  = 500
+        output["min"]   = 500
+        output["max"]   = 500
+        output["rest"]  = datas["cardio"]["rate_resting"] 
+        output["high"]  = datas["cardio"]["rate_high"] 
     
     return output
 
 def get_hrv():
-    
+    datas = st.session_state.commun_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["mean"]  = ""
-    # output["min"]   = ""
-    # output["max"]   = ""
-    # output["rest"]  = ""
-    # output["high"]  = ""
-    
-    output["mean"]  = 162
-    output["min"]   = 42
-    output["max"]   = 555
-    output["rest"]  = 150
-    output["high"]  = 111
+    output["mean"]  = ""
+    output["min"]   = ""
+    output["max"]   = ""
+    output["rest"]  = ""
+    output["high"]  = ""
+
+    if len(datas) > 0 and datas["cardio"]["rate_var_resting"] is not None:
+        output["mean"]  = 500
+        output["min"]   = 500
+        output["max"]   = 500
+        output["rest"]  = datas["cardio"]["rate_var_resting"] 
+        output["high"]  = 500
     
     return output
 
 def get_qt():
+    datas = st.session_state.chronolife_indicators
     
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["mean"]      = ""
-    # output["min"]       = ""
-    # output["max"]       = ""
-    # output["rest"]      = ""
-    # output["high"]      = ""
-    # output["threshold"] = ""
+    output["exists"]    = False
+    output["mean"]      = ""
+    output["min"]       = ""
+    output["max"]       = ""
+    output["rest"]      = ""
+    output["high"]      = ""
+    output["threshold"] = ""
     
-    output["mean"]      = 50
-    output["min"]       = 817
-    output["max"]       = 324
-    output["rest"]      = 324
-    output["high"]      = 324
-    output["threshold"] = 550
+    if len(datas["anomalies"]["qt"]["values"]) > 0:
+        values = datas["anomalies"]["qt"]["values"]
+        output["exists"]    = datas["anomalies"]["qt"]["exists"]
+        output["mean"]      = round(np.mean(values))
+        output["min"]       = round(min(values))
+        output["max"]       = round(max(values))
+        output["rest"]      = 500
+        output["high"]      = 500
+        output["threshold"] = 550
     
-    if output["mean"] > output["threshold"]:
+    if output["exists"]:
         qt_alert_icon = st.session_state.alert
     else:
         qt_alert_icon = st.session_state.alert_no
@@ -354,18 +332,21 @@ def get_qt():
     return output
 
 def get_bradycardia():
-    
+    datas = st.session_state.chronolife_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["exists"]      = ""
-    # output["mean"]        = ""
-    # output["duration"]    = ""
-    # output["percentage"]  = ""
+    output["exists"]      = ""
+    output["mean"]        = ""
+    output["duration"]    = ""
+    output["percentage"]  = ""
     
-    output["exists"]      = False
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
+    if len(datas["anomalies"]["bradycardia"]["values"]) > 0:
+        values = datas["anomalies"]["bradycardia"]["values"]
+        output["exists"]      = datas["anomalies"]["bradycardia"]["exists"]
+        output["mean"]        = round(np.mean(values))
+        output["duration"]    = 500
+        output["percentage"]  = 500
     
     if output["exists"]:
         bradycardia_alert_icon = st.session_state.alert
@@ -376,17 +357,21 @@ def get_bradycardia():
     return output
     
 def get_tachycardia():
-    
+    datas = st.session_state.chronolife_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["exists"]      = ""
-    # output["mean"]        = ""
-    # output["duration"]    = ""
-    # output["percentage"]  = ""
-    output["exists"]      = False
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
+    output["exists"]      = ""
+    output["mean"]        = ""
+    output["duration"]    = ""
+    output["percentage"]  = ""
+
+    if len(datas["anomalies"]["tachycardia"]["values"]) > 0:
+        values = datas["anomalies"]["tachycardia"]["values"]
+        output["exists"]      = datas["anomalies"]["bradycardia"]["exists"]
+        output["mean"]        = round(np.mean(values))
+        output["duration"]    = 500
+        output["percentage"]  = 500
     
     if output["exists"]:
         tachycardia_alert_icon = st.session_state.alert
@@ -397,69 +382,107 @@ def get_tachycardia():
     return output
 
 def get_brpm():
-    
+    datas = st.session_state.commun_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["mean"]  = ""
-    # output["min"]   = ""
-    # output["max"]   = ""
-    # output["rest"]  = ""
-    # output["high"]  = ""
+    output["mean"]  = ""
+    output["min"]   = ""
+    output["max"]   = ""
+    output["rest"]  = ""
+    output["high"]  = ""
     
-    output["mean"]  = 15
-    output["min"]   = 9
-    output["max"]   = 21
-    output["rest"]  = 12
-    output["high"]  = 22
+    if len(datas) > 0 and datas["breath"]["rate_high"] is not None:
+        output["mean"]  = 500
+        output["min"]   = 500
+        output["max"]   = 500
+        output["rest"]  = datas["breath"]["rate_resting"] 
+        output["high"]  = datas["breath"]["rate_high"] 
     
     return output
 
 def get_brv():
-    
+    datas = st.session_state.commun_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["mean"]  = ""
-    # output["min"]   = ""
-    # output["max"]   = ""
-    # output["rest"]  = ""
-    # output["high"]  = ""
-    output["mean"]  = 1.2
-    output["min"]   = 0.2
-    output["max"]   = 2.0
-    output["rest"]  = 1.3
-    output["high"]  = 1.8
+    output["mean"]  = ""
+    output["min"]   = ""
+    output["max"]   = ""
+    output["rest"]  = ""
+    output["high"]  = ""
+
+    if len(datas) > 0 and datas["breath"]["rate_var_resting"] is not None:
+        output["mean"]  = 1.2
+        output["min"]   = 0.2
+        output["max"]   = 2.0
+        output["rest"]  = datas["breath"]["rate_var_resting"]
+        output["high"]  = 1.8
     
     return output
 
 def get_inexratio():
-    
+    datas = st.session_state.commun_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["mean"]  = ""
-    # output["min"]   = ""
-    # output["max"]   = ""
-    # output["rest"]  = ""
-    # output["high"]  = ""
-    output["mean"]  = 1.5
-    output["min"]   = 1.2
-    output["max"]   = 2.1
-    output["rest"]  = 1.3
-    output["high"]  = 2.3
+    output["mean"]  = ""
+    output["min"]   = ""
+    output["max"]   = ""
+    output["rest"]  = ""
+    output["high"]  = ""
+
+    if len(datas) > 0 and datas["breath"]["ratio_in_exhale"] is not None:
+        output["mean"]  = datas["breath"]["ratio_in_exhale"]
+        output["min"]   = 500
+        output["max"]   = 500
+        output["rest"]  = 500
+        output["high"]  = 500
+    
+    return output
+
+
+def get_bradycardia():
+    datas = st.session_state.chronolife_indicators
+
+    # !!! TO BE UPDATED !!!
+    output = {}
+    output["exists"]      = ""
+    output["mean"]        = ""
+    output["duration"]    = ""
+    output["percentage"]  = ""
+    
+    if len(datas["anomalies"]["bradycardia"]["values"]) > 0:
+        values = datas["anomalies"]["bradycardia"]["values"]
+        output["exists"]      = datas["anomalies"]["bradycardia"]["exists"]
+        output["mean"]        = round(np.mean(values))
+        output["duration"]    = 500
+        output["percentage"]  = 500
+    
+    if output["exists"]:
+        bradycardia_alert_icon = st.session_state.alert
+    else:
+        bradycardia_alert_icon = st.session_state.alert_no
+    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
     
     return output
 
 def get_bradypnea():
-    
+    datas = st.session_state.chronolife_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["exists"]      = ""
-    # output["mean"]        = ""
-    # output["duration"]    = ""
-    # output["percentage"]  = ""
-    output["exists"]      = True
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
+    output["exists"]      = ""
+    output["mean"]        = ""
+    output["duration"]    = ""
+    output["percentage"]  = ""
+
+    if len(datas["anomalies"]["bradypnea"]["values"]) > 0:
+        values = datas["anomalies"]["bradypnea"]["values"]
+        output["exists"]      = datas["anomalies"]["bradypnea"]["exists"]
+        output["mean"]        = round(np.mean(values))
+        output["duration"]    = 500
+        output["percentage"]  = 500
     
     if output["exists"]:
         bradycardia_alert_icon = st.session_state.alert
@@ -470,17 +493,21 @@ def get_bradypnea():
     return output
     
 def get_tachypnea():
-    
+    datas = st.session_state.chronolife_indicators
+
     # !!! TO BE UPDATED !!!
     output = {}
-    # output["exists"]      = ""
-    # output["mean"]        = ""
-    # output["duration"]    = ""
-    # output["percentage"]  = ""
-    output["exists"]       = True
-    output["mean"]        = 0
-    output["duration"]    = 0
-    output["percentage"]  = 0
+    output["exists"]      = ""
+    output["mean"]        = ""
+    output["duration"]    = ""
+    output["percentage"]  = ""
+
+    if len(datas["anomalies"]["tachypnea"]["values"]) > 0:
+        values = datas["anomalies"]["tachypnea"]["values"]
+        output["exists"]      = datas["anomalies"]["tachypnea"]["exists"]
+        output["mean"]        = round(np.mean(values))
+        output["duration"]    = 500
+        output["percentage"]  = 500
     
     if output["exists"]:
         tachycardia_alert_icon = st.session_state.alert
@@ -520,9 +547,6 @@ def get_myendusers():
 def get_sessions(end_user, year, month):
     
     translate = st.session_state.translate
-    
-    """
-    """
     
     url         = st.session_state.url_data
     api_key     = st.session_state.api_key

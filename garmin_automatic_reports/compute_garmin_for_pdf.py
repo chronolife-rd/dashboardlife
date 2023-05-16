@@ -5,8 +5,6 @@ Created on Fri Mar 17 13:23:57 2023
 @author: aterman
 """
 import copy
-import datetime
-from datetime import timedelta
 
 TEXT_FONT = "Helvetica"
 BLUE_COLOR = "#3E738D"
@@ -61,94 +59,96 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
     dict_aux["color"] = BLUE_COLOR
     
     # ========================== stress dict =================================
-    # Add rest info
-    td_str = td_to_hhmm_str(garmin_data["stress"]["rest"])
-    percentage = garmin_data["stress"]["rest"]/garmin_data["stress"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["stress"]["rest"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 0.6
-    dict_aux["y"] = 9.13
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+    if garmin_data["stress"]["recorded_time"] > 0:
+        # Add rest info
+        td_str = td_to_hhmm_str(garmin_data["stress"]["rest"])
+        percentage = garmin_data["stress"]["rest"]/garmin_data["stress"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["stress"]["rest"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 0.6
+        dict_aux["y"] = 9.13
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
-    # Add low info
-    td_str = td_to_hhmm_str(garmin_data["stress"]["low"])
-    percentage = garmin_data["stress"]["low"]/garmin_data["stress"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["stress"]["low"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 0.6
-    dict_aux["y"] = 9.45
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+        # Add low info
+        td_str = td_to_hhmm_str(garmin_data["stress"]["low"])
+        percentage = garmin_data["stress"]["low"]/garmin_data["stress"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["stress"]["low"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 0.6
+        dict_aux["y"] = 9.45
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
-    # Add medium info
-    td_str = td_to_hhmm_str(garmin_data["stress"]["medium"])
-    percentage = garmin_data["stress"]["medium"]/garmin_data["stress"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["stress"]["medium"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 0.6
-    dict_aux["y"] = 9.77
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+        # Add medium info
+        td_str = td_to_hhmm_str(garmin_data["stress"]["medium"])
+        percentage = garmin_data["stress"]["medium"]/garmin_data["stress"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["stress"]["medium"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 0.6
+        dict_aux["y"] = 9.77
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
-    # Add high info
-    td_str = td_to_hhmm_str(garmin_data["stress"]["high"])
-    percentage = garmin_data["stress"]["high"]/garmin_data["stress"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["stress"]["high"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 0.6
-    dict_aux["y"] = 10.09
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+        # Add high info
+        td_str = td_to_hhmm_str(garmin_data["stress"]["high"])
+        percentage = garmin_data["stress"]["high"]/garmin_data["stress"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["stress"]["high"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 0.6
+        dict_aux["y"] = 10.09
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
-    # ========================== sleep dict =================================
-    # Add deep info
-    td_str = td_to_hhmm_str(garmin_data["sleep"]["deep"])
-    percentage = garmin_data["sleep"]["deep"]/garmin_data["sleep"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["sleep"]["deep"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 5.85
-    dict_aux["y"] = 9.11
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+    # ========================== sleep dict ==================================
+    if garmin_data["sleep"]["recorded_time"] > 0:
+        # Add deep info
+        td_str = td_to_hhmm_str(garmin_data["sleep"]["deep"])
+        percentage = garmin_data["sleep"]["deep"]/garmin_data["sleep"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["sleep"]["deep"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 5.85
+        dict_aux["y"] = 9.11
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
-    # Add light info
-    td_str = td_to_hhmm_str(garmin_data["sleep"]["light"])
-    percentage = garmin_data["sleep"]["light"]/garmin_data["sleep"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["sleep"]["light"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 5.85
-    dict_aux["y"] = 9.43
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+        # Add light info
+        td_str = td_to_hhmm_str(garmin_data["sleep"]["light"])
+        percentage = garmin_data["sleep"]["light"]/garmin_data["sleep"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["sleep"]["light"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 5.85
+        dict_aux["y"] = 9.43
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
-    # Add rem info
-    td_str = td_to_hhmm_str(garmin_data["sleep"]["rem"])
-    percentage = garmin_data["sleep"]["rem"]/garmin_data["sleep"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["sleep"]["rem"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 5.85
-    dict_aux["y"] = 9.75
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+        # Add rem info
+        td_str = td_to_hhmm_str(garmin_data["sleep"]["rem"])
+        percentage = garmin_data["sleep"]["rem"]/garmin_data["sleep"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["sleep"]["rem"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 5.85
+        dict_aux["y"] = 9.75
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
-    # Add awake info
-    td_str = td_to_hhmm_str(garmin_data["sleep"]["awake"])
-    percentage = garmin_data["sleep"]["awake"]/garmin_data["sleep"]["recorded_time"]*100
-    dict_aux = garmin_data_pdf["sleep"]["awake"]
-    dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
-    dict_aux["x"] = 5.85
-    dict_aux["y"] = 10.07
-    dict_aux["font"] = TEXT_FONT
-    dict_aux["size"] = 8
-    dict_aux["color"] = BLUE_COLOR
+        # Add awake info
+        td_str = td_to_hhmm_str(garmin_data["sleep"]["awake"])
+        percentage = garmin_data["sleep"]["awake"]/garmin_data["sleep"]["recorded_time"]*100
+        dict_aux = garmin_data_pdf["sleep"]["awake"]
+        dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
+        dict_aux["x"] = 5.85
+        dict_aux["y"] = 10.07
+        dict_aux["font"] = TEXT_FONT
+        dict_aux["size"] = 8
+        dict_aux["color"] = BLUE_COLOR
 
     # ========================== Calories dict ==================================
     # Add active calories info

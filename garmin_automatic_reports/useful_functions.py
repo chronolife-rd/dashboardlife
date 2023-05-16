@@ -5,7 +5,7 @@ Created on Thu Apr 27 17:29:37 2023
 @author: aterman
 """
 import numpy as np
-from garmin_automatic_reports.config import DELTA_TIME
+from config import DELTA_TIME
 
 # ---------- Functions for computing durations of wearing the device ----------
 
@@ -77,3 +77,44 @@ def timedelta_formatter(time_delta, convert = False):    # defining the function
     minute_count, second_count = divmod(rem, 60)         # distributing the remainders
     msg = "{}h, {}min".format(hour_count,minute_count)
     return msg 
+
+def unwrap(values):
+    """ Unwrap values from list
+
+     Parameter
+    ----------
+    values:     Values to unwrap
+
+    Returns
+    ----------
+    new_values: unwrapped values
+
+    """
+    if not is_list_of_list(values):
+        return values
+
+    new_values = []
+    for value in values:     
+        if value is not None and type(value)==float:            
+            new_values.append(value)
+        else:
+             if value is not None:
+                 new_values.extend(value) 
+
+    return np.array(new_values)
+
+def is_list_of_list(values):
+    """ Define if input signal is a matrix """
+    is_list_list = False
+
+    if isinstance(values, int) or  isinstance(0, float):
+        return is_list_list
+
+    if len(values) > 0:
+        sig = np.array(values)
+        for i in range(len(sig)):
+            if type(sig[i]) is np.ndarray or type(sig[i]) is list:
+                is_list_list = True
+                break
+
+    return is_list_list

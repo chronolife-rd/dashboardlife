@@ -1,13 +1,14 @@
 
 import io
+import os
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4
-from PyPDF2 import PdfFileWriter, PdfFileReader, PdfMerger
+from PyPDF2 import PdfFileWriter, PdfFileReader
 
-from garmin_automatic_reports.config import PATH_PDF, PATH_SAVE_IMG
-from garmin_automatic_reports.config import GarminIndicator, CstIndicator, CommunIndicator, Alert, ImageForPdf
+from config import PATH_PDF
+from config import GarminIndicator, CstIndicator, CommunIndicator, ImageForPdf
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
@@ -94,13 +95,14 @@ def _add_text(can, text_parameters):
     font = text_parameters["font"]
     size = text_parameters["size"]
 
-    y_top = 11.69
-    x_start = x*inch
-    y_start = (y_top - y)*inch
-    
-    can.setFillColor(color)
-    can.setFont(font, size)
-    can.drawString(x_start, y_start, text)
+    if x is not None:
+        y_top = 11.69
+        x_start = x*inch
+        y_start = (y_top - y)*inch
+        
+        can.setFillColor(color)
+        can.setFont(font, size)
+        can.drawString(x_start, y_start, text)
 
 def _add_image(can, image_parameters):
     x = image_parameters["x"]
@@ -109,12 +111,13 @@ def _add_image(can, image_parameters):
     height = image_parameters["h"]
     path_img = image_parameters["path"]
 
-    width = width*inch 
-    height = height*inch
+    if x is not None and os.path.exists(path_img):
+        width = width*inch 
+        height = height*inch
 
-    y_top = 11.69
-    x_start = x*inch
-    y_start = (y_top - y)*inch 
+        y_top = 11.69
+        x_start = x*inch
+        y_start = (y_top - y)*inch 
 
-    can.drawImage(path_img, x_start, y_start, width, height,
-                  preserveAspectRatio = True, mask = 'auto')
+        can.drawImage(path_img, x_start, y_start, width, height,
+                    preserveAspectRatio = True, mask = 'auto')
