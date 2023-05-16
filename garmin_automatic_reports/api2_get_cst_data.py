@@ -367,15 +367,15 @@ def get_timestamp(id_:str):
     return output
 
 # %% ------------- Test the main function-------------------------------------
-# from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
-# prod = False
-# user_id = "5Nwwut" # "7k6Hs3"
-# date = "2023-05-04" # "2022-09-09"
-# if prod == True :
-#     api = API_KEY_PROD
-#     url = URL_CST_PROD
-# else :
-#     api = API_KEY_PREPROD
-#     url = URL_CST_PREPROD
+from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
+prod = False
+user_id = "6o2Fzp" # "7k6Hs3"
+date = "2023-05-10" # "2022-09-09"
+if prod == True :
+    api = API_KEY_PROD
+    url = URL_CST_PROD
+else :
+    api = API_KEY_PREPROD
+    url = URL_CST_PREPROD
 
-#/ results_dict = get_cst_data(user_id, date, api, url)
+results_dict = get_cst_data(user_id, date, api, url)
