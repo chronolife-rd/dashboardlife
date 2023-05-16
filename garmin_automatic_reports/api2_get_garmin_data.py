@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
 from garmin_automatic_reports.config import GARMIN_SIGNAL_TYPES
 
+
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
 # Request user's data from servers
@@ -456,7 +457,7 @@ def initialize_dictionary_with_template() -> dict :
                     }
     return copy.deepcopy(dict_template)
 
-# %% ---------------------------- Test function ------------------------------ 
+# ------------------------------- Test function ------------------------------ 
 # ----------------------------------------------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD
 # prod = False

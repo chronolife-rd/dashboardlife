@@ -33,7 +33,7 @@ def get_cst_data(user_id, date, api, url):
     results_dict = initialize_dictionary_with_template()
     results_dict['user_id']  = user_id
     add_cardio(date, datas_3_days, results_dict['cardio'])
-    add_breath(date, datas_3_days, results_dict['breath'])                  
+    add_breath(date, datas_3_days, results_dict['breath']) # To add inspi expi               
     add_activity(date, datas_3_days, results_dict['activity'])
     add_durations(date, results_dict)
     
@@ -160,11 +160,11 @@ def add_cardio(date, datas, cardio_dict):
 def add_breath(date, datas, breath_dict):
     rate = get_cst_result_info(date, datas, result_type='breath_2_brpm')
     rate_var = get_cst_result_info(date, datas, result_type='breath_2_brv')
-    inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi') # TO CHANGE!!!
+    # inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi') # TO CHANGE!!!
 
     breath_dict['rate'] = rate
     breath_dict['rate_var'] = rate_var
-    breath_dict['inspi_expi'] = inspi_expi
+    # breath_dict['inspi_expi'] = inspi_expi
 
 def add_activity(date, datas, activity_dict) : 
     averaged_activity = get_cst_result_info(date, datas, result_type='averaged_activity')
@@ -193,7 +193,7 @@ def add_activity_to_indicators(results_dict) -> dict:
     sig_indicators = results_dict["breath"]
     sig_indicators["rate"] = merge_on_times(sig_indicators["rate"], averaged_activity_df)
     sig_indicators["rate_var"] = merge_on_times(sig_indicators["rate_var"], averaged_activity_df)
-    sig_indicators["inspi_expi"] = merge_on_times(sig_indicators["inspi_expi"], averaged_activity_df)
+    # sig_indicators["inspi_expi"] = merge_on_times(sig_indicators["inspi_expi"], averaged_activity_df)
 
     return copy.deepcopy(results_dict)
 
@@ -377,11 +377,11 @@ def get_timestamp(id_:str):
 # user_id = "6o2Fzp"
 # date = "2023-05-10"
 
-# if prod == True :
+#/ if prod == True :
 #     api = API_KEY_PROD
 #     url = URL_CST_PROD
 # else :
 #     api = API_KEY_PREPROD
 #     url = URL_CST_PREPROD
 
-# results_dict = get_cst_data(user_id, date, api, url)
+#/ results_dict = get_cst_data(user_id, date, api, url)

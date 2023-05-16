@@ -88,7 +88,7 @@ def get_intensity():
     datas = st.session_state.garmin_indicators
     
     output = {}
-    output["total"]    ,= ""
+    output["total"]     = ""
     output["moderate"]  = ""
     output["vigurous"]  = ""
     
@@ -243,20 +243,6 @@ def get_temperature():
     output["mean"]  = 35.4
     output["min"]   = 33.4
     output["max"]   = 37.1
-    
-    return output
-
-
-def get_bpm():
-    datas = st.session_state.commun_indicators
-
-    output = {}
-    output["rest"]  = ""
-    output["high"]     = ""
-
-    if len(datas) > 0 and datas["cardio"]["rate_high"] is not None:
-        output["resting"]  = datas["cardio"]["rate_resting"] 
-        output["high"]     = datas["cardio"]["rate_high"] 
     
     return output
 
