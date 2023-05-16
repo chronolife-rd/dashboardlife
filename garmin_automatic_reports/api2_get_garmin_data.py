@@ -5,8 +5,8 @@ import requests
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
-from config import GARMIN_SIGNAL_TYPES
+from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
+from garmin_automatic_reports.config import GARMIN_SIGNAL_TYPES
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
@@ -461,16 +461,16 @@ def initialize_dictionary_with_template() -> dict :
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD
 # prod = False
 # # Michel
-# user_id = "5Nwwut" 
-# date = "2023-05-04" 
+# # user_id = "5Nwwut" 
+# # date = "2023-05-04" 
 # #/ Adriana
-# # user_id = "6o2Fzp"
-# # date = "2023-05-10"
+# user_id = "6o2Fzp"
+# date = "2023-05-10"
 
-#/ if prod == True :
+# if prod == True :
 #     api = API_KEY_PROD
 #     url = URL_GARMIN_PROD
 # else :
 #     api = API_KEY_PREPROD
 #     url = URL_GARMIN_PREPROD
-# datas, results_dict =  get_garmin_data(user_id, date, api, url)
+# results_dict =  get_garmin_data(user_id, date, api, url)

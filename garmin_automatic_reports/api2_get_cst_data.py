@@ -8,9 +8,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-from useful_functions import find_time_intervals, sum_time_intervals, unwrap
-from config import CST_SIGNAL_TYPES
-from config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
+from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, unwrap
+from garmin_automatic_reports.config import CST_SIGNAL_TYPES
+from garmin_automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
     
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
@@ -369,8 +369,14 @@ def get_timestamp(id_:str):
 # %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
-# user_id = "5Nwwut" # "7k6Hs3"
-# date = "2023-05-04" # "2022-09-09"
+
+# # # Michel
+# # user_id = "5Nwwut" 
+# # date = "2023-05-04" 
+# # #/ Adriana
+# user_id = "6o2Fzp"
+# date = "2023-05-10"
+
 # if prod == True :
 #     api = API_KEY_PROD
 #     url = URL_CST_PROD
@@ -378,4 +384,4 @@ def get_timestamp(id_:str):
 #     api = API_KEY_PREPROD
 #     url = URL_CST_PREPROD
 
-#/ results_dict = get_cst_data(user_id, date, api, url)
+# results_dict = get_cst_data(user_id, date, api, url)
