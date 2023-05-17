@@ -223,7 +223,7 @@ def overview_data_collection():
                             <div class="row data_collection">
                                 <div class='""" + col_duration + """'>
                                     <p>""" + translate["total_data"] + """ &ensp; <span class='collect_duration'>""" +\
-                                        str(chronolife_duration) + " " + translate["hours"] + """</span></p> 
+                                        str(chronolife_duration) + """</span></p> 
                                 </div>
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.night + """'/> 
@@ -232,7 +232,7 @@ def overview_data_collection():
                                     <p>""" + translate["night"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_day) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_day) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
@@ -241,7 +241,7 @@ def overview_data_collection():
                                     <p>""" + translate["day"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_night) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_night)+ """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
@@ -250,7 +250,7 @@ def overview_data_collection():
                                     <p>""" + translate["rest"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_rest) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_rest) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.activity + """'/> 
@@ -259,7 +259,7 @@ def overview_data_collection():
                                     <p>""" + translate["activity"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_activity) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_activity) + """</p>
                                 </div> 
                             </div>
                         </div>
@@ -281,7 +281,7 @@ def overview_data_collection():
                             <div class="row data_collection">
                                 <div class='""" + col_duration + """'>
                                     <p>""" + translate["total_data"] + """ &ensp; <span class='collect_duration'>""" +\
-                                        str(garmin_duration) + " " + translate["hours"] + """</span></p> 
+                                        str(garmin_duration) + """</span></p> 
                                 </div>
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.night + """'/> 
@@ -290,7 +290,7 @@ def overview_data_collection():
                                     <p>""" + translate["night"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_day) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_day) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
@@ -299,7 +299,7 @@ def overview_data_collection():
                                     <p>""" + translate["day"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_night) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_night) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
@@ -308,7 +308,7 @@ def overview_data_collection():
                                     <p>""" + translate["rest"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_rest) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_rest) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.activity + """'/> 
@@ -317,7 +317,7 @@ def overview_data_collection():
                                     <p>""" + translate["activity"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_activity) + " " + translate["hours"] + """</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_activity) + """</p>
                                 </div> 
                             </div>
                         </div>
