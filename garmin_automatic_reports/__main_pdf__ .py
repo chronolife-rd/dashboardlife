@@ -27,11 +27,17 @@ URL_CST_PREPROD = "https://preprod.chronolife.net/api/2/data"
 URL_GARMIN_PROD = "https://prod.chronolife.net/api/2/garmin/data" 
 URL_GARMIN_PREPROD = "https://preprod.chronolife.net/api/2/garmin/data" 
 
+# -- Adriana
 user_id = "6o2Fzp"
 date = "2023-05-10"
 
+# -- Michel
 # user_id = "5Nwwut" 
 # date = "2023-05-04" 
+
+# -- Laurent
+# user_id = "342pv5"
+# date = "2023-05-03"
 
 # ----------------------------- Chronolife ------------------------------------
 # Start timer    

@@ -59,12 +59,14 @@ def get_bodybattery():
     datas = st.session_state.garmin_indicators
 
     output = {}
-    output["high"]  = ""
-    output["low"]   = ""
+    output['values'] = ""
+    output["high"]   = ""
+    output["low"]    = ""
     
     if len(datas) > 0 and datas["body_battery"]["highest"] is not None:
-        output["high"] = datas["body_battery"]["highest"]
-        output["low"]  = datas["body_battery"]["lowest"]
+        output["values"] = datas["body_battery"]["all_values"]
+        output["high"]   = datas["body_battery"]["highest"]
+        output["low"]    = datas["body_battery"]["lowest"]
     
     return output
 
@@ -93,9 +95,9 @@ def get_intensity():
     output["vigurous"]  = ""
     
     if len(datas) > 0 and datas["intensity_min"]["total"] is not None:
-            output["total"]    = datas["intensity_min"]["total"]
-            output["moderate"] = datas["intensity_min"]["moderate"]
-            output["vigurous"] = datas["intensity_min"]["vigurous"]
+            output["total"]    = td_to_hhmm_str(datas["intensity_min"]["total"])
+            output["moderate"] = td_to_hhmm_str(datas["intensity_min"]["moderate"])
+            output["vigurous"] = td_to_hhmm_str(datas["intensity_min"]["vigurous"])
     
     return output
 
@@ -121,13 +123,13 @@ def get_sleep():
         output["score"]             = datas["sleep"]["score"]
         output["quality"]           = datas["sleep"]["quality"]
         output["duration"]          = datas["sleep"]["recorded_time"]
-        output["duration_deep"]     = int(round(datas["sleep"]["deep"]/60))
-        output["duration_light"]    = int(round(datas["sleep"]["light"]/60))
-        output["duration_rem"]      = int(round(datas["sleep"]["rem"]/60))
-        output["duration_awake"]    = int(round(datas["sleep"]["awake"]/60))
-        
-        output["percentage_deep"]   = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
-        output["percentage_light"]  = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
+        output["duration_deep"]     = td_to_hhmm_str(datas["sleep"]["deep"])
+        output["duration_light"]    = td_to_hhmm_str(datas["sleep"]["light"])
+        output["duration_rem"]      = td_to_hhmm_str(datas["sleep"]["rem"])
+        output["duration_awake"]    = td_to_hhmm_str(datas["sleep"]["awake"])
+
+        output["percentage_deep"]   = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_light"]  = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
         output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
         output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
 
@@ -168,10 +170,11 @@ def get_stress():
         output["values"]            = datas["stress"]["all_values"]
         output["score"]             = datas["stress"]["score"]
         output["duration"]          = datas["stress"]["recorded_time"]
-        output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
-        output["duration_low"]      = int(round(datas["stress"]["low"]/60))
-        output["duration_medium"]   = int(round(datas["stress"]["medium"]/60))
-        output["duration_high"]     = int(round(datas["stress"]["high"]/60))
+        
+        output["duration_rest"]     = td_to_hhmm_str(datas["stress"]["rest"])
+        output["duration_low"]      = td_to_hhmm_str(datas["stress"]["low"])
+        output["duration_medium"]   = td_to_hhmm_str(datas["stress"]["medium"])
+        output["duration_high"]     = td_to_hhmm_str(datas["stress"]["high"])
         
         output["percentage_rest"]   = int(round(datas["stress"]["rest"]/datas["stress"]["recorded_time"]*100))
         output["percentage_low"]    = int(round(datas["stress"]["low"]/datas["stress"]["recorded_time"]*100))
@@ -654,3 +657,11 @@ def get_sessions(end_user, year, month):
     df = pd.DataFrame(np.array(data).T, columns=columns)
     
     return df
+
+def td_to_hhmm_str(td_seconds):
+   
+    sign = ''
+    tdhours, rem = divmod(td_seconds, 3600)
+    tdminutes, rem = divmod(rem, 60)
+    tdstr = '{}{:}h {:02d}m'.format(sign, int(tdhours), int(tdminutes))
+    return tdstr

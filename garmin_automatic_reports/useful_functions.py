@@ -58,7 +58,7 @@ def sum_time_intervals(time_intervals):
             delta_time = delta_time.seconds  
             total_time += delta_time
     
-    return timedelta_formatter(total_time)
+    return total_time
 
 def sum_time_intervals_garmin(time_intervals):
     total_time = 0

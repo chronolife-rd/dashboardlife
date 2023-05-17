@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, unwrap
+from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap
 from garmin_automatic_reports.config import CST_SIGNAL_TYPES
 from garmin_automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
     
@@ -33,7 +33,7 @@ def get_cst_data(user_id, date, api, url):
     results_dict = initialize_dictionary_with_template()
     results_dict['user_id']  = user_id
     add_cardio(date, datas_3_days, results_dict['cardio'])
-    add_breath(date, datas_3_days, results_dict['breath']) # To add inspi expi               
+    add_breath(date, datas_3_days, results_dict['breath'])                  
     add_activity(date, datas_3_days, results_dict['activity'])
     add_durations(date, results_dict)
     
@@ -137,6 +137,8 @@ def initialize_alerts_with_template() -> dict :
         "y" : None,
         "w" : ALERT_SIZE,
         "h" : ALERT_SIZE,
+        "exists" : False,
+        "values" : []
         }
 
     dict_template = {
@@ -221,13 +223,20 @@ def add_durations(date, results_dict):
     rest_time_intervals = find_time_intervals(rest_times)
     activity_time_intervals = find_time_intervals(active_times)
     
+    collected_in_s = sum_time_intervals(time_intervals)
+    day_in_s = sum_time_intervals(day_time_intervals)
+    night_in_s = sum_time_intervals(night_time_intervals)
+    rest_in_s = sum_time_intervals(rest_time_intervals)
+    active_in_s = collected_in_s - rest_in_s
+    
     duration_dict = results_dict["duration"]
     duration_dict["intervals"] = time_intervals
-    duration_dict["collected"] = sum_time_intervals(time_intervals)
-    duration_dict["day"] = sum_time_intervals(day_time_intervals)
-    duration_dict["night"] = sum_time_intervals(night_time_intervals)
-    duration_dict["rest"] = sum_time_intervals(rest_time_intervals)
-    duration_dict["active"] = sum_time_intervals(activity_time_intervals)
+    duration_dict["collected"] = timedelta_formatter(collected_in_s)
+    duration_dict["day"] = timedelta_formatter(day_in_s)
+    duration_dict["night"] = timedelta_formatter(night_in_s)
+    duration_dict["rest"] = timedelta_formatter(rest_in_s)
+    duration_dict["active"] = timedelta_formatter(active_in_s)
+    
 
 def add_anomalies(results_dict):
     alerts_dict = results_dict['anomalies']
@@ -256,8 +265,12 @@ def add_anomalies(results_dict):
     
     if(value > 20):
         alerts_dict["tachypnea"]["path"]  = RED_ALERT
+        alerts_dict["tachypnea"]["exists"] = True
+        alerts_dict["tachypnea"]["values"] = values
     elif(value < 6):
         alerts_dict["bradypnea"]["path"]  = RED_ALERT
+        alerts_dict["bradypnea"]["exists"] = True
+        alerts_dict["bradypnea"]["values"] = values
 
     # Cardio Tachy/Brady
     df_aux = results_dict['cardio']['rate']
@@ -266,8 +279,12 @@ def add_anomalies(results_dict):
 
     if(value > 100):
         alerts_dict["tachycardia"]["path"] = RED_ALERT
+        alerts_dict["tachycardia"]["exists"] = True
+        alerts_dict["tachycardia"]["values"] = values
     elif(value < 60):
         alerts_dict["bradycardia"]["path"]  = RED_ALERT
+        alerts_dict["bradycardia"]["exists"] = True
+        alerts_dict["bradycardia"]["values"] = values
     
     # Cardio QTc length TO CHANGE TO CHANGE when indicator is updateted !!!
     df_aux = results_dict['cardio']['qt']
@@ -276,6 +293,9 @@ def add_anomalies(results_dict):
     value_min = round(min(values))
     if(value_max > 500 or value_min < 350):
         alerts_dict["qt"]["path"]  = RED_ALERT
+        alerts_dict["qt"]["exists"] = True
+        alerts_dict["qt"]["values"] = values
+        
 
 def merge_on_times(df_1, df_2):
     df_result = pd.merge(df_1, df_2, how="outer", on="times")
@@ -369,19 +389,18 @@ def get_timestamp(id_:str):
 # %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
-
 # # # Michel
 # # user_id = "5Nwwut" 
 # # date = "2023-05-04" 
-# # #/ Adriana
+# #/ Adriana
 # user_id = "6o2Fzp"
 # date = "2023-05-10"
 
-#/ if prod == True :
+# if prod == True :
 #     api = API_KEY_PROD
 #     url = URL_CST_PROD
 # else :
 #     api = API_KEY_PREPROD
 #     url = URL_CST_PREPROD
 
-#/ results_dict = get_cst_data(user_id, date, api, url)
+# results_dict = get_cst_data(user_id, date, api, url)

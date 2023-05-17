@@ -49,7 +49,7 @@ def get_commun_indicators(cst_data:dict, garmin_data:dict) :
     value = round(min(mean_values))
     commun_indicators["breath"]["rate_resting"] = value
 
-    # Add rate variability
+    # Add rate variability TO CHANGE !!!!!
     df_aux = commun_data['breath']['rate_var']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, 
                         "values"].dropna().reset_index(drop=True)
@@ -57,7 +57,7 @@ def get_commun_indicators(cst_data:dict, garmin_data:dict) :
     commun_indicators["breath"]["rate_var_resting"] = value
 
     # Add inhale/exhale ratio TO CHANGE !!!!!
-    value = 500
+    value = 80
     commun_indicators["breath"]["ratio_in_exhale"] = value
 
     # ========================== Activity dict ===============================

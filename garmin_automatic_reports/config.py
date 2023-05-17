@@ -14,7 +14,7 @@ GARMIN_SIGNAL_TYPES = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pul
 
 # Constants used in functions 
 ACTIVITY_THREASHOLD = 18 # constant used in computing alerts
-DELTA_TIME = timedelta(minutes = 5) # constant used in computing times intervals 
+DELTA_TIME = timedelta(minutes = 3) # constant used in computing times intervals 
 
 # Path to the pdf results folder 
 PATH_PDF = "pdf_results"

@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
 from garmin_automatic_reports.config import GARMIN_SIGNAL_TYPES
 
-
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
 # Request user's data from servers
@@ -164,24 +163,28 @@ def add_durations(date, results_dict):
     night_times  = ref_df.loc[ref_df["times"] < NIGHT_LIMIT, 
                                     "times"].reset_index(drop=True)
     
+    df_activity = results_dict['activity']['intensity'] 
+    medium_duration_df = df_activity.loc[df_activity['intensity'] == 'ACTIVE', 'duration']
+    high_duration_df = df_activity.loc[df_activity['intensity'] == 'HIGHLY_ACTIVE', 'duration']
+    
     time_intervals = find_time_intervals(ref_df['times'])
     day_time_intervals = find_time_intervals(day_times)
     night_time_intervals = find_time_intervals(night_times)
 
+    collected_in_s = sum_time_intervals(time_intervals)
+    day_in_s = sum_time_intervals(day_time_intervals)
+    night_in_s = sum_time_intervals(night_time_intervals)
+    active_in_s = sum(medium_duration_df) + sum(high_duration_df)
+    rest_in_s = collected_in_s - active_in_s 
+    
     duration_dict = results_dict["duration"]
     duration_dict["intervals"] = time_intervals
-    duration_dict["collected"] = sum_time_intervals(time_intervals)
-    duration_dict["day"] = sum_time_intervals(day_time_intervals)
-    duration_dict["night"] = sum_time_intervals(night_time_intervals)
-
-    df = results_dict['activity']['intensity'] 
-    rest_duration_df = df.loc[df['intensity'] == 'SEDENTARY', 'duration']
-    medium_duration_df = df.loc[df['intensity'] == 'ACTIVE', 'duration']
-    high_duration_df = df.loc[df['intensity'] == 'HIGHLY_ACTIVE', 'duration']
-
-    duration_dict["rest"] = timedelta_formatter(sum(rest_duration_df))
-    duration_dict["active"] = timedelta_formatter(sum(medium_duration_df) \
-                                                  + sum(high_duration_df))
+    duration_dict["collected"] = timedelta_formatter(collected_in_s)
+    duration_dict["day"] = timedelta_formatter(day_in_s)
+    duration_dict["night"] = timedelta_formatter(night_in_s)
+    
+    duration_dict["rest"] = timedelta_formatter(rest_in_s)
+    duration_dict["active"] = timedelta_formatter(active_in_s)
 
 def add_intensity_minutes(datas, intensity_min_dict):
     if datas_exist(datas, result_type = 'dailies'):
@@ -457,21 +460,21 @@ def initialize_dictionary_with_template() -> dict :
                     }
     return copy.deepcopy(dict_template)
 
-# ------------------------------- Test function ------------------------------ 
+# %% ---------------------------- Test function ------------------------------ 
 # ----------------------------------------------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD
 # prod = False
 # # Michel
-# # user_id = "5Nwwut" 
-# # date = "2023-05-04" 
+# user_id = "5Nwwut" 
+# date = "2023-05-04" 
 # #/ Adriana
-# user_id = "6o2Fzp"
-# date = "2023-05-10"
+# # user_id = "6o2Fzp"
+# # date = "2023-05-10"
 
-# if prod == True :
+#/ if prod == True :
 #     api = API_KEY_PROD
 #     url = URL_GARMIN_PROD
 # else :
 #     api = API_KEY_PREPROD
 #     url = URL_GARMIN_PREPROD
-# results_dict =  get_garmin_data(user_id, date, api, url)
+# datas, results_dict =  get_garmin_data(user_id, date, api, url)
