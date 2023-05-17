@@ -103,6 +103,7 @@ def get_sleep():
     datas = st.session_state.garmin_indicators
     
     output = {}
+    output["values"]            = ""
     output["score"]             = ""
     output["quality"]           = ""
     output["duration"]          = ""
@@ -116,6 +117,7 @@ def get_sleep():
     output["percentage_awake"]  = ""
     
     if len(datas) > 0 and datas["sleep"]["score"] is not None:
+        output["values"]            = datas["sleep"]["sleep_map"]
         output["score"]             = datas["sleep"]["score"]
         output["quality"]           = datas["sleep"]["quality"]
         output["duration"]          = datas["sleep"]["recorded_time"]
@@ -130,7 +132,6 @@ def get_sleep():
         output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
 
     return output
-
 
 def get_spo2():
     datas = st.session_state.garmin_indicators
@@ -151,6 +152,7 @@ def get_stress():
     datas = st.session_state.garmin_indicators
     
     output = {}
+    output["values"]            = ""
     output["score"]             = ""
     output["duration"]          = ""
     output["duration_rest"]     = ""
@@ -163,6 +165,7 @@ def get_stress():
     output["percentage_high"]   = ""
     
     if len(datas) > 0 and datas["stress"]["recorded_time"] is not None:
+        output["values"]            = datas["stress"]["all_values"]
         output["score"]             = datas["stress"]["score"]
         output["duration"]          = datas["stress"]["recorded_time"]
         output["duration_rest"]     = int(round(datas["stress"]["rest"]/60))
