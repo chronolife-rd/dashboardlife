@@ -360,7 +360,7 @@ def get_tachycardia():
 
     if len(datas["anomalies"]["tachycardia"]["values"]) > 0:
         values = datas["anomalies"]["tachycardia"]["values"]
-        output["exists"]      = datas["anomalies"]["bradycardia"]["exists"]
+        output["exists"]      = datas["anomalies"]["tachycardia"]["exists"]
         output["mean"]        = round(np.mean(values))
         output["duration"]    = 500
         output["percentage"]  = 500

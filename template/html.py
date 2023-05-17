@@ -951,7 +951,7 @@ def health_indicators_heart_tachy_brady_qt():
             <div class='health_section'> 
                 <div class="row">
                     <div class='""" + col_title + """'>
-                        <img class=icon src='data:image/png;base64,""" + st.session_state.tachycardia_alert_icon + """'/> 
+                        <img class=icon src='data:image/png;base64,""" + st.session_state.bradycardia_alert_icon + """'/> 
                         <p class='indicator_name'>""" + translate["bradycardia"] + """</p>
                     </div>
                     <div class='""" + col_key + """'>
