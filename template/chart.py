@@ -63,7 +63,7 @@ def temperature_mean():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
-    y = 60*np.random.rand(len(x))
+    y = 35 + np.random.rand(len(x))
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -89,7 +89,7 @@ def sleep():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
 
-    y = 90*np.random.rand(len(x))
+    y = np.linspace(0,100, num=len(x)) + 20*np.random.rand(len(x))
 
     thr_light     = 25
     thr_rem     = 50
@@ -162,7 +162,8 @@ def bodybattery():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
-    y = 100*np.random.rand(len(x))
+    y = np.linspace(80,20,num=len(x)) + 20*np.random.rand(len(x))
+    
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -188,7 +189,7 @@ def pulseox():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
 
-    y = 150*np.random.rand(len(x))
+    y = 95 - np.ones(len(x)) + 5*np.random.rand(len(x))
 
     thr_low     = 90
     thr_medium  = 80
@@ -261,7 +262,7 @@ def stress():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
-    y = 90*np.random.rand(len(x))
+    y = np.linspace(20,50,num=len(x)) + 20*np.random.rand(len(x))
     
     thr_low     = 25
     thr_medium  = 50
@@ -334,7 +335,7 @@ def breath_brv():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
-    y = 10*np.random.rand(len(x))
+    y = 1 + np.random.rand(len(x))
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -364,7 +365,7 @@ def breath_brpm():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
-    y = 40*np.random.rand(len(x))
+    y = 14 + np.random.rand(len(x))
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -394,7 +395,7 @@ def heart_hrv():
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
     
-    y = 435*np.random.rand(len(x))
+    y = 162 + np.random.rand(len(x))
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -423,7 +424,7 @@ def heart_bpm():
     
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    y = 120*np.random.rand(len(x))
+    y = 67 + np.random.rand(len(x))
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -461,50 +462,50 @@ def duration():
     y_empty2        = np.repeat("", 2)
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(y=y_empty,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                              mode="lines", line=dict(color="white",width=width)))
+    # fig.add_trace(go.Scatter(y=y_empty,
+    #                           x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
+    #                              datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
+    #                           mode="lines", line=dict(color="white",width=width)))
     
     fig.add_trace(go.Scatter(y=y_garmin,
                               x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 6, 0, 0)],
+                                 datetime.datetime(date.year, date.month, date.day, 23, 59, 0)],
                               mode="lines", line=dict(color=COLORS["garmin"],width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
-                             mode="lines",line=dict(color="white",width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
-                             mode="lines",line=dict(color=COLORS["garmin"],width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                             mode="lines",line=dict(color="white",width=width)))
+    # fig.add_trace(go.Scatter(y=y_garmin,
+    #                          x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
+    #                            datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
+    #                          mode="lines",line=dict(color="white",width=width)))
+    # fig.add_trace(go.Scatter(y=y_garmin,
+    #                          x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
+    #                            datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
+    #                          mode="lines",line=dict(color=COLORS["garmin"],width=width)))
+    # fig.add_trace(go.Scatter(y=y_garmin,
+    #                          x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
+    #                            datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
+    #                          mode="lines",line=dict(color="white",width=width)))
     
     
     fig.add_trace(go.Scatter(y=y_chronolife,
                               x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 6, 0, 0)],
+                                 datetime.datetime(date.year, date.month, date.day, 23, 59, 0)],
                               mode="lines", line=dict(color=COLORS["chronolife"],width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
-                             mode="lines",line=dict(color="white",width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
-                             mode="lines",line=dict(color=COLORS["chronolife"],width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                             mode="lines",line=dict(color="white",width=width)))
+    # fig.add_trace(go.Scatter(y=y_chronolife,
+    #                          x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
+    #                            datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
+    #                          mode="lines",line=dict(color="white",width=width)))
+    # fig.add_trace(go.Scatter(y=y_chronolife,
+    #                          x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
+    #                            datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
+    #                          mode="lines",line=dict(color=COLORS["chronolife"],width=width)))
+    # fig.add_trace(go.Scatter(y=y_chronolife,
+    #                          x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
+    #                            datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
+    #                          mode="lines",line=dict(color="white",width=width)))
     
-    fig.add_trace(go.Scatter(y=y_empty2,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 23, 0, 0)],
-                              mode="lines", line=dict(color="white",width=width)))
+    # fig.add_trace(go.Scatter(y=y_empty2,
+    #                           x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
+    #                              datetime.datetime(date.year, date.month, date.day, 23, 0, 0)],
+    #                           mode="lines", line=dict(color="white",width=width)))
     
     fig.update_layout(barmode='stack', height=300, 
                       template="plotly_white",

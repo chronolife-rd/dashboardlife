@@ -50,22 +50,22 @@ def get_myendusers():
 def get_duration_chronolife():
     
     output = {}
-    output["duration"]          = 17
-    output["duration_day"]      = 12
-    output["duration_night"]    = 5
+    output["duration"]          = 24
+    output["duration_day"]      = 6
+    output["duration_night"]    = 18
     output["duration_rest"]     = 16 
-    output["duration_activity"] = 1
+    output["duration_activity"] = 8
     
     return output
 
 def get_duration_garmin():
     
     output = {}
-    output["duration"]          = 22
-    output["duration_day"]      = 16
-    output["duration_night"]    = 6
+    output["duration"]          = 24
+    output["duration_day"]      = 6
+    output["duration_night"]    = 18
     output["duration_rest"]     = 16 
-    output["duration_activity"] = 6
+    output["duration_activity"] = 8
     
     return output    
 

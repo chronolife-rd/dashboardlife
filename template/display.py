@@ -56,7 +56,7 @@ def run():
                 data_report()
                 
                 # Definitions section
-                definitions()
+                # definitions()
             
         # Logout button
         logout()
@@ -457,35 +457,33 @@ def data_report():
     
     st.markdown("---")
     
-def definitions():
-    st.markdown(html.definitions_title(), unsafe_allow_html=True)
+# def definitions():
+#     st.markdown(html.definitions_title(), unsafe_allow_html=True)
     
-    tab_alert, tab_period_and_activity, tab_heart, tab_breath, tab_stress,\
-        tab_pulseox, tab_bodybattery, tab_sleep, tab_temp = st.tabs(["Alert", 
-                                                                     "Period and Activity", 
-                                                                     "Heart",
-                                                                     "Breath", 
-                                                                     "Stress",
-                                                                     "Pulse Ox",
-                                                                     "Body Battery",
-                                                                     "Sleep",
-                                                                     "Temperature",
-                                                                     ])
-    with tab_alert:
-        st.markdown(html.definitions_alert(), unsafe_allow_html=True)
-    with tab_period_and_activity:
-        st.markdown(html.definitions_period_and_activity(), unsafe_allow_html=True)
-    with tab_heart:
-        st.markdown(html.definitions_heart(), unsafe_allow_html=True)
-    with tab_breath:
-        st.markdown(html.definitions_breath(), unsafe_allow_html=True)
-    with tab_stress:
-        st.markdown(html.definitions_stress(), unsafe_allow_html=True)
-    with tab_pulseox:
-        st.markdown(html.definitions_pulseox(), unsafe_allow_html=True)
-    with tab_bodybattery:
-        st.markdown(html.definitions_bodybattery(), unsafe_allow_html=True)
-    with tab_sleep:
-        st.markdown(html.definitions_sleep(), unsafe_allow_html=True)
-    with tab_temp:
-        st.markdown(html.definitions_temp(), unsafe_allow_html=True)
+#     tab_alert, tab_period_and_activity, tab_heart, tab_breath, tab_stress,\
+#         = st.tabs(["Alert", 
+#                                                                      "Period and Activity", 
+#                                                                      "Heart",
+#                                                                      "Breath", 
+                                                                     
+                                                                     
+                                                                     
+#                                                                      ])
+#     with tab_alert:
+#         st.markdown(html.definitions_alert(), unsafe_allow_html=True)
+#     with tab_period_and_activity:
+#         st.markdown(html.definitions_period_and_activity(), unsafe_allow_html=True)
+#     with tab_heart:
+#         st.markdown(html.definitions_heart(), unsafe_allow_html=True)
+#     with tab_breath:
+#         st.markdown(html.definitions_breath(), unsafe_allow_html=True)
+#     with tab_stress:
+#         st.markdown(html.definitions_stress(), unsafe_allow_html=True)
+#     # with tab_pulseox:
+#     #     st.markdown(html.definitions_pulseox(), unsafe_allow_html=True)
+#     # with tab_bodybattery:
+#     #     st.markdown(html.definitions_bodybattery(), unsafe_allow_html=True)
+#     # with tab_sleep:
+#     #     st.markdown(html.definitions_sleep(), unsafe_allow_html=True)
+#     # with tab_temp:
+#     #     st.markdown(html.definitions_temp(), unsafe_allow_html=True)
