@@ -6,15 +6,18 @@ URL_DATA    = URL_ROOT + "/data"
 URL_USER    = URL_ROOT + "/user"
 
 TYPE = {}
-TYPE_ECG                 = "ecg_filtered"
-TYPE_BREATH_THORACIC     = "breath_1_filtered"
-TYPE_BREATH_ABDOMINAL    = "breath_2_filtered"
+TYPE_ECG                 = "ecg"
+TYPE_BREATH_THORACIC     = "breath_1"
+TYPE_BREATH_ABDOMINAL    = "breath_2"
 TYPE_ACCELERATION_X      = "accx"
 TYPE_ACCELERATION_Y      = "accy"
 TYPE_ACCELERATION_Z      = "accz"
 TYPE_RAW_SIGNALS        = (TYPE_ACCELERATION_X + "," + 
                                            TYPE_ACCELERATION_Y + "," + 
-                                           TYPE_ACCELERATION_Z) 
+                                           TYPE_ACCELERATION_Z +','  +
+                                           TYPE_ECG + "," + 
+                                           TYPE_BREATH_THORACIC + "," +
+                                           TYPE_BREATH_ABDOMINAL)
 TYPE_FILTERED_SIGNALS   = (TYPE_ECG + "," + 
                                            TYPE_BREATH_THORACIC + "," +
                                            TYPE_BREATH_ABDOMINAL)

@@ -239,12 +239,12 @@ def overview_data_collection():
                 <div class='overview_section'> 
                     <div class="row">
                         <div class='""" + col_title + """'>
-                            <p class='indicator_name'>Garmin watch</p>
+                            <p class='indicator_name'>Garmin wearable</p>
                         </div>
                     </div>
                     <div class="row overview_sub_section_garmin">
                         <div class='""" + col_logo + """'>
-                            <img class=device_icon src='data:image/png;base64,""" + st.session_state.garrmin + """'/>
+                            <img class=device_icon_garmin src='data:image/png;base64,""" + st.session_state.garrmin + """'/>
                         </div>
                         <div class='""" + col_data + """'>
                             <div class="row data_collection">
@@ -1273,9 +1273,9 @@ def health_indicators_bodybattery_results():
     html = """
     <div class=col1_indicators>
         <p>High</p>
-        <p class="indicator_main_value">""" + str(bodybattery_high) + """ </p>
+        <p class="indicator_main_value">""" + str(bodybattery_high) +""" % """ """ </p>
         <p>Low</p>
-        <p class="indicator_value">""" + str(bodybattery_low) + """</p>
+        <p class="indicator_value">""" + str(bodybattery_low) +""" % """ """</p>
     </div>
     """
     

@@ -202,7 +202,7 @@ def form_indicators():
     c1, c2 = form_indicators_layout.columns(2)
     
     # Date picker
-    date = c1.date_input("Date", max_value=datetime.datetime.now(), key="ksd")
+    date = c1.date_input("Date", datetime.date(2022, 12, 13),max_value=datetime.datetime.now(), key="ksd")
     # User ID input
     end_user = c2.text_input("End-user ID","5P4svk")
     
@@ -312,8 +312,8 @@ def form_smart_textile_raw_data():
 def health_indicators():
     
     st.markdown(html.health_indicators_title(), unsafe_allow_html=True)
-    st.markdown(html.health_indicators_download(), unsafe_allow_html=True)
-    health_indicator_download_button = st.button('Download', key="download_health_indicators")
+    # st.markdown(html.health_indicators_download(), unsafe_allow_html=True)
+    # health_indicator_download_button = st.button('Download', key="download_health_indicators")
     tab_heart, tab_breath, tab_stress, tab_pulseox, tab_bodybattery, tab_sleep, tab_temp = st.tabs(["Heart", 
                                                                                                   "Breath", 
                                                                                                   "Stress",
@@ -458,26 +458,26 @@ def data_report():
     
     st.markdown("---")
     
-# def definitions():
-#     st.markdown(html.definitions_title(), unsafe_allow_html=True)
+def definitions():
+    st.markdown(html.definitions_title(), unsafe_allow_html=True)
     
-#     tab_alert, tab_period_and_activity, tab_heart, tab_breath, tab_stress,\
-#         = st.tabs(["Alert", 
-#                                                                      "Period and Activity", 
-#                                                                      "Heart",
-#                                                                      "Breath", 
+    tab_alert, tab_period_and_activity, tab_heart, tab_breath,\
+        = st.tabs(["Alert", 
+                                                                     "Period and Activity", 
+                                                                     "Heart",
+                                                                     "Breath", 
                                                                      
                                                                      
                                                                      
-#                                                                      ])
-#     with tab_alert:
-#         st.markdown(html.definitions_alert(), unsafe_allow_html=True)
-#     with tab_period_and_activity:
-#         st.markdown(html.definitions_period_and_activity(), unsafe_allow_html=True)
-#     with tab_heart:
-#         st.markdown(html.definitions_heart(), unsafe_allow_html=True)
-#     with tab_breath:
-#         st.markdown(html.definitions_breath(), unsafe_allow_html=True)
+                                                                     ])
+    with tab_alert:
+        st.markdown(html.definitions_alert(), unsafe_allow_html=True)
+    with tab_period_and_activity:
+        st.markdown(html.definitions_period_and_activity(), unsafe_allow_html=True)
+    with tab_heart:
+        st.markdown(html.definitions_heart(), unsafe_allow_html=True)
+    with tab_breath:
+        st.markdown(html.definitions_breath(), unsafe_allow_html=True)
 #     with tab_stress:
 #         st.markdown(html.definitions_stress(), unsafe_allow_html=True)
 #     # with tab_pulseox:

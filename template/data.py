@@ -381,14 +381,14 @@ def get_smart_textile_raw_data():
                 tmp = get_sig_info(datas_mapped, key_type, verbose=0)
                 raw_data[key_type][val_type] = tmp[val_type]
         
-        # --- Map filtered data 
-        types_filtered  = TYPE_FILTERED_SIGNALS.split(',')
-        datas_filtered_mapped = map_data_filt(datas, types_filtered)
-        for key_type in types_filtered:
-            raw_data[key_type] = {}
-            for val_type in ["times", "sig"]:
-                tmp = get_sig_info(datas_filtered_mapped, key_type, verbose=0)
-                raw_data[key_type][val_type] = tmp[val_type]
+        # # --- Map filtered data 
+        # types_filtered  = TYPE_FILTERED_SIGNALS.split(',')
+        # datas_filtered_mapped = map_data_filt(datas, types_filtered)
+        # for key_type in types_filtered:
+        #     raw_data[key_type] = {}
+        #     for val_type in ["times", "sig"]:
+        #         tmp = get_sig_info(datas_filtered_mapped, key_type, verbose=0)
+        #         raw_data[key_type][val_type] = tmp[val_type]
                 
     st.session_state.smart_textile_raw_data = raw_data
     
