@@ -151,7 +151,7 @@ def get_calories():
 def get_intensity():
     
     output = {}
-    output["total"]       = 45
+    output["total"]       = 33
     output["moderate"]    = 20
     output["vigorous"]    = 13
     

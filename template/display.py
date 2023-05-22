@@ -453,7 +453,8 @@ def health_indicators_sleep():
 def data_report():
     st.markdown(html.data_report_title(), unsafe_allow_html=True)
     st.markdown(html.data_report_download(), unsafe_allow_html=True)
-    data_report_download_button = st.button('Download', key="download_data_report")
+    with open("Data_5P4svk_2022-12-13.pdf", "rb") as file:
+        data_report_download_button = st.download_button('Download', data=file, file_name="Data_5P4svk_2022-12-13.pdf",key="download_data_report")
     
     st.markdown("---")
     
