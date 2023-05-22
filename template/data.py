@@ -266,8 +266,8 @@ def get_bradypnea():
     
     output = {}
     output["exists"]      = True
-    output["mean"]        = 0
-    output["duration"]    = 0
+    output["mean"]        = 5
+    output["duration"]    = 5
     output["percentage"]  = 0
     
     if output["exists"]:
@@ -282,8 +282,8 @@ def get_tachypnea():
     
     output = {}
     output["exists"]       = True
-    output["mean"]        = 0
-    output["duration"]    = 0
+    output["mean"]        = 8
+    output["duration"]    = 2
     output["percentage"]  = 0
     
     if output["exists"]:
