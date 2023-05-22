@@ -639,17 +639,19 @@ def sleep_donut():
     translate   = st.session_state.translate
     sleep       = data.get_sleep()
     
-    score   = sleep["score"]
-    if sleep["score"] == "":
-        deep    = 25
-        light   = 25
-        rem     = 25
-        awake   = 25
-    else:
+    recoded_time   = sleep["duration"]
+    if recoded_time > 1:
         deep    = sleep["percentage_deep"]
         light   = sleep["percentage_light"]
         rem     = sleep["percentage_rem"]
         awake   = sleep["percentage_awake"]
+    else:
+        deep    = 25
+        light   = 25
+        rem     = 25
+        awake   = 25
+
+    score   = sleep["score"]
     quality = sleep["quality"]
     
     plt.rcParams['figure.facecolor'] = "white" #cycler(color="#F0F2F6")

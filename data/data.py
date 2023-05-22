@@ -106,7 +106,6 @@ def get_sleep():
     
     output = {}
     output["values"]            = ""
-    output["score"]             = ""
     output["quality"]           = ""
     output["duration"]          = ""
     output["duration_deep"]     = ""
@@ -128,10 +127,10 @@ def get_sleep():
         output["duration_rem"]      = td_to_hhmm_str(datas["sleep"]["rem"])
         output["duration_awake"]    = td_to_hhmm_str(datas["sleep"]["awake"])
 
-        output["percentage_deep"]   = int(round(datas["sleep"]["deep"]/datas["sleep"]["recorded_time"]*100))
-        output["percentage_light"]  = int(round(datas["sleep"]["light"]/datas["sleep"]["recorded_time"]*100))
-        output["percentage_rem"]    = int(round(datas["sleep"]["rem"]/datas["sleep"]["recorded_time"]*100))
-        output["percentage_awake"]  = int(round(datas["sleep"]["awake"]/datas["sleep"]["recorded_time"]*100))
+        output["percentage_deep"]   = datas["sleep"]["percentage_deep"]
+        output["percentage_light"]  = datas["sleep"]["percentage_light"]
+        output["percentage_rem"]    = datas["sleep"]["percentage_rem"]
+        output["percentage_awake"]  = datas["sleep"]["percentage_awake"]
 
     return output
 

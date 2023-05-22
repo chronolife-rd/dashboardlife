@@ -162,11 +162,11 @@ def add_cardio(date, datas, cardio_dict):
 def add_breath(date, datas, breath_dict):
     rate = get_cst_result_info(date, datas, result_type='breath_2_brpm')
     rate_var = get_cst_result_info(date, datas, result_type='breath_2_brv')
-    # inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi') # TO CHANGE!!!
+    inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi') # TO CHANGE!!!
 
     breath_dict['rate'] = rate
     breath_dict['rate_var'] = rate_var
-    # breath_dict['inspi_expi'] = inspi_expi
+    breath_dict['inspi_expi'] = inspi_expi
 
 def add_activity(date, datas, activity_dict) : 
     averaged_activity = get_cst_result_info(date, datas, result_type='averaged_activity')
@@ -195,7 +195,7 @@ def add_activity_to_indicators(results_dict) -> dict:
     sig_indicators = results_dict["breath"]
     sig_indicators["rate"] = merge_on_times(sig_indicators["rate"], averaged_activity_df)
     sig_indicators["rate_var"] = merge_on_times(sig_indicators["rate_var"], averaged_activity_df)
-    # sig_indicators["inspi_expi"] = merge_on_times(sig_indicators["inspi_expi"], averaged_activity_df)
+    sig_indicators["inspi_expi"] = merge_on_times(sig_indicators["inspi_expi"], averaged_activity_df)
 
     return copy.deepcopy(results_dict)
 

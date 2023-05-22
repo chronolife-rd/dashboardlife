@@ -33,7 +33,6 @@ def get_garmin_data(user_id, date, api, url):
 # ----------------------------------------------------------------------------
 def request_data_from_servers(params, api, url):
 
-        
     # Perform the POST request authenticated with YOUR API key (NOT the one of
     # the sub-user!).
     reply = requests.get(url, headers={"X-API-Key": api}, params=params)
@@ -208,6 +207,12 @@ def add_sleep(date, user_id, datas, sleep_dict, api, url):
     sleep_dict["awake"] = value_dict[ 'awakeDurationInSeconds']
     sleep_dict["recorded_time"] = sleep_dict["deep"] + sleep_dict["light"] +\
                                   sleep_dict["rem"] + sleep_dict["awake"]
+    
+    if(sleep_dict["recorded_time"] > 0):
+        sleep_dict["percentage_deep"]   = int(round(sleep_dict["deep"]/sleep_dict["recorded_time"]*100))
+        sleep_dict["percentage_light"]  = int(round(sleep_dict["light"]/sleep_dict["recorded_time"]*100))
+        sleep_dict["percentage_rem"]    = int(round(sleep_dict["rem"]/sleep_dict["recorded_time"] *100))
+        sleep_dict["percentage_awake"]  = int(round(sleep_dict["awake"]/sleep_dict["recorded_time"] *100))
 
 def add_spo2(datas, spo2_dict):
     if datas_exist(datas, result_type = 'pulseox'):
@@ -429,6 +434,10 @@ def initialize_dictionary_with_template() -> dict :
         "rem" : None, 
         "score" : None,
         "timestamp_end" : None,
+        'percentage_deep' : 0,
+        'percentage_light' : 0,
+        'percentage_rem' : 0,
+        'percentage_awake' : 0,
     }
     spo2_dict = {
         "all_values" : None,

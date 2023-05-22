@@ -8,7 +8,7 @@ import copy
 import numpy as np
 import pandas as pd 
 from collections import deque
-from config import ACTIVITY_THREASHOLD
+from garmin_automatic_reports.config import ACTIVITY_THREASHOLD
 from datetime import datetime
 
 TEXT_FONT = "Helvetica"
