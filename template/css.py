@@ -136,7 +136,11 @@ def body():
                         padding-right: 50px;
                         margin-top: 50px;
                         }
-                    
+                    .device_icon_garmin{
+                        width: 160px;
+                        padding-right: 20px;
+                        margin-top: 50px;
+                    }
                     .icon {
                         float: left;
                         width: 40px;

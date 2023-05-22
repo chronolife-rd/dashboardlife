@@ -15,6 +15,8 @@ from scipy.signal import medfilt
 import numpy as np
 import datetime
 from template.util import img_to_bytes
+import template.filt_codes as filt_codes
+import random
 
 def test_chart():
     
@@ -84,12 +86,27 @@ def temperature_mean():
     
     return fig
 
+def generer_liste(x):
+    liste = []
+    
+    # Générer 60 valeurs aléatoires entre 23 et 50
+    for _ in range(int(x/4)):
+        valeur = random.randint(23, 80)
+        liste.append(valeur)
+    
+    # Ajouter 40 valeurs égales à zéro
+    liste.extend([0] * int(3*x/4))
+    
+    return liste
+
+
 def sleep():
     
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
 
-    y = np.linspace(0,100, num=len(x)) + 20*np.random.rand(len(x))
+    # y = np.linspace(0,100, num=len(x)) + 20*np.random.rand(len(x))
+    y = np.array(generer_liste(len(x)))
 
     thr_light     = 25
     thr_rem     = 50
@@ -543,10 +560,12 @@ def smart_textile_raw_data(layout=False):
 def ecg_signal(template='plotly_white', width_line=2, height=500):
     # ECG
     raw_data = st.session_state.smart_textile_raw_data[TYPE_ECG]
-    ymin = max([min(unwrap(raw_data['sig']))*1.1, -1000])
-    ymax = min([max(unwrap(raw_data['sig']))*1.1, 1000])
+
+    ecg_filt = filt_codes.filter_ecg_scipy_unwrap(raw_data['sig'],fs=200)
+    ymin = max([min(unwrap(ecg_filt))*1.1, -1000])
+    ymax = min([max(unwrap(ecg_filt))*1.1, 1000])
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(raw_data['sig']),
+    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(ecg_filt),
                         mode='lines',
                         line=dict(color=COLORS["ecg"], width=width_line),
                                   name='ECG'))
@@ -560,20 +579,25 @@ def ecg_signal(template='plotly_white', width_line=2, height=500):
                       )
     
     return fig
-    
+
 def breath_signal(template='plotly_white', width_line=2, height=500):
     # Breath
     raw_data = st.session_state.smart_textile_raw_data[TYPE_BREATH_ABDOMINAL]
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(raw_data['sig']),
+
+    abdominal_filt = filt_codes.filter_breath_unwrap(raw_data['sig'],fs=20)
+    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(abdominal_filt),
                               mode='lines',
                               line=dict(color=COLORS["breath_2"], width=width_line),
                               name='Abdominal Breath'))
+    
     raw_data = st.session_state.smart_textile_raw_data[TYPE_BREATH_THORACIC]
-    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(raw_data['sig']),
+    thoracic_filt = filt_codes.filter_breath_unwrap(raw_data['sig'],fs=20)
+    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(thoracic_filt),
                         mode='lines',
                         line=dict(color=COLORS["breath"], width=width_line),
                         name='Thoracic Breath'))
+    
     fig.update_layout(height=height, 
                       template=template, 
                       title='Breath',
