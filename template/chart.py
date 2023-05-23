@@ -117,7 +117,6 @@ def sleep():
                       title="Sleep scores",
                       showlegend=False,
                       )
-    
     return fig
 
 def bodybattery():

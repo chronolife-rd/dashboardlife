@@ -232,7 +232,7 @@ def overview_data_collection():
                                     <p>""" + translate["night"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_day) + """</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_night) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
@@ -241,7 +241,7 @@ def overview_data_collection():
                                     <p>""" + translate["day"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_night)+ """</p>
+                                    <p class='""" + class_val + """'>""" + str(chronolife_duration_day)+ """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
@@ -290,7 +290,7 @@ def overview_data_collection():
                                     <p>""" + translate["night"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_day) + """</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_night) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.day + """'/> 
@@ -299,7 +299,7 @@ def overview_data_collection():
                                     <p>""" + translate["day"] + """</p>
                                 </div> 
                                 <div class='""" + col_val + """'>
-                                    <p class='""" + class_val + """'>""" + str(garmin_duration_night) + """</p>
+                                    <p class='""" + class_val + """'>""" + str(garmin_duration_day) + """</p>
                                 </div> 
                                 <div class='""" + col_icon + """'>
                                     <img class=miniicon src='data:image/png;base64,""" + st.session_state.rest + """'/> 
