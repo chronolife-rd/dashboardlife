@@ -888,7 +888,7 @@ def health_indicators_heart_tachy_brady_qt():
                         <p>HR</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p class='""" + class_val + """'>""" + str(tachy_mean) + """ bpm</p>
+                        <p class='""" + class_val + """'>""" + """ NA</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Duration</p>
@@ -916,7 +916,7 @@ def health_indicators_heart_tachy_brady_qt():
                         <p>HR</p>
                     </div>
                     <div class='""" + col_val + """'>
-                        <p class='""" + class_val + """'>""" + str(brady_mean) + """ bpm</p>
+                        <p class='""" + class_val + """'>""" + """ NA</p>
                     </div>
                     <div class='""" + col_key + """'>
                         <p>Duration</p>
