@@ -9,7 +9,7 @@ from scipy.signal import medfilt
 import numpy as np
 import datetime
 from template.util import img_to_bytes
-from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin
+from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery
 import random
 
 def temperature_mean():
@@ -123,23 +123,20 @@ def sleep():
 def bodybattery():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    y0=98
-    for i in range(len(x)):
-        y.append(y0-i/3+np.random.randn())
-    
     line_width = 2
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, 
-                             y=y,
-                        mode='lines',
-                        line=dict(color=constant.COLORS()['bodybattery'], width=line_width),
-                        name='tmp'))
+   
+    values_df = get_bodybattery()['values']
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]
+        
+        fig.add_trace(go.Scatter(x=x, 
+                                    y=y,
+                            mode='lines',
+                            line=dict(color=constant.COLORS()['bodybattery'], width=line_width),
+                            name='tmp'))
     
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['bodybattery'],
@@ -156,143 +153,143 @@ def bodybattery():
 def pulseox():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-
-    y = 150*np.random.rand(len(x))
-
     thr_low     = 90
     thr_medium  = 80
     thr_high    = 70
 
-    idx = np.where(y >= thr_low)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rest = x[idx]
-    y_rest = y[idx]
-
-    idx = np.where((y < thr_low) & (y >= thr_medium))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_low = x[idx]
-    y_low = y[idx]
-
-    idx = np.where((y < thr_medium) & (y >= thr_high))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_medium = x[idx]
-    y_medium = y[idx]
-
-    idx = np.where(y < thr_high)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_high = x[idx]
-    y_high = y[idx]
-
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=x_rest, 
-                         y=y_rest,
-                         marker_color=constant.COLORS()['spo2_green'],
-                         name="Normal"))
-    fig.add_trace(go.Bar(x=x_low, 
-                         y=y_low,
-                         marker_color=constant.COLORS()['spo2_low'],
-                         name="Low"))
-    fig.add_trace(go.Bar(x=x_medium, 
-                         y=y_medium,
-                         marker_color=constant.COLORS()['spo2_medium'],
-                         name="Very Low"))
-    fig.add_trace(go.Bar(x=x_high, 
-                         y=y_high,
-                         marker_color=constant.COLORS()['spo2_high'],
-                         name="Extremely low"))
-
-    fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title="SpO2",
-                      font=dict(size=14,),
-                      height=300, 
-                      template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
-                      title="Pulse Ox Scores",
-                      showlegend=False,
-                      )
     
+    values_df = get_spo2()['values']
+
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]
+    
+        idx = np.where(y >= thr_low)
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_rest = x[idx]
+        y_rest = y[idx]
+
+        idx = np.where((y < thr_low) & (y >= thr_medium))
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_low = x[idx]
+        y_low = y[idx]
+
+        idx = np.where((y < thr_medium) & (y >= thr_high))
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_medium = x[idx]
+        y_medium = y[idx]
+
+        idx = np.where(y < thr_high)
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_high = x[idx]
+        y_high = y[idx]
+
+        fig.add_trace(go.Bar(x=x_rest, 
+                            y=y_rest,
+                            marker_color=constant.COLORS()['spo2_green'],
+                            name="Normal"))
+        fig.add_trace(go.Bar(x=x_low, 
+                            y=y_low,
+                            marker_color=constant.COLORS()['spo2_low'],
+                            name="Low"))
+        fig.add_trace(go.Bar(x=x_medium, 
+                            y=y_medium,
+                            marker_color=constant.COLORS()['spo2_medium'],
+                            name="Very Low"))
+        fig.add_trace(go.Bar(x=x_high, 
+                            y=y_high,
+                            marker_color=constant.COLORS()['spo2_high'],
+                            name="Extremely low"))
+        
+    fig.update_layout(xaxis_title=translate["times"],
+                yaxis_title="SpO2",
+                font=dict(size=14,),
+                height=300, 
+                template="plotly_white",
+                paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                title="Pulse Ox Scores",
+                showlegend=False,
+                )
     return fig
 
 def stress():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y = 90*np.random.rand(len(x))
-    
     thr_low     = 25
     thr_medium  = 50
     thr_high    = 75
-    
-    idx = np.where(y < thr_low)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rest = x[idx]
-    y_rest = y[idx]
-    
-    idx = np.where((y > thr_low) & (y <= thr_medium))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_low = x[idx]
-    y_low = y[idx]
-    
-    idx = np.where((y > thr_medium) & (y <= thr_high))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_medium = x[idx]
-    y_medium = y[idx]
-    
-    idx = np.where(y > thr_high)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_high = x[idx]
-    y_high = y[idx]
-    
+
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=x_rest, 
-                         y=y_rest,
-                         marker_color=constant.COLORS()['stress_rest'],
-                         name="Rest"))
-    fig.add_trace(go.Bar(x=x_low, 
-                         y=y_low,
-                         marker_color=constant.COLORS()['stress_low'],
-                         name="Low"))
-    fig.add_trace(go.Bar(x=x_medium, 
-                         y=y_medium,
-                         marker_color=constant.COLORS()['stress_medium'],
-                         name="Medium"))
-    fig.add_trace(go.Bar(x=x_high, 
-                         y=y_high,
-                         marker_color=constant.COLORS()['stress_high'],
-                         name="High"))
+
+    values_df = get_stress()['values']
+    values_df = values_df.loc[values_df["values"] > 0].dropna().reset_index(drop=True)
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]
     
+        idx = np.where(y < thr_low)
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_rest = x[idx]
+        y_rest = y[idx]
+        
+        idx = np.where((y > thr_low) & (y <= thr_medium))
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_low = x[idx]
+        y_low = y[idx]
+        
+        idx = np.where((y > thr_medium) & (y <= thr_high))
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_medium = x[idx]
+        y_medium = y[idx]
+        
+        idx = np.where(y > thr_high)
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_high = x[idx]
+        y_high = y[idx]
+        
+    
+        fig.add_trace(go.Bar(x=x_rest, 
+                            y=y_rest,
+                            marker_color=constant.COLORS()['stress_rest'],
+                            name="Rest"))
+        fig.add_trace(go.Bar(x=x_low, 
+                            y=y_low,
+                            marker_color=constant.COLORS()['stress_low'],
+                            name="Low"))
+        fig.add_trace(go.Bar(x=x_medium, 
+                            y=y_medium,
+                            marker_color=constant.COLORS()['stress_medium'],
+                            name="Medium"))
+        fig.add_trace(go.Bar(x=x_high, 
+                            y=y_high,
+                            marker_color=constant.COLORS()['stress_high'],
+                            name="High"))
+        
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title="Stress Scores",
                       font=dict(size=14,),
