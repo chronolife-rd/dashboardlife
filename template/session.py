@@ -229,7 +229,7 @@ def init():
     
     if 'steps_dict' not in st.session_state:
             st.session_state.steps_dict = []
-            
+                
     if 'translate' not in st.session_state:
         st.session_state.translate = ''
         

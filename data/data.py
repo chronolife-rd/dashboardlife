@@ -200,8 +200,6 @@ def get_duration_chronolife():
         output["duration_night"]    = datas["duration"]["night"] 
         output["duration_rest"]     = datas["duration"]["rest"] 
         output["duration_activity"] = datas["duration"]["active"] 
-    
-    st.session_state.chronolife_intervals = output["intervals"]
 
     return output
 
@@ -223,8 +221,6 @@ def get_duration_garmin():
         output["duration_night"]    = datas["duration"]["night"] 
         output["duration_rest"]     = datas["duration"]["rest"] 
         output["duration_activity"] = datas["duration"]["active"] 
-    
-    st.session_state.garmin_intervals = output["intervals"]
     
     return output    
 
@@ -262,19 +258,53 @@ def get_temperature():
 def get_bpm():
     datas = st.session_state.common_indicators
     output = {}
-    output["mean"]  = ""
-    output["min"]   = ""
-    output["max"]   = ""
-    output["rest"]  = ""
-    output["high"]  = ""
+    output["values"]  = ""
+    output["mean"]    = ""
+    output["min"]     = ""
+    output["max"]     = ""
+    output["rest"]    = ""
+    output["high"]    = ""
     
     if len(datas) > 0 and datas["cardio"]["rate_high"] is not None:
-        output["mean"]  = datas["cardio"]["rate_mean"] 
-        output["min"]   = datas["cardio"]["rate_min"] 
-        output["max"]   = datas["cardio"]["rate_max"] 
-        output["rest"]  = datas["cardio"]["rate_resting"] 
-        output["high"]  = datas["cardio"]["rate_high"] 
+        output["values"]  = datas["cardio"]["rate_mean"] 
+        output["mean"]    = datas["cardio"]["rate_mean"] 
+        output["min"]     = datas["cardio"]["rate_min"] 
+        output["max"]     = datas["cardio"]["rate_max"] 
+        output["rest"]    = datas["cardio"]["rate_resting"] 
+        output["high"]    = datas["cardio"]["rate_high"] 
     
+    return output
+
+def get_bpm_values():
+    datas = st.session_state.common_data
+    output = []
+    if len(datas["cardio"]["rate"]) > 0 :
+        output = datas["cardio"]["rate"] 
+
+    return output
+
+def get_hrv_values():
+    datas = st.session_state.common_data
+    output = []
+    if len(datas["cardio"]["rate_var"]) > 0 :
+        output = datas["cardio"]["rate_var"] 
+    st.session_state.hrv_values = output
+    return output
+
+def get_brpm_values():
+    datas = st.session_state.common_data
+    output = []
+    if len(datas["breath"]["rate"]) > 0 :
+        output = datas["breath"]["rate"] 
+    st.session_state.brpm_values = output
+    return output
+
+def get_brv_values():
+    datas = st.session_state.common_data
+    output = []
+    if len(datas["breath"]["rate_var"]) > 0 :
+        output = datas["breath"]["rate_var"] 
+    st.session_state.brv_values = output
     return output
 
 def get_hrv():

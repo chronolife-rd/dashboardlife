@@ -348,7 +348,7 @@ def overview_health_indicators():
     
     # breath brv
     brv         = data.get_brv()
-    brv_rest    = brpm["rest"]
+    brv_rest    = brv["rest"]
     
     # ----- Steps
     steps           = data.get_steps()
@@ -575,28 +575,28 @@ def overview_health_indicators():
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_rest + """'/> 
                                 <p>
                                     """ + translate["rest"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(stress_duration_rest) + """ min (""" + str(stress_percentage_rest) + """%)</span>
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_rest) + """ (""" + str(stress_percentage_rest) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_low + """'/>
                                 <p>
                                     """ + translate["low"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(stress_duration_low) + """ min (""" + str(stress_percentage_low) + """%)</span>
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_low) + """ (""" + str(stress_percentage_low) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_medium + """'/>
                                 <p>
                                     """ + translate["medium"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(stress_duration_medium) + """ min (""" + str(stress_percentage_medium) + """%)</span>
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_medium) + """ (""" + str(stress_percentage_medium) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.stress_high + """'/>
                                 <p>
                                     """ + translate["high"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(stress_duration_high) + """ min (""" + str(stress_percentage_high) + """%)</span>
+                                    <span class='""" + class_val + """'>""" + str(stress_duration_high) + """ (""" + str(stress_percentage_high) + """%)</span>
                                 </p>
                             </div>
                         </div>
@@ -622,28 +622,28 @@ def overview_health_indicators():
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_deep + """'/>
                                 <p>
                                     """ + translate["deep"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(sleep_duration_deep) + """ min (""" + str(sleep_percentage_deep) + """%)</span>
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_deep) + """ (""" + str(sleep_percentage_deep) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_light + """'/>
                                 <p>
                                     """ + translate["light"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(sleep_duration_light) + """ min (""" + str(sleep_percentage_light) + """%)</span>
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_light) + """ (""" + str(sleep_percentage_light) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_rem + """'/>
                                 <p>
                                     """ + translate["rem"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(sleep_duration_rem) + """ min (""" + str(sleep_percentage_rem) + """%)</span>
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_rem) + """ (""" + str(sleep_percentage_rem) + """%)</span>
                                 </p>
                             </div>
                             <div class="col-12">
                                 <img class=coloricon src='data:image/png;base64,""" + st.session_state.sleep_awake + """'/>
                                 <p>
                                     """ + translate["awake"] + """ <br>
-                                    <span class='""" + class_val + """'>""" + str(sleep_duration_awake) + """ min (""" + str(sleep_percentage_awake) + """%)</span>  
+                                    <span class='""" + class_val + """'>""" + str(sleep_duration_awake) + """ (""" + str(sleep_percentage_awake) + """%)</span>  
                                 </p>
                             </div>
                         </div>

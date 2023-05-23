@@ -9,10 +9,12 @@ from scipy.signal import medfilt
 import numpy as np
 import datetime
 from template.util import img_to_bytes
+from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin
 import random
 
 def temperature_mean():
-    
+
+    bgcolor = 'rgba(255,255,255,1)'
     translate = st.session_state.translate
     
     # !!! TO BE UPDATED WITH REAL DATA !!!
@@ -35,7 +37,7 @@ def temperature_mean():
                       font=dict(size=14,),
                       height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=bgcolor, plot_bgcolor=bgcolor,
                       title=constant.SHORTCUT()['temp'],
                        yaxis = dict(range=constant.RANGE()['temp']),
                       )
@@ -308,13 +310,10 @@ def breath_brv():
     translate = st.session_state.translate
     
     # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(0, 12)/10)
-    y[int(len(x)/2)] = 2.7
+    values_df = get_brv_values()
+    x = values_df["times"]
+    y = values_df["values"]
+
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -326,10 +325,7 @@ def breath_brv():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['brv'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14))
     fig.update_layout(height=300, 
                       template="plotly_white",
                       paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
@@ -343,14 +339,9 @@ def breath_brpm():
     
     translate = st.session_state.translate
     
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(14, 17))
-    y[int(len(x)/2)] = 25
+    values_df = get_brpm_values()
+    x = values_df["times"]
+    y = values_df["values"]
     
     line_width = 2
     fig = go.Figure()
@@ -363,10 +354,7 @@ def breath_brpm():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['brpm'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14,))
     fig.update_layout(height=300, 
                       template="plotly_white",
                       paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
@@ -380,14 +368,9 @@ def heart_hrv():
     
     translate = st.session_state.translate
     
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(120, 200))
-    y[int(len(x)/2)] = 50
+    values_df = get_hrv_values()
+    x = values_df["times"]
+    y = values_df["values"]
     
     line_width = 2
     fig = go.Figure()
@@ -400,10 +383,7 @@ def heart_hrv():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['hrv'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14,))
     fig.update_layout(height=300, 
                       template="plotly_white",
                       paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
@@ -417,15 +397,10 @@ def heart_bpm():
     
     translate = st.session_state.translate
     
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    y = []
-    for i in range(len(x)):
-        y.append(random.randint(60, 65))
-    
-    y[int(len(x)/2)] = 120
-    
+    values_df = get_bpm_values()
+    x = values_df["times"]
+    y = values_df["values"]
+        
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -437,10 +412,7 @@ def heart_bpm():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['bpm'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14))
     fig.update_layout(height=300, 
                       template="plotly_white",
                       paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
@@ -454,7 +426,6 @@ def duration():
     
     translate = st.session_state.translate
 
-    # !!! TO BE UPDATED WITH REAL DATA !!!
     date = st.session_state.date
     date = datetime.datetime.strptime(date, "%Y-%m-%d")   
     xmin = date
@@ -465,8 +436,8 @@ def duration():
     y_empty         = np.repeat(" ", 2)
     y_empty2        = np.repeat("", 2)
 
-    x_garmin        = st.session_state.garmin_intervals
-    x_chronolife    = st.session_state.chronolife_intervals
+    x_garmin        = get_duration_garmin()['intervals']
+    x_chronolife    = get_duration_chronolife()['intervals']
     
     width = 20
     fig = go.Figure()
@@ -508,80 +479,7 @@ def duration():
     
     return fig
 
-# To be deleted !!!
-def duration_old():
-    
-    translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    date = st.session_state.date
-    date = datetime.datetime.strptime(date, "%Y-%m-%d")
-    xmin = date
-    xmax = xmin + datetime.timedelta(days=1)
-    
-    y_chronolife    = np.repeat("Smart Textile", 2)
-    y_garmin        = np.repeat("Garmin", 2)
-    y_empty         = np.repeat(" ", 2)
-    y_empty2        = np.repeat("", 2)
-    
-    width = 20
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(y=y_empty,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                              mode="lines", line=dict(color="white",width=width)))
-    
-    fig.add_trace(go.Scatter(y=y_garmin,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 6, 0, 0)],
-                              mode="lines", line=dict(color=constant.COLORS()["garmin"],width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
-                             mode="lines",line=dict(color="white",width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
-                             mode="lines",line=dict(color=constant.COLORS()["garmin"],width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                             mode="lines",line=dict(color="white",width=width)))
-    
-    
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 6, 0, 0)],
-                              mode="lines", line=dict(color=constant.COLORS()["chronolife"],width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
-                             mode="lines",line=dict(color="white",width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
-                             mode="lines",line=dict(color=constant.COLORS()["chronolife"],width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                             mode="lines",line=dict(color="white",width=width)))
-    
-    fig.add_trace(go.Scatter(y=y_empty2,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 23, 0, 0)],
-                              mode="lines", line=dict(color="white",width=width)))
-    
-    fig.update_layout(barmode='stack', height=300, 
-                      template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
-                      showlegend=False,
-                      title="<span style='font-size:20px;'>" + translate["data_collection_duration"] + "</span>",
-                      xaxis = dict(range=[xmin, xmax]), 
-                      )
-    
-    return fig
-
-def smart_textile_raw_data(layout=False):
+def smart_textile_raw_data():
 
     cst_raw_data.get_raw_data()
     
@@ -598,7 +496,7 @@ def smart_textile_raw_data(layout=False):
     
     fig_ecg     = ecg_signal(template=template, width_line=width_line, height=height)
     fig_breath  = breath_signal(template=template, width_line=width_line, height=height)
-    # fig_acc     = acceleration_signal(template=template, width_line=width_line, height=height)
+    #/ fig_acc     = acceleration_signal(template=template, width_line=width_line, height=height)
     
     st.plotly_chart(fig_ecg, use_container_width=True)
     st.plotly_chart(fig_breath, use_container_width=True)

@@ -1,6 +1,6 @@
 import streamlit as st
 
-PDF_FILE = "garmin_automatic_reports/pdf_results/result.pdf"
+PDF_FILE = "automatic_reports/pdf_results/result.pdf"
 
 def TYPE():
     TYPE = {}
