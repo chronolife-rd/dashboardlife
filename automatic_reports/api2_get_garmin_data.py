@@ -5,8 +5,8 @@ import requests
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
-from garmin_automatic_reports.config import GARMIN_SIGNAL_TYPES
+from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
+from automatic_reports.config import GARMIN_SIGNAL_TYPES
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------

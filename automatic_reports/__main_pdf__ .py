@@ -16,7 +16,7 @@ from api2_get_garmin_data import get_garmin_data
 from generate_pdf import generate_pdf
 from compute_garmin_for_pdf import garmin_data_for_pdf
 from compute_cst_for_pdf import cst_data_for_pdf
-from compute_commun_for_pdf import get_commun_indicators
+from compute_common_for_pdf import get_common_indicators
 from plot_images import plot_images
 
 API_KEY_PROD = 'CLjfUipLb32dfMC8ZCCwUA' 
@@ -39,6 +39,9 @@ date = "2023-05-10"
 # user_id = "342pv5"
 # date = "2023-05-03"
 
+# -- Ludo 
+# user_id = "4vk5VJ"
+# date = "2023-05-17"
 # ----------------------------- Chronolife ------------------------------------
 # Start timer    
 begin = time.time()
@@ -77,9 +80,9 @@ garmin_time_intervals = garmin_data['duration']['intervals']
 end = time.time()
 print('Time taken to get Garmin data:',round((end-begin)/60,2),'min')
 
-# ----------------------------- Commun ----------------------------------------
-# Compute commun indicators: cardio, respiration and steps
-commun_data, commun_data_pdf, steps_dict = get_commun_indicators(cst_data, garmin_data) 
+# ----------------------------- Common ----------------------------------------
+# Compute common indicators: cardio, respiration and steps
+common_data, common_data_pdf, steps_dict = get_common_indicators(cst_data, garmin_data) 
 
 # Plot and save graphs
 plot_images(garmin_data, steps_dict, cst_time_intervals, 
@@ -93,5 +96,5 @@ cst_data_pdf = cst_data_for_pdf(user_id, date, cst_data)
 garmin_data_pdf = garmin_data_for_pdf(garmin_data)
 
 # Construct pdf
-generate_pdf(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict)
+generate_pdf(cst_data_pdf, garmin_data_pdf, common_data_pdf, alerts_dict)
 

@@ -453,6 +453,65 @@ def heart_bpm():
 def duration():
     
     translate = st.session_state.translate
+
+    # !!! TO BE UPDATED WITH REAL DATA !!!
+    date = st.session_state.date
+    date = datetime.datetime.strptime(date, "%Y-%m-%d")   
+    xmin = date
+    xmax = date + datetime.timedelta(days = 1)
+        
+    y_chronolife    = np.repeat("Smart Textile", 2)
+    y_garmin        = np.repeat("Garmin", 2)
+    y_empty         = np.repeat(" ", 2)
+    y_empty2        = np.repeat("", 2)
+
+    x_garmin        = st.session_state.garmin_intervals
+    x_chronolife    = st.session_state.chronolife_intervals
+    
+    width = 20
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(y=y_empty,
+                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
+                                 datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
+                              mode="lines", line=dict(color="white",width=width)))
+    
+    # Add Garmin
+    for i in range(len(x_garmin)):
+        interval = x_garmin[i][:]
+        if (len(interval) > 10):
+            interval_start = interval.iloc[0]
+            interval_end = interval.iloc[-1]
+            fig.add_trace(go.Scatter(y = y_garmin, x=[interval_start, interval_end],
+                        mode="lines", line=dict(color=constant.COLORS()["garmin"],width=width)))
+
+    # Add Chronolife
+    for i in range(len(x_chronolife)):
+        interval = x_chronolife[i][:]
+        if (len(interval) > 10):
+            interval_start = interval.iloc[0]
+            interval_end = interval.iloc[-1]
+            fig.add_trace(go.Scatter(y = y_chronolife, x=[interval_start, interval_end],
+                        mode="lines", line=dict(color=constant.COLORS()["chronolife"],width=width)))
+    
+    fig.add_trace(go.Scatter(y=y_empty2,
+                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
+                                 datetime.datetime(date.year, date.month, date.day, 23, 0, 0)],
+                              mode="lines", line=dict(color="white",width=width)))
+    
+    fig.update_layout(barmode='stack', height=300, 
+                      template="plotly_white",
+                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      showlegend=False,
+                      title="<span style='font-size:20px;'>" + translate["data_collection_duration"] + "</span>",
+                      xaxis = dict(range=[xmin, xmax]), 
+                      )
+    
+    return fig
+
+# To be deleted !!!
+def duration_old():
+    
+    translate = st.session_state.translate
     
     # !!! TO BE UPDATED WITH REAL DATA !!!
     date = st.session_state.date

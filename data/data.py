@@ -11,10 +11,10 @@ from pylife.useful import unwrap
 import time
 
 # Imports for requesting data and genereting reports
-from garmin_automatic_reports.api2_get_cst_data import get_cst_data
-from garmin_automatic_reports.api2_get_garmin_data import get_garmin_data
-from garmin_automatic_reports.compute_commun_for_html import get_commun_indicators
-from garmin_automatic_reports.plot_images import plot_images
+from automatic_reports.api2_get_cst_data import get_cst_data
+from automatic_reports.api2_get_garmin_data import get_garmin_data
+from automatic_reports.compute_common_for_html import get_common_indicators
+from automatic_reports.plot_images import plot_images
 
 
 def get_health_indicators():
@@ -27,7 +27,7 @@ def get_health_indicators():
     
     garmin_data = []
     cst_data    = []
-    commun_data = []
+    common_data = []
 
     # Get CST (Chronolife Smart Textile) data
     cst_data = get_cst_data(
@@ -45,14 +45,14 @@ def get_health_indicators():
         url = url_garmin
         )
     
-    # Compute commun data
-    commun_data, commun_indicators,\
-    steps_dict = get_commun_indicators(cst_data, garmin_data) 
+    # Compute common data
+    common_data, common_indicators,\
+    steps_dict = get_common_indicators(cst_data, garmin_data) 
 
     st.session_state.garmin_indicators      = garmin_data
     st.session_state.chronolife_indicators  = cst_data
-    st.session_state.commun_data            = commun_data       # New
-    st.session_state.commun_indicators      = commun_indicators # New
+    st.session_state.common_data            = common_data       # New
+    st.session_state.common_indicators      = common_indicators # New
     st.session_state.steps_dict             = steps_dict        # New
 
 def get_bodybattery():
@@ -185,7 +185,8 @@ def get_stress():
 def get_duration_chronolife():
     datas = st.session_state.chronolife_indicators
 
-    output = {}    
+    output = {}   
+    output["intervals"]         = ""
     output["duration"]          = ""
     output["duration_day"]      = ""
     output["duration_night"]    = ""
@@ -193,18 +194,22 @@ def get_duration_chronolife():
     output["duration_activity"] = ""
     
     if len(datas) > 0 and datas["duration"]["collected"] is not None:
+        output["intervals"]         = datas["duration"]["intervals"] 
         output["duration"]          = datas["duration"]["collected"] 
         output["duration_day"]      = datas["duration"]["day"]
         output["duration_night"]    = datas["duration"]["night"] 
         output["duration_rest"]     = datas["duration"]["rest"] 
         output["duration_activity"] = datas["duration"]["active"] 
     
+    st.session_state.chronolife_intervals = output["intervals"]
+
     return output
 
 def get_duration_garmin():
     datas = st.session_state.garmin_indicators
 
     output = {}    
+    output["intervals"]         = ""
     output["duration"]          = ""
     output["duration_day"]      = ""
     output["duration_night"]    = ""
@@ -212,16 +217,19 @@ def get_duration_garmin():
     output["duration_activity"] = ""
     
     if len(datas) > 0 and datas["duration"]["collected"] is not None:
+        output["intervals"]         = datas["duration"]["intervals"] 
         output["duration"]          = datas["duration"]["collected"] 
         output["duration_day"]      = datas["duration"]["day"]
         output["duration_night"]    = datas["duration"]["night"] 
         output["duration_rest"]     = datas["duration"]["rest"] 
         output["duration_activity"] = datas["duration"]["active"] 
     
+    st.session_state.garmin_intervals = output["intervals"]
+    
     return output    
 
 def get_steps():
-    datas = st.session_state.commun_indicators
+    datas = st.session_state.common_indicators
   
     output = {}
     output["number"]    = ""
@@ -252,9 +260,7 @@ def get_temperature():
     return output
 
 def get_bpm():
-    datas = st.session_state.commun_indicators
-
-    # !!! TO BE UPDATED !!!
+    datas = st.session_state.common_indicators
     output = {}
     output["mean"]  = ""
     output["min"]   = ""
@@ -263,18 +269,16 @@ def get_bpm():
     output["high"]  = ""
     
     if len(datas) > 0 and datas["cardio"]["rate_high"] is not None:
-        output["mean"]  = 500
-        output["min"]   = 500
-        output["max"]   = 500
+        output["mean"]  = datas["cardio"]["rate_mean"] 
+        output["min"]   = datas["cardio"]["rate_min"] 
+        output["max"]   = datas["cardio"]["rate_max"] 
         output["rest"]  = datas["cardio"]["rate_resting"] 
         output["high"]  = datas["cardio"]["rate_high"] 
     
     return output
 
 def get_hrv():
-    datas = st.session_state.commun_indicators
-
-    # !!! TO BE UPDATED !!!
+    datas = st.session_state.common_indicators
     output = {}
     output["mean"]  = ""
     output["min"]   = ""
@@ -283,18 +287,17 @@ def get_hrv():
     output["high"]  = ""
 
     if len(datas) > 0 and datas["cardio"]["rate_var_resting"] is not None:
-        output["mean"]  = 500
-        output["min"]   = 500
-        output["max"]   = 500
+        output["mean"]  = datas["cardio"]["rate_var_mean"] 
+        output["min"]   = datas["cardio"]["rate_var_min"] 
+        output["max"]   = datas["cardio"]["rate_var_max"] 
         output["rest"]  = datas["cardio"]["rate_var_resting"] 
-        output["high"]  = 500
+        output["high"]  = datas["cardio"]["rate_var_high"] 
     
     return output
 
 def get_qt():
     datas = st.session_state.chronolife_indicators
     
-    # !!! TO BE UPDATED !!!
     output = {}
     output["exists"]    = False
     output["mean"]      = ""
@@ -305,13 +308,12 @@ def get_qt():
     output["threshold"] = ""
     
     if len(datas["anomalies"]["qt"]["values"]) > 0:
-        values = datas["anomalies"]["qt"]["values"]
         output["exists"]    = datas["anomalies"]["qt"]["exists"]
-        output["mean"]      = round(np.mean(values))
-        output["min"]       = round(min(values))
-        output["max"]       = round(max(values))
-        output["rest"]      = 500
-        output["high"]      = 500
+        output["mean"]      = datas["anomalies"]["qt"]["mean"]
+        output["min"]       = datas["anomalies"]["qt"]["min"]
+        output["max"]       = datas["anomalies"]["qt"]["max"]
+        output["rest"]      = datas["anomalies"]["qt"]["rest"]
+        output["high"]      = datas["anomalies"]["qt"]["high"]
         output["threshold"] = 550
     
     if output["exists"]:
@@ -324,8 +326,6 @@ def get_qt():
 
 def get_bradycardia():
     datas = st.session_state.chronolife_indicators
-
-    # !!! TO BE UPDATED !!!
     output = {}
     output["exists"]      = ""
     output["mean"]        = ""
@@ -333,11 +333,10 @@ def get_bradycardia():
     output["percentage"]  = ""
     
     if len(datas["anomalies"]["bradycardia"]["values"]) > 0:
-        values = datas["anomalies"]["bradycardia"]["values"]
         output["exists"]      = datas["anomalies"]["bradycardia"]["exists"]
-        output["mean"]        = round(np.mean(values))
-        output["duration"]    = 500
-        output["percentage"]  = 500
+        output["mean"]        = datas["anomalies"]["bradycardia"]["mean"]
+        output["duration"]    = datas["anomalies"]["bradycardia"]["duration"]
+        output["percentage"]  = datas["anomalies"]["bradycardia"]["percentage"]
     
     if output["exists"]:
         bradycardia_alert_icon = st.session_state.alert
@@ -349,8 +348,6 @@ def get_bradycardia():
     
 def get_tachycardia():
     datas = st.session_state.chronolife_indicators
-
-    # !!! TO BE UPDATED !!!
     output = {}
     output["exists"]      = ""
     output["mean"]        = ""
@@ -358,11 +355,10 @@ def get_tachycardia():
     output["percentage"]  = ""
 
     if len(datas["anomalies"]["tachycardia"]["values"]) > 0:
-        values = datas["anomalies"]["tachycardia"]["values"]
         output["exists"]      = datas["anomalies"]["tachycardia"]["exists"]
-        output["mean"]        = round(np.mean(values))
-        output["duration"]    = 500
-        output["percentage"]  = 500
+        output["mean"]        = datas["anomalies"]["tachycardia"]["mean"]
+        output["duration"]    = datas["anomalies"]["tachycardia"]["duration"]
+        output["percentage"]  = datas["anomalies"]["tachycardia"]["percentage"]
     
     if output["exists"]:
         tachycardia_alert_icon = st.session_state.alert
@@ -373,9 +369,8 @@ def get_tachycardia():
     return output
 
 def get_brpm():
-    datas = st.session_state.commun_indicators
+    datas = st.session_state.common_indicators
 
-    # !!! TO BE UPDATED !!!
     output = {}
     output["mean"]  = ""
     output["min"]   = ""
@@ -384,18 +379,17 @@ def get_brpm():
     output["high"]  = ""
     
     if len(datas) > 0 and datas["breath"]["rate_high"] is not None:
-        output["mean"]  = 500
-        output["min"]   = 500
-        output["max"]   = 500
+        output["mean"]  = datas["breath"]["rate_mean"] 
+        output["min"]   = datas["breath"]["rate_min"] 
+        output["max"]   = datas["breath"]["rate_max"] 
         output["rest"]  = datas["breath"]["rate_resting"] 
         output["high"]  = datas["breath"]["rate_high"] 
     
     return output
 
 def get_brv():
-    datas = st.session_state.commun_indicators
+    datas = st.session_state.common_indicators
 
-    # !!! TO BE UPDATED !!!
     output = {}
     output["mean"]  = ""
     output["min"]   = ""
@@ -404,16 +398,16 @@ def get_brv():
     output["high"]  = ""
 
     if len(datas) > 0 and datas["breath"]["rate_var_resting"] is not None:
-        output["mean"]  = 1.2
-        output["min"]   = 0.2
-        output["max"]   = 2.0
+        output["mean"]  = datas["breath"]["rate_var_mean"]
+        output["min"]   = datas["breath"]["rate_var_min"]
+        output["max"]   = datas["breath"]["rate_var_max"]
         output["rest"]  = datas["breath"]["rate_var_resting"]
-        output["high"]  = 1.8
+        output["high"]  = datas["breath"]["rate_var_high"]
     
     return output
 
 def get_inexratio():
-    datas = st.session_state.commun_indicators
+    datas = st.session_state.common_indicators
 
     # !!! TO BE UPDATED !!!
     output = {}
@@ -425,43 +419,16 @@ def get_inexratio():
 
     if len(datas) > 0 and datas["breath"]["ratio_in_exhale"] is not None:
         output["mean"]  = datas["breath"]["ratio_in_exhale"]
-        output["min"]   = 500
-        output["max"]   = 500
-        output["rest"]  = 500
-        output["high"]  = 500
-    
-    return output
-
-
-def get_bradycardia():
-    datas = st.session_state.chronolife_indicators
-
-    # !!! TO BE UPDATED !!!
-    output = {}
-    output["exists"]      = ""
-    output["mean"]        = ""
-    output["duration"]    = ""
-    output["percentage"]  = ""
-    
-    if len(datas["anomalies"]["bradycardia"]["values"]) > 0:
-        values = datas["anomalies"]["bradycardia"]["values"]
-        output["exists"]      = datas["anomalies"]["bradycardia"]["exists"]
-        output["mean"]        = round(np.mean(values))
-        output["duration"]    = 500
-        output["percentage"]  = 500
-    
-    if output["exists"]:
-        bradycardia_alert_icon = st.session_state.alert
-    else:
-        bradycardia_alert_icon = st.session_state.alert_no
-    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
+        output["min"]   = -1
+        output["max"]   = -1
+        output["rest"]  = -1
+        output["high"]  = -1
     
     return output
 
 def get_bradypnea():
     datas = st.session_state.chronolife_indicators
 
-    # !!! TO BE UPDATED !!!
     output = {}
     output["exists"]      = ""
     output["mean"]        = ""
@@ -469,11 +436,10 @@ def get_bradypnea():
     output["percentage"]  = ""
 
     if len(datas["anomalies"]["bradypnea"]["values"]) > 0:
-        values = datas["anomalies"]["bradypnea"]["values"]
         output["exists"]      = datas["anomalies"]["bradypnea"]["exists"]
-        output["mean"]        = round(np.mean(values))
-        output["duration"]    = 500
-        output["percentage"]  = 500
+        output["mean"]        = datas["anomalies"]["bradypnea"]["mean"]
+        output["duration"]    = datas["anomalies"]["bradypnea"]["duration"]
+        output["percentage"]  = datas["anomalies"]["bradypnea"]["percentage"]
     
     if output["exists"]:
         bradycardia_alert_icon = st.session_state.alert
@@ -486,7 +452,6 @@ def get_bradypnea():
 def get_tachypnea():
     datas = st.session_state.chronolife_indicators
 
-    # !!! TO BE UPDATED !!!
     output = {}
     output["exists"]      = ""
     output["mean"]        = ""
@@ -494,11 +459,10 @@ def get_tachypnea():
     output["percentage"]  = ""
 
     if len(datas["anomalies"]["tachypnea"]["values"]) > 0:
-        values = datas["anomalies"]["tachypnea"]["values"]
         output["exists"]      = datas["anomalies"]["tachypnea"]["exists"]
-        output["mean"]        = round(np.mean(values))
-        output["duration"]    = 500
-        output["percentage"]  = 500
+        output["mean"]        = datas["anomalies"]["tachypnea"]["mean"]
+        output["duration"]    = datas["anomalies"]["tachypnea"]["duration"]
+        output["percentage"]  = datas["anomalies"]["tachypnea"]["percentage"]
     
     if output["exists"]:
         tachycardia_alert_icon = st.session_state.alert

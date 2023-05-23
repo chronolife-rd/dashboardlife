@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from garmin_automatic_reports.config import PATH_SAVE_IMG as path_save
+from automatic_reports.config import PATH_SAVE_IMG as path_save
 from datetime import datetime, timedelta
 
 # Constants (colors)

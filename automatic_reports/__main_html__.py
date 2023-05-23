@@ -10,7 +10,7 @@ import time
 from api2_get_cst_data import get_cst_data
 from api2_get_garmin_data import get_garmin_data
 
-from compute_commun_for_html import get_commun_indicators
+from compute_common_for_html import get_common_indicators
 from plot_images import plot_images
 
 API_KEY_PROD = 'CLjfUipLb32dfMC8ZCCwUA' 
@@ -22,9 +22,11 @@ URL_GARMIN_PROD = "https://prod.chronolife.net/api/2/garmin/data"
 URL_GARMIN_PREPROD = "https://preprod.chronolife.net/api/2/garmin/data" 
 
 # ----------------------------- Chronolife -------------------------------
-# Start timer    
-user_id = "6o2Fzp"
-date = "2023-05-10"
+# Start timer   
+# -- Ludo 
+user_id = "4vk5VJ"
+date = "2023-05-17"
+
 begin = time.time()
 
 cst_data = get_cst_data(
@@ -53,10 +55,10 @@ garmin_data = get_garmin_data(
 end = time.time()
 print('Time taken to get Garmin data:', round((end-begin)/60,2),'min')
 
-# %% ------------------------------ Commun --------------------------------------
-# Compute commun indicators: cardio, respiration and steps
-commun_data, commun_indicators,\
-    steps_dict = get_commun_indicators(cst_data, garmin_data) 
+# %% ------------------------------ Common --------------------------------------
+# Compute common indicators: cardio, respiration and steps
+common_data, common_indicators,\
+    steps_dict = get_common_indicators(cst_data, garmin_data) 
 
 # Plot and save graphs
 

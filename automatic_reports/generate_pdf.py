@@ -8,20 +8,20 @@ from reportlab.lib.pagesizes import A4
 from PyPDF2 import PdfFileWriter, PdfFileReader
 
 from config import PATH_PDF
-from config import GarminIndicator, CstIndicator, CommunIndicator, ImageForPdf
+from config import GarminIndicator, CstIndicator, CommonIndicator, ImageForPdf
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
-def generate_pdf(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict):
+def generate_pdf(cst_data_pdf, garmin_data_pdf, common_data_pdf, alerts_dict):
     in_pdf_path = PATH_PDF + "/empty.pdf"
     out_pdf_file = PATH_PDF + "/result.pdf"
 
-    generate_page(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict, in_pdf_path, out_pdf_file)
+    generate_page(cst_data_pdf, garmin_data_pdf, common_data_pdf, alerts_dict, in_pdf_path, out_pdf_file)
 
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
 
-def generate_page(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict, in_pdf_path, out_pdf_file):
+def generate_page(cst_data_pdf, garmin_data_pdf, common_data_pdf, alerts_dict, in_pdf_path, out_pdf_file):
 
     # Costrunct pdf   
     packet = io.BytesIO()
@@ -44,9 +44,9 @@ def generate_page(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict, i
                 can = can, 
                 text_parameters = dict_aux[key],
             )
-    # COMMUN
-    for commun_indicator in CommunIndicator:
-        dict_aux = commun_data_pdf[commun_indicator.value]
+    # COMMON
+    for common_indicator in CommonIndicator:
+        dict_aux = common_data_pdf[common_indicator.value]
         for key in dict_aux:
             _add_text(
                 can = can, 

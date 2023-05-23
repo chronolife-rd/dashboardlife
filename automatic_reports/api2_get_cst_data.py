@@ -8,9 +8,11 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-from garmin_automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap
-from garmin_automatic_reports.config import CST_SIGNAL_TYPES
-from garmin_automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
+from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap
+from automatic_reports.config import CST_SIGNAL_TYPES
+from automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
+from automatic_reports.config import TACHYPNEA_TH, BRADYPNEA_TH, TACHYCARDIA_TH, BRADYCARDIA_TH,\
+    QT_MAX_TH, QT_MIN_TH
     
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
@@ -138,6 +140,12 @@ def initialize_alerts_with_template() -> dict :
         "w" : ALERT_SIZE,
         "h" : ALERT_SIZE,
         "exists" : False,
+        "min" : "",
+        "max" : "",
+        "high" : "",
+        "resting" : "",
+        "percentage" : "",
+        "duration" : "",
         "values" : []
         }
 
@@ -213,15 +221,13 @@ def add_durations(date, results_dict):
     night_times  = ref_df.loc[ref_df["times"] < NIGHT_LIMIT, 
                                     "times"].reset_index(drop=True)
     
-    rest_times   = ref_df.loc[ref_df["values"] <= 15, "times"].reset_index(drop=True)
-    active_times = ref_df.loc[ref_df["values"] > 15, "times"].reset_index(drop=True)
-   
+    rest_times   = ref_df.loc[ref_df["values"] <= ACTIVITY_THREASHOLD,
+                            "times"].reset_index(drop=True)   
     
     time_intervals = find_time_intervals(ref_df['times'])
     day_time_intervals = find_time_intervals(day_times)
     night_time_intervals = find_time_intervals(night_times)
     rest_time_intervals = find_time_intervals(rest_times)
-    activity_time_intervals = find_time_intervals(active_times)
     
     collected_in_s = sum_time_intervals(time_intervals)
     day_in_s = sum_time_intervals(day_time_intervals)
@@ -237,7 +243,6 @@ def add_durations(date, results_dict):
     duration_dict["rest"] = timedelta_formatter(rest_in_s)
     duration_dict["active"] = timedelta_formatter(active_in_s)
     
-
 def add_anomalies(results_dict):
     alerts_dict = results_dict['anomalies']
     # --- Set alerts image positions ---
@@ -263,11 +268,11 @@ def add_anomalies(results_dict):
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
     value = round(max(values))
     
-    if(value > 20):
+    if(value > TACHYPNEA_TH):
         alerts_dict["tachypnea"]["path"]  = RED_ALERT
         alerts_dict["tachypnea"]["exists"] = True
         alerts_dict["tachypnea"]["values"] = values
-    elif(value < 6):
+    elif(value < BRADYPNEA_TH):
         alerts_dict["bradypnea"]["path"]  = RED_ALERT
         alerts_dict["bradypnea"]["exists"] = True
         alerts_dict["bradypnea"]["values"] = values
@@ -277,25 +282,36 @@ def add_anomalies(results_dict):
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
     value = round(max(values))
 
-    if(value > 100):
+    if(value > TACHYCARDIA_TH):
         alerts_dict["tachycardia"]["path"] = RED_ALERT
         alerts_dict["tachycardia"]["exists"] = True
         alerts_dict["tachycardia"]["values"] = values
-    elif(value < 60):
+        alerts_dict["tachycardia"]["mean"] = round(np.mean(values))
+        alerts_dict["tachycardia"]["duration"] = -1
+        alerts_dict["tachycardia"]["percentage"] = -1
+
+    elif(value < BRADYCARDIA_TH):
         alerts_dict["bradycardia"]["path"]  = RED_ALERT
         alerts_dict["bradycardia"]["exists"] = True
         alerts_dict["bradycardia"]["values"] = values
+        alerts_dict["bradycardia"]["mean"] = round(np.mean(values))
+        alerts_dict["bradycardia"]["duration"] = -1
+        alerts_dict["bradycardia"]["percentage"] = -1
     
     # Cardio QTc length TO CHANGE TO CHANGE when indicator is updateted !!!
     df_aux = results_dict['cardio']['qt']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
     value_max = round(max(values))
     value_min = round(min(values))
-    if(value_max > 500 or value_min < 350):
+    if(value_max > QT_MAX_TH or value_min < QT_MIN_TH):
         alerts_dict["qt"]["path"]  = RED_ALERT
         alerts_dict["qt"]["exists"] = True
         alerts_dict["qt"]["values"] = values
-        
+        alerts_dict["qt"]["min"] = round(min(values))
+        alerts_dict["qt"]["max"] = round(max(values))
+        alerts_dict["qt"]["mean"] = round(np.mean(values))
+        alerts_dict["qt"]["duration"] = -1
+        alerts_dict["qt"]["percentage"] = -1
 
 def merge_on_times(df_1, df_2):
     df_result = pd.merge(df_1, df_2, how="outer", on="times")
@@ -389,12 +405,18 @@ def get_timestamp(id_:str):
 # %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
-# # # Michel
+# # -- Ludo
+# user_id = "4vk5VJ"
+# date = "2023-05-17"
+# # -- Fernando
+# user_id = "5Nwwut"
+# date = "2023-05-17"
+# # -- Michel
 # # user_id = "5Nwwut" 
 # # date = "2023-05-04" 
-# #/ Adriana
-# user_id = "6o2Fzp"
-# date = "2023-05-10"
+# # -- Adriana
+# # user_id = "6o2Fzp"
+# # date = "2023-05-10"
 
 # if prod == True :
 #     api = API_KEY_PROD

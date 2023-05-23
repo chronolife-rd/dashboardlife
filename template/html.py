@@ -882,11 +882,11 @@ def health_indicators_heart_hrv_results():
     html = """
     <div class=col1_indicators>
         <p>""" + translate["median"] + """</p>
-        <p class="indicator_main_value">""" + str(hrv_mean) + """ bpm</p>
+        <p class="indicator_main_value">""" + str(hrv_mean) + """ ms</p>
         <p>""" + translate["min"] + """</p>
-        <p class="indicator_value">""" + str(hrv_min) + """ bpm</p>
+        <p class="indicator_value">""" + str(hrv_min) + """ ms</p>
         <p>""" + translate["max"] + """</p>
-        <p class="indicator_value">""" + str(hrv_max) + """ bpm</p>
+        <p class="indicator_value">""" + str(hrv_max) + """ ms</p>
     </div>
     """
     

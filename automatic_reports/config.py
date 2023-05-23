@@ -14,6 +14,15 @@ GARMIN_SIGNAL_TYPES = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pul
 
 # Constants used in functions 
 ACTIVITY_THREASHOLD = 18 # constant used in computing alerts
+BRADYPNEA_TH = 6
+TACHYPNEA_TH = 20
+
+BRADYCARDIA_TH = 60
+TACHYCARDIA_TH = 100
+
+QT_MIN_TH = 350
+QT_MAX_TH = 500
+
 DELTA_TIME = timedelta(minutes = 3) # constant used in computing times intervals 
 
 # Path to the pdf results folder 
@@ -43,7 +52,7 @@ class CstIndicator(Enum):
     HEADER = "header"
     DURATION = "duration"
 
-class CommunIndicator(Enum):
+class CommonIndicator(Enum):
     CARDIO = "cardio"
     BREATH = "breath"
     ACTIVITY = "activity"

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Last updated on 05/05/2023
+Created on Fri Mar 17 13:23:57 2023
 
 @author: aterman
 """
@@ -8,79 +8,152 @@ import copy
 import numpy as np
 import pandas as pd 
 from collections import deque
-from garmin_automatic_reports.config import ACTIVITY_THREASHOLD
+from config import ACTIVITY_THREASHOLD
 from datetime import datetime
+
+TEXT_FONT = "Helvetica"
+BLUE_COLOR = "#3E738D"
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
-def get_commun_indicators(cst_data:dict, garmin_data:dict) :
+def get_common_indicators(cst_data:dict, garmin_data:dict) :
     # Compute the combination of Garmin and cst data 
-    commun_data = combine_data(cst_data, garmin_data)
+    common_data = combine_data(cst_data, garmin_data)
 
     # Initialize the dictionary where the new data will be saved
-    commun_indicators = initialize_dictionary_with_template()
+    common_data_pdf = initialize_dictionary_with_template()
 
     # ========================== Cardio dict ===============================
     # Add rate high
-    value = round(max(commun_data["cardio"]["rate"]["values"].dropna()))
-    commun_indicators["cardio"]["rate_high"] = value
-    
+    value = round(max(common_data["cardio"]["rate"]["values"].dropna()))
+    dict_aux = common_data_pdf["cardio"]["rate_high"]
+    dict_aux["text"] = str(value) + " bpm"
+    dict_aux["x"] = 1.95
+    dict_aux["y"] = 7.81
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 8
+    dict_aux["color"] = BLUE_COLOR
+
     # Add rate resting 
-    df_values = commun_data['cardio']['rate']["values"].dropna()
+    df_values = common_data['cardio']['rate']["values"].dropna()
     mean_values = sliding_window(df_values, minutes = 30)
     value = round(min(mean_values))
-    commun_indicators["cardio"]["rate_resting"] = value
+
+    dict_aux = common_data_pdf["cardio"]["rate_resting"]
+    dict_aux["text"] = str(value) + " bpm"
+    dict_aux["x"] = 1.95
+    dict_aux["y"] = 8.02
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 8
+    dict_aux["color"] = BLUE_COLOR
 
     # Add rate variability
-    df_aux = commun_data['cardio']['rate_var']
+    df_aux = common_data['cardio']['rate_var']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, 
                         "values"].dropna().reset_index(drop=True)
     value = round(np.mean(values))
-    commun_indicators["cardio"]["rate_var_resting"] = value
+
+    dict_aux = common_data_pdf["cardio"]["rate_var_resting"]
+    dict_aux["text"] = str(value) + " ms"
+    dict_aux["x"] = 1.95
+    dict_aux["y"] = 8.26
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 8
+    dict_aux["color"] = BLUE_COLOR
 
     # ========================== Breath dict =================================
     # Add rate high
-    value = round(max(commun_data["breath"]["rate"]["values"].dropna()))
-    commun_indicators["breath"]["rate_high"] = value
+    value = round(max(common_data["breath"]["rate"]["values"].dropna()))
+    dict_aux = common_data_pdf["breath"]["rate_high"]
+    dict_aux["text"] = str(value) + " brpm"
+    dict_aux["x"] = 4.56
+    dict_aux["y"] = 7.55
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 8
+    dict_aux["color"] = BLUE_COLOR
 
     # Add rate resting
-    values_df = commun_data['breath']['rate']['values'].dropna()
+    values_df = common_data['breath']['rate']['values'].dropna()
     mean_values = sliding_window(values_df, minutes = 30)
     value = round(min(mean_values))
-    commun_indicators["breath"]["rate_resting"] = value
 
-    # Add rate variability TO CHANGE !!!!!
-    df_aux = commun_data['breath']['rate_var']
+    dict_aux = common_data_pdf["breath"]["rate_resting"]
+    dict_aux["text"] = str(value) + " brpm"
+    dict_aux["x"] = 4.56
+    dict_aux["y"] = 7.81
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 8
+    dict_aux["color"] = BLUE_COLOR
+
+    # Add rate variability 
+    df_aux = common_data['breath']['rate_var']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, 
                         "values"].dropna().reset_index(drop=True)
     value = round(np.mean(values))
-    commun_indicators["breath"]["rate_var_resting"] = value
+
+    dict_aux = common_data_pdf["breath"]["rate_var_resting"]
+    dict_aux["text"] = str(value) + " s"
+    dict_aux["x"] = 4.56
+    dict_aux["y"] = 8.06
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 8
+    dict_aux["color"] = BLUE_COLOR
 
     # Add inhale/exhale ratio TO CHANGE !!!!!
-    value = 80
-    commun_indicators["breath"]["ratio_in_exhale"] = value
+    df_aux = common_data['breath']['inspi_expi']
+    values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, 
+                        "values"].dropna().reset_index(drop=True)
+    value = round(np.mean(values))
+
+    dict_aux = common_data_pdf["breath"]["inspi_expi"]
+    dict_aux["text"] = str(value) + " %"
+    dict_aux["x"] = 4.56
+    dict_aux["y"] = 8.28
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 8
+    dict_aux["color"] = BLUE_COLOR
 
     # ========================== Activity dict ===============================
     # dictionary with data used to plot steps graph 
-    steps_dict_for_plot = {
+    steps_dict = {
         "total_steps" : None,
         "goal" : None
     }
     # Steps
-    value = round(sum(commun_data["activity"]["steps"]["values"].dropna()))
-    commun_indicators["activity"]["steps"] = value
-    steps_dict_for_plot["total_steps"] = value
+    value = round(sum(common_data["activity"]["steps"]["values"].dropna()))
+    dict_aux = common_data_pdf["activity"]["steps"]
+    dict_aux["text"] = str(value) 
+    dict_aux["x"] = 5.73
+    dict_aux["y"] = 7.43
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 12
+    dict_aux["color"] = BLUE_COLOR
+
+    steps_dict["total_steps"] = value
 
     # Goal
     value = garmin_data["activity"]["goal"]
-    commun_indicators["activity"]["goal"] = value
-    steps_dict_for_plot["goal"] = value
+    dict_aux = common_data_pdf["activity"]["goal"]
+    dict_aux["text"] = str(value)
+    dict_aux["x"] = 5.73
+    dict_aux["y"] = 7.81
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 12
+    dict_aux["color"] = BLUE_COLOR
+
+    steps_dict["goal"] = value
 
     # Distance
-    value = round(sum(commun_data["activity"]["distance"]["values"].dropna()))
-    commun_indicators["activity"]["distance"] = value
+    value = round(sum(common_data["activity"]["distance"]["values"].dropna()))
+    dict_aux = common_data_pdf["activity"]["distance"]
+    dict_aux["text"] = str(value) + " m"
+    dict_aux["x"] = 5.73
+    dict_aux["y"] = 8.23
+    dict_aux["font"] = TEXT_FONT
+    dict_aux["size"] = 12
+    dict_aux["color"] = BLUE_COLOR
 
-    return commun_data, commun_indicators, steps_dict_for_plot
+    return copy.deepcopy(common_data), copy.deepcopy(common_data_pdf), steps_dict
 
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
@@ -98,10 +171,10 @@ def  combine_data(cst_data, garmin_data):
         "distance" : None,
         }
     
-    commun_data = {  
-        "cardio" : cardio_dict,
-        "breath" : breath_dict,
-        "activity" : activity_dict,
+    common_data = {  
+        "cardio" : copy.deepcopy(cardio_dict),
+        "breath" : copy.deepcopy(breath_dict),
+        "activity" : copy.deepcopy(activity_dict),
         }
     
     # --- Cardio ---
@@ -109,59 +182,74 @@ def  combine_data(cst_data, garmin_data):
     garmin_df = garmin_data["cardio"]["rate"]
     cst_df = cst_data["cardio"]["rate"][["times", "values"]]
 
-    commun_data["cardio"]["rate"] = merge_cst_and_garmin_data(cst_df, garmin_df)
+    common_data["cardio"]["rate"] = merge_cst_and_garmin_data(cst_df, garmin_df)
     
     # Rate variability
     cst_df = cst_data["cardio"]["rate_var"]
-    commun_data["cardio"]["rate_var"] = cst_df
+    common_data["cardio"]["rate_var"] = cst_df
     
     # --- Breath ---
     # Rate 
     garmin_df = garmin_data["breath"]["rate"]
     cst_df    = cst_data["breath"]["rate"][["times", "values"]]
-    commun_data["breath"]["rate"] = merge_cst_and_garmin_data(cst_df, garmin_df)
-
+    common_data["breath"]["rate"] = merge_cst_and_garmin_data(cst_df, garmin_df)
+ 
     # Rate variability
     cst_df = cst_data["breath"]["rate_var"]
-    commun_data["breath"]["rate_var"] = cst_df
+    common_data["breath"]["rate_var"] = cst_df
+
+    # Inhale Exhale
+    cst_df = cst_data["breath"]["inspi_expi"]
+    common_data["breath"]["inspi_expi"] = cst_df
     
     # --- Activity ---
     # Steps 
     garmin_df = garmin_data["activity"]["intensity"][["times", "steps"]]
     garmin_df = garmin_df.rename(columns={"steps": "values"})
     cst_df    = cst_data["activity"]["steps"]
-    commun_data["activity"]["steps"] = merge_cst_and_garmin_data(garmin_df, cst_df)
+    common_data["activity"]["steps"] = merge_cst_and_garmin_data(garmin_df, cst_df)
 
     # Distance 
     garmin_df = garmin_data["activity"]["intensity"][["times", "distance"]]
     garmin_df.rename(columns = {'distance':'values'}, inplace = True)
     cst_df    = cst_data["activity"]["distance"]
-    commun_data["activity"]["distance"] = merge_cst_and_garmin_data(garmin_df, cst_df)
+    common_data["activity"]["distance"] = merge_cst_and_garmin_data(garmin_df, cst_df)
     
-    return copy.deepcopy(commun_data)
+    return copy.deepcopy(common_data)
 
 def initialize_dictionary_with_template() -> dict :
+    pdf_info = {
+        "text" : None, 
+        "x" : None,
+        "y" : None,
+        "font" : None,
+        "size" : None,
+        "color" : None,
+        }
+
     cardio_dict = {
-        "rate_high"        : None,
-        "rate_resting"     : None,
-        "rate_var_resting" : None,
+        "rate_high"        : copy.deepcopy(pdf_info),
+        "rate_resting"     : copy.deepcopy(pdf_info),
+        "rate_var_resting" : copy.deepcopy(pdf_info),
     } 
     breath_dict = {
-        "rate_high"        : None,
-        "rate_resting"     : None,
-        "rate_var_resting" : None,
-        "ratio_in_exhale"  : None,
+        "rate_high"        : copy.deepcopy(pdf_info),
+        "rate_resting"     : copy.deepcopy(pdf_info),
+        "rate_var_resting" : copy.deepcopy(pdf_info),
+        "inspi_expi"  : copy.deepcopy(pdf_info),
     } 
     activity_dict = {
-        "steps"            : None,
-        "distance"         : None,
-        "goal"             : None,
+        "steps"            : copy.deepcopy(pdf_info),
+        "distance"         : copy.deepcopy(pdf_info),
+        "goal"             : copy.deepcopy(pdf_info),
     }
+    
     dict_template = {
                     'cardio'   : copy.deepcopy(cardio_dict),
                     'breath'   : copy.deepcopy(breath_dict),
                     'activity' : copy.deepcopy(activity_dict)
                     }
+    
     return copy.deepcopy(dict_template)
 
 def merge_cst_and_garmin_data(df_1, df_2): 
@@ -187,8 +275,9 @@ def merge_cst_and_garmin_data(df_1, df_2):
     
     return df_result
     
+
 # Sliding window to compute the average rate on 30 min sliding window
-# TO CHANGE !! adapt to time intervals (when the session is interrupted)
+# TO CHANGE !! it has to be adapted to time intervals 
 def sliding_window(sequence, minutes):
     """Calcule une moyenne sur des fenêtres glissantes.
     k est la taille de la fenêtre glissante
