@@ -37,6 +37,7 @@ def get_cst_data(user_id, date, api, url):
     add_cardio(date, datas_3_days, results_dict['cardio'])
     add_breath(date, datas_3_days, results_dict['breath'])                  
     add_activity(date, datas_3_days, results_dict['activity'])
+    add_temperature(date, datas_3_days, results_dict['temperature'])
     add_durations(date, results_dict)
     
     # Add activity level to each indicator
@@ -122,12 +123,23 @@ def initialize_dictionary_with_template() -> dict :
         'rest' : None,
         'active' : None,
         }
+    temperature_dict = {
+        'right' : None,
+        'left' : None,
+        'mean_left' : None, 
+        'mean_right' : None, 
+        'min_left' : None, 
+        'min_right' : None, 
+        'max_left' : None, 
+        'max_right' : None, 
+    }
     dict_template = {
                     'user_id' : None,
                     'activity': copy.deepcopy(activity_dict),
                     'anomalies': copy.deepcopy(anomalies_dict),
                     'breath': copy.deepcopy(breath_dict),
-                    'cardio'  : copy.deepcopy(cardio_dict),
+                    'cardio' : copy.deepcopy(cardio_dict),
+                    'temperature' : copy.deepcopy(temperature_dict),
                     'duration': copy.deepcopy(duration_dict),
                     }
     return copy.deepcopy(dict_template)
@@ -175,6 +187,28 @@ def add_breath(date, datas, breath_dict):
     breath_dict['rate'] = rate
     breath_dict['rate_var'] = rate_var
     breath_dict['inspi_expi'] = inspi_expi
+
+def add_temperature(date, datas, temperature_dict):
+    right = get_cst_result_info(date, datas, result_type='temp_1')
+    left = get_cst_result_info(date, datas, result_type='temp_2')
+    
+    mean_right = round(np.mean(left['values']))/100
+    mean_left = round(np.mean(right['values']))/100
+
+    min_right = round(min(left['values']))/100
+    min_left = round(min(right['values']))/100
+
+    max_right = round(max(left['values']))/100
+    max_left = round(max(right['values']))/100
+
+    temperature_dict['right'] = right
+    temperature_dict['left'] = left
+    temperature_dict['mean_right'] = mean_right
+    temperature_dict['mean_left'] = mean_left
+    temperature_dict['min_right'] = min_right
+    temperature_dict['min_left'] = min_left
+    temperature_dict['max_right'] = max_right
+    temperature_dict['max_left'] = max_left
 
 def add_activity(date, datas, activity_dict) : 
     averaged_activity = get_cst_result_info(date, datas, result_type='averaged_activity')
@@ -402,21 +436,21 @@ def get_timestamp(id_:str):
 
     return output
 
-# %% ------------- Test the main function-------------------------------------
+# # %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
 # # -- Ludo
-# user_id = "4vk5VJ"
-# date = "2023-05-17"
+# # user_id = "4vk5VJ"
+# # date = "2023-05-17"
 # # -- Fernando
-# user_id = "5Nwwut"
-# date = "2023-05-17"
+# # user_id = "5Nwwut"
+# # date = "2023-05-17"
 # # -- Michel
 # # user_id = "5Nwwut" 
 # # date = "2023-05-04" 
 # # -- Adriana
-# # user_id = "6o2Fzp"
-# # date = "2023-05-10"
+# user_id = "6o2Fzp"
+# date = "2023-05-24"
 
 # if prod == True :
 #     api = API_KEY_PROD
@@ -425,4 +459,4 @@ def get_timestamp(id_:str):
 #     api = API_KEY_PREPROD
 #     url = URL_CST_PREPROD
 
-# results_dict = get_cst_data(user_id, date, api, url)
+# datas_3_days, results_dict = get_cst_data(user_id, date, api, url)

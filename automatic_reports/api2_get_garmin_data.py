@@ -470,17 +470,21 @@ def initialize_dictionary_with_template() -> dict :
     return copy.deepcopy(dict_template)
 
 # %% ---------------------------- Test function ------------------------------ 
-# ----------------------------------------------------------------------------
+# # ----------------------------------------------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD
 # prod = False
 # # Michel
-# user_id = "5Nwwut" 
-# date = "2023-05-04" 
+# # user_id = "5Nwwut" 
+# # date = "2023-05-04" 
 # #/ Adriana
-# # user_id = "6o2Fzp"
-# # date = "2023-05-10"
+# user_id = "6o2Fzp"
+# date = "2023-05-24"
 
-#/ if prod == True :
+# # -- Ludo
+# # user_id = "4vk5VJ"
+# # date = "2023-05-17"
+
+# if prod == True :
 #     api = API_KEY_PROD
 #     url = URL_GARMIN_PROD
 # else :

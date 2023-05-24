@@ -9,35 +9,35 @@ from scipy.signal import medfilt
 import numpy as np
 import datetime
 from template.util import img_to_bytes
-from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery
+from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature
 import random
+
+BGCOLOR = 'rgba(255,255,255,1)'
 
 def temperature_mean():
 
-    bgcolor = 'rgba(255,255,255,1)'
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(334, 355)/10)
     line_width = 2
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, 
-                             y=y,
-                        mode='lines',
-                        line=dict(color=constant.COLORS()['temp'], width=line_width),
-                        name='tmp'))
+
+    values_df = get_temperature()['values']
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]/100
     
+        fig.add_trace(go.Scatter(x=x, 
+                                y=y,
+                                mode='lines',
+                                line=dict(color=constant.COLORS()['temp'], width=line_width),
+                                name='tmp'))
+        
     fig.update_layout(xaxis_title = translate["times"],
                       yaxis_title=constant.UNIT()['temp'],
                       font=dict(size=14,),
                       height=300, 
                       template="plotly_white",
-                      paper_bgcolor=bgcolor, plot_bgcolor=bgcolor,
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['temp'],
                        yaxis = dict(range=constant.RANGE()['temp']),
                       )
@@ -113,7 +113,7 @@ def sleep():
                       font=dict(size=14,),
                       height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title="Sleep scores",
                       showlegend=False,
                       )
@@ -142,7 +142,7 @@ def bodybattery():
                       font=dict(size=14,),
                       height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['bodybattery'],
                       yaxis = dict(range=constant.RANGE()['bodybattery']),
                       )
@@ -218,7 +218,7 @@ def pulseox():
                 font=dict(size=14,),
                 height=300, 
                 template="plotly_white",
-                paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                 title="Pulse Ox Scores",
                 showlegend=False,
                 )
@@ -294,7 +294,7 @@ def stress():
                       font=dict(size=14,),
                       height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title="Stress scores",
                       showlegend=False,
                       )
@@ -324,7 +324,7 @@ def breath_brv():
                       font=dict(size=14))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['brv'],
                        yaxis = dict(range=constant.RANGE()['brv']),
                       )
@@ -353,7 +353,7 @@ def breath_brpm():
                       font=dict(size=14,))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['brpm'],
                        yaxis = dict(range=constant.RANGE()['brpm']),
                       )
@@ -382,7 +382,7 @@ def heart_hrv():
                       font=dict(size=14,))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['hrv'],
                        yaxis = dict(range=constant.RANGE()['hrv']),
                       )
@@ -411,7 +411,7 @@ def heart_bpm():
                       font=dict(size=14))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['bpm'],
                        yaxis = dict(range=constant.RANGE()['bpm']),
                       )
@@ -467,7 +467,7 @@ def duration():
     
     fig.update_layout(barmode='stack', height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       showlegend=False,
                       title="<span style='font-size:20px;'>" + translate["data_collection_duration"] + "</span>",
                       xaxis = dict(range=[xmin, xmax]), 
@@ -512,8 +512,8 @@ def ecg_signal(template='plotly_white', width_line=2, height=500):
                       title='Electrocardiogram',
                       yaxis = dict(range=[ymin, ymax]), 
                       template=template,
-                      paper_bgcolor='rgba(255,255,255,1)', 
-                      plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, 
+                      plot_bgcolor=BGCOLOR,
                       showlegend=False,
                       )
     
@@ -535,8 +535,8 @@ def breath_signal(template='plotly_white', width_line=2, height=500):
     fig.update_layout(height=height, 
                       template=template, 
                       title='Breath',
-                      paper_bgcolor='rgba(255,255,255,1)', 
-                      plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, 
+                      plot_bgcolor=BGCOLOR,
                       showlegend=True,
                       legend=dict(yanchor="top",
                                   y=0.99, xanchor="left", 
@@ -564,8 +564,8 @@ def acceleration_signal(template='plotly_white', width_line=2, height=500):
                       template=template, 
                       yaxis = dict(range=[ymin, ymax]),
                       title='Acceleration',
-                      paper_bgcolor='rgba(255,255,255,1)', 
-                      plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, 
+                      plot_bgcolor=BGCOLOR,
                       showlegend=False,
                       )
     

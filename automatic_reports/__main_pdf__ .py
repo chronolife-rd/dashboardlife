@@ -29,7 +29,7 @@ URL_GARMIN_PREPROD = "https://preprod.chronolife.net/api/2/garmin/data"
 
 # -- Adriana
 user_id = "6o2Fzp"
-date = "2023-05-10"
+date = "2023-05-24"
 
 # -- Michel
 # user_id = "5Nwwut" 

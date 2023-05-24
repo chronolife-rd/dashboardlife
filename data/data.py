@@ -242,17 +242,18 @@ def get_steps():
     return output
 
 def get_temperature():
-    
-    # !!! TO BE UPDATED !!!
+    datas = st.session_state.chronolife_indicators
     output = {}
-    #/ output["mean"]  = ""
-    # output["min"]   = ""
-    # output["max"]   = ""
+    output["mean"]  = ""
+    output["min"]   = ""
+    output["max"]   = ""
     
-    output["mean"]  = 35.4
-    output["min"]   = 33.4
-    output["max"]   = 37.1
-    
+    if len(datas) > 0 and datas["temperature"]["mean_left"] is not None:
+        output["values"] = datas["temperature"]["left"]
+        output["mean"]   = datas["temperature"]["mean_left"]
+        output["min"]    = datas["temperature"]["min_left"]
+        output["max"]    = datas["temperature"]["max_left"]
+
     return output
 
 def get_bpm():

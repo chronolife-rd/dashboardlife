@@ -9,7 +9,7 @@ URL_CST_PREPROD = "https://preprod.chronolife.net/api/2/data"
 URL_GARMIN_PROD = "https://prod.chronolife.net/api/2/garmin/data" 
 URL_GARMIN_PREPROD = "https://preprod.chronolife.net/api/2/garmin/data" 
 
-CST_SIGNAL_TYPES = 'heartbeat,HRV,qt_c_framingham_per_seg,breath_2_brpm,breath_2_brv,breath_2_inspi_over_expi,averaged_activity,steps_number' 
+CST_SIGNAL_TYPES = 'heartbeat,HRV,qt_c_framingham_per_seg,breath_2_brpm,breath_2_brv,breath_2_inspi_over_expi,averaged_activity,steps_number,temp_1,temp_2' 
 GARMIN_SIGNAL_TYPES = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pulseox'
 
 # Constants used in functions 
