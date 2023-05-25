@@ -23,9 +23,18 @@ URL_GARMIN_PREPROD = "https://preprod.chronolife.net/api/2/garmin/data"
 
 # ----------------------------- Chronolife -------------------------------
 # Start timer   
-# -- Ludo 
-user_id = "4vk5VJ"
-date = "2023-05-17"
+# -- Ludo
+# user_id = "4vk5VJ"
+# date = "2023-05-17"
+# -- Fernando
+# user_id = "5Nwwut"
+# date = "2023-05-17"
+# -- Michel
+# user_id = "5Nwwut" 
+# date = "2023-05-04" 
+# -- Adriana
+user_id = "6o2Fzp"
+date = "2023-05-24"
 
 begin = time.time()
 

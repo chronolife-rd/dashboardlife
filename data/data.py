@@ -330,28 +330,22 @@ def get_qt():
     datas = st.session_state.chronolife_indicators
     
     output = {}
-    output["exists"]    = False
-    output["mean"]      = ""
-    output["min"]       = ""
-    output["max"]       = ""
-    output["rest"]      = ""
-    output["high"]      = ""
-    output["threshold"] = ""
+    output["exists"]  = False
+    output["mean"]    = ""
+    output["min"]     = ""
+    output["max"]     = ""
     
     if len(datas["anomalies"]["qt"]["values"]) > 0:
-        output["exists"]    = datas["anomalies"]["qt"]["exists"]
-        output["mean"]      = datas["anomalies"]["qt"]["mean"]
-        output["min"]       = datas["anomalies"]["qt"]["min"]
-        output["max"]       = datas["anomalies"]["qt"]["max"]
-        output["rest"]      = datas["anomalies"]["qt"]["rest"]
-        output["high"]      = datas["anomalies"]["qt"]["high"]
-        output["threshold"] = 550
+        output["exists"] = datas["anomalies"]["qt"]["exists"]
+        output["mean"]   = datas["anomalies"]["qt"]["mean"]
+        output["min"]    = datas["anomalies"]["qt"]["min"]
+        output["max"]    = datas["anomalies"]["qt"]["max"]
     
     if output["exists"]:
         qt_alert_icon = st.session_state.alert
     else:
         qt_alert_icon = st.session_state.alert_no
-    st.session_state.qt_alert_icon          = qt_alert_icon
+    st.session_state.qt_alert_icon = qt_alert_icon
     
     return output
 
@@ -440,21 +434,15 @@ def get_brv():
 def get_inexratio():
     datas = st.session_state.common_indicators
 
-    # !!! TO BE UPDATED !!!
     output = {}
     output["mean"]  = ""
     output["min"]   = ""
     output["max"]   = ""
-    output["rest"]  = ""
-    output["high"]  = ""
 
-    if len(datas) > 0 and datas["breath"]["ratio_in_exhale"] is not None:
-        output["mean"]  = datas["breath"]["ratio_in_exhale"]
-        output["min"]   = -1
-        output["max"]   = -1
-        output["rest"]  = -1
-        output["high"]  = -1
-    
+    if len(datas) > 0 and datas["breath"]["inspi_expi_mean"] is not None:
+        output["mean"]  = datas["breath"]["inspi_expi_mean"]
+        output["min"]   = datas["breath"]["inspi_expi_min"]
+        output["max"]   = datas["breath"]["inspi_expi_max"]
     return output
 
 def get_bradypnea():

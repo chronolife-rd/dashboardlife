@@ -87,17 +87,14 @@ def get_common_indicators(cst_data:dict, garmin_data:dict) :
     # --------------------------- rate var -----------------------------------
     # Add rate variability high and max
     values_df = common_data["breath"]["rate_var"]["values"].dropna()
-    value = round(max(values_df))
-    common_indicators["breath"]["rate_var_max"] = value
-    common_indicators["breath"]["rate_var_high"] = value
+    common_indicators["breath"]["rate_var_max"] = round(max(values_df))
+    common_indicators["breath"]["rate_var_high"] = round(max(values_df))
 
     # Add rate variability min
-    value = round(min(values_df))
-    common_indicators["breath"]["rate_var_min"] = value
+    common_indicators["breath"]["rate_var_min"] = round(min(values_df))
 
     # Add rate variability mean
-    value = round(np.mean(values_df))
-    common_indicators["breath"]["rate_var_mean"] = value
+    common_indicators["breath"]["rate_var_mean"] = round(np.mean(values_df))
 
     # Add rate variability resting
     df_aux = common_data['breath']['rate_var']
@@ -106,9 +103,17 @@ def get_common_indicators(cst_data:dict, garmin_data:dict) :
     value = round(np.mean(values))
     common_indicators["breath"]["rate_var_resting"] = value
 
-    # Add inhale/exhale ratio TO CHANGE !!!!!
-    value = 80
-    common_indicators["breath"]["ratio_in_exhale"] = value
+    # ------------------------- inspi expi -----------------------------------
+    values_df = common_data["breath"]["inspi_expi"]["values"].dropna()
+
+    # Add rate variability high and max
+    common_indicators["breath"]["inspi_expi_max"] =  round(max(values_df))
+    
+    # Add rate variability min
+    common_indicators["breath"]["inspi_expi_min"] = round(min(values_df))
+
+    # Add rate variability mean
+    common_indicators["breath"]["inspi_expi_mean"] = round(np.mean(values_df))
 
     # ========================== Activity dict ===============================
     # dictionary with data used to plot steps graph 
@@ -174,6 +179,10 @@ def  combine_data(cst_data, garmin_data):
     # Rate variability
     cst_df = cst_data["breath"]["rate_var"]
     common_data["breath"]["rate_var"] = cst_df
+
+    # Ratio inspi/expi
+    cst_df = cst_data["breath"]["inspi_expi"]
+    common_data["breath"]["inspi_expi"] = cst_df
     
     # --- Activity ---
     # Steps 
@@ -217,7 +226,9 @@ def initialize_dictionary_with_template() -> dict :
         "rate_var_mean"    : None,
         "rate_var_resting" : None,
         
-        "ratio_in_exhale"  : None,
+        "inspi_expi_max"  : None,
+        "inspi_expi_min"  : None,
+        "inspi_expi_mean" : None,
     } 
     activity_dict = {
         "steps"            : None,

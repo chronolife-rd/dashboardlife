@@ -490,4 +490,4 @@ def initialize_dictionary_with_template() -> dict :
 # else :
 #     api = API_KEY_PREPROD
 #     url = URL_GARMIN_PREPROD
-# datas, results_dict =  get_garmin_data(user_id, date, api, url)
+# results_dict =  get_garmin_data(user_id, date, api, url)

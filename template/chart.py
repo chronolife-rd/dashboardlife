@@ -9,7 +9,7 @@ from scipy.signal import medfilt
 import numpy as np
 import datetime
 from template.util import img_to_bytes
-from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature
+from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature, get_sleep
 import random
 
 BGCOLOR = 'rgba(255,255,255,1)'
@@ -49,6 +49,7 @@ def sleep():
     translate = st.session_state.translate
     
     # !!! TO BE UPDATED WITH REAL DATA !!!
+
     base = datetime.datetime(2023, 4, 19)
     x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
 
@@ -57,6 +58,78 @@ def sleep():
     thr_light     = 25
     thr_rem     = 50
     thr_awake    = 75
+
+    idx = np.where(y < thr_light)
+    if len(idx[0]) > 0:
+        idx = idx[0]
+    else:
+        idx = []
+    x_rest = x[idx]
+    y_rest = y[idx]
+
+    idx = np.where((y > thr_light) & (y <= thr_rem))
+    if len(idx[0]) > 0:
+        idx = idx[0]
+    else:
+        idx = []
+    x_light = x[idx]
+    y_light = y[idx]
+
+    idx = np.where((y > thr_rem) & (y <= thr_awake))
+    if len(idx[0]) > 0:
+        idx = idx[0]
+    else:
+        idx = []
+    x_rem = x[idx]
+    y_rem = y[idx]
+
+    idx = np.where(y > thr_awake)
+    if len(idx[0]) > 0:
+        idx = idx[0]
+    else:
+        idx = []
+    x_awake = x[idx]
+    y_awake = y[idx]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x=x_rest, 
+                         y=y_rest,
+                         marker_color=constant.COLORS()['sleep_deep'],
+                         name="Deep"))
+    fig.add_trace(go.Bar(x=x_light, 
+                         y=y_light,
+                         marker_color=constant.COLORS()['sleep_light'],
+                         name="Light"))
+    fig.add_trace(go.Bar(x=x_rem, 
+                         y=y_rem,
+                         marker_color=constant.COLORS()['sleep_rem'],
+                         name="REM"))
+    fig.add_trace(go.Bar(x=x_awake, 
+                         y=y_awake,
+                         marker_color=constant.COLORS()['sleep_awake'],
+                         name="Awake"))
+
+    fig.update_layout(xaxis_title=translate["times"],
+                      yaxis_title="Sleep Scores",
+                      font=dict(size=14,),
+                      height=300, 
+                      template="plotly_white",
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                      title="Sleep scores",
+                      showlegend=False,
+                      )
+    return fig
+
+def sleep_new():
+    
+    translate = st.session_state.translate
+    
+    # !!! TO BE UPDATED WITH REAL DATA !!!
+    map_sleep = get_sleep()['values']
+    awake = map_sleep['awake']
+    rem = map_sleep['rem']
+    light = map_sleep['light']
+    deep = map_sleep['deep']
 
     idx = np.where(y < thr_light)
     if len(idx[0]) > 0:
@@ -701,7 +774,7 @@ def spo2_donut():
     plt.savefig("template/images/spo2_donut.png", transparent=True)
     st.session_state.spo2_donut = img_to_bytes('template/images/spo2_donut.png')
     
-def steps_donut():
+def steps_donut_old():
     
     translate = st.session_state.translate
     steps           = data.get_steps()
@@ -722,6 +795,57 @@ def steps_donut():
             startangle=90,
             counterclock=False,
             wedgeprops=wedgeprops)
+    my_circle=plt.Circle( (0,0), 0.8, color="white")
+    
+    if steps["score"] == "":
+        plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
+                 horizontalalignment='center',verticalalignment='center')
+    else:
+        plt.text(0, 0, (str(steps_score) + '%'), fontsize=40, color=color_text,
+                 horizontalalignment='center')
+        
+    p=plt.gcf()
+    p.gca().add_artist(my_circle)
+    
+    plt.savefig("template/images/steps_donut.png", transparent=True)
+    st.session_state.steps_donut = img_to_bytes('template/images/steps_donut.png')
+
+
+def steps_donut():
+    
+    translate = st.session_state.translate
+    steps           = data.get_steps()
+    steps_score     = steps["score"]
+    
+    color_text = '#3E738D'
+    
+    if steps_score == "":
+        size_of_groups=[0, 100]
+
+    elif (steps_score < 100):
+        size_of_groups=[steps_score, 100-steps_score]
+        plt.pie(size_of_groups, 
+                colors=["#4393B4", "#E6E6E6"], 
+                startangle=90,
+                counterclock=False)
+        
+    elif (steps_score >= 100) :
+        size_of_groups=[100]
+        plt.pie(size_of_groups, 
+        colors=["#13A943"], 
+        startangle=90,
+        counterclock=False)
+        
+    wedgeprops = {"linewidth": 1, "edgecolor": "white"}
+    plt.close('all')
+    plt.figure()
+    plt.pie(size_of_groups, 
+            colors=['green', "#e8e8e8"], 
+            startangle=90,
+            counterclock=False,
+            wedgeprops=wedgeprops)
+    
+
     my_circle=plt.Circle( (0,0), 0.8, color="white")
     
     if steps["score"] == "":

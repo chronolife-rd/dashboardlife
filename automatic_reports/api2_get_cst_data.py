@@ -154,6 +154,7 @@ def initialize_alerts_with_template() -> dict :
         "exists" : False,
         "min" : "",
         "max" : "",
+        "mean" : "",
         "high" : "",
         "resting" : "",
         "percentage" : "",
@@ -297,55 +298,64 @@ def add_anomalies(results_dict):
     alerts_dict["qt"]["y"]  = 7.45 + ALERT_SIZE
 
     # ------------------- detect anomaly ----------------------
-    # Cardio Tachy/Brady
+    # Breath Tachy/Brady
     df_aux = results_dict['breath']['rate']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
-    value = round(max(values))
-    
-    if(value > TACHYPNEA_TH):
+
+    values_tachy = [i for i in values if i > TACHYPNEA_TH]
+    if len(values_tachy) > 0:
         alerts_dict["tachypnea"]["path"]  = RED_ALERT
         alerts_dict["tachypnea"]["exists"] = True
-        alerts_dict["tachypnea"]["values"] = values
-    elif(value < BRADYPNEA_TH):
+        alerts_dict["tachypnea"]["values"] = values_tachy
+        alerts_dict["tachypnea"]["mean"] = round(np.mean(values_tachy))
+        alerts_dict["tachypnea"]["duration"] = len(values_tachy)
+        alerts_dict["tachypnea"]["percentage"] = len(values)/len(values_tachy)*100
+
+    values_brady = [i for i in values if i < BRADYPNEA_TH] 
+    if len(values_brady) > 0:
         alerts_dict["bradypnea"]["path"]  = RED_ALERT
         alerts_dict["bradypnea"]["exists"] = True
-        alerts_dict["bradypnea"]["values"] = values
+        alerts_dict["bradypnea"]["values"] = values_brady
+        alerts_dict["bradypnea"]["mean"] = round(np.mean(values_brady))
+        alerts_dict["bradypnea"]["duration"] = len(values_brady)
+        alerts_dict["bradypnea"]["percentage"] = len(values)/len(values_brady)*100
 
     # Cardio Tachy/Brady
     df_aux = results_dict['cardio']['rate']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
-    value = round(max(values))
-
-    if(value > TACHYCARDIA_TH):
+    
+    values_tachy = [i for i in values if i > TACHYCARDIA_TH]
+    if len(values_tachy) > 0:
         alerts_dict["tachycardia"]["path"] = RED_ALERT
         alerts_dict["tachycardia"]["exists"] = True
-        alerts_dict["tachycardia"]["values"] = values
-        alerts_dict["tachycardia"]["mean"] = round(np.mean(values))
-        alerts_dict["tachycardia"]["duration"] = -1
-        alerts_dict["tachycardia"]["percentage"] = -1
+        alerts_dict["tachycardia"]["values"] = values_tachy
+        alerts_dict["tachycardia"]["mean"] = round(np.mean(values_tachy))
+        alerts_dict["tachycardia"]["duration"] = len(values_tachy)
+        alerts_dict["tachycardia"]["percentage"] = len(values)/len(values_tachy)*100
 
-    elif(value < BRADYCARDIA_TH):
+    values_brady = [i for i in values if i < BRADYCARDIA_TH] 
+    if len(values_brady) > 0:
         alerts_dict["bradycardia"]["path"]  = RED_ALERT
         alerts_dict["bradycardia"]["exists"] = True
-        alerts_dict["bradycardia"]["values"] = values
-        alerts_dict["bradycardia"]["mean"] = round(np.mean(values))
-        alerts_dict["bradycardia"]["duration"] = -1
-        alerts_dict["bradycardia"]["percentage"] = -1
+        alerts_dict["bradycardia"]["values"] = values_brady
+        alerts_dict["bradycardia"]["mean"] = round(np.mean(values_brady))
+        alerts_dict["bradycardia"]["duration"] = len(values_brady)
+        alerts_dict["bradycardia"]["percentage"] = len(values)/len(values_brady)*100
     
     # Cardio QTc length TO CHANGE TO CHANGE when indicator is updateted !!!
     df_aux = results_dict['cardio']['qt']
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
-    value_max = round(max(values))
-    value_min = round(min(values))
-    if(value_max > QT_MAX_TH or value_min < QT_MIN_TH):
-        alerts_dict["qt"]["path"]  = RED_ALERT
-        alerts_dict["qt"]["exists"] = True
+    
+    if len(values) > 0:
+        value_max = round(max(values))
+        value_min = round(min(values))
         alerts_dict["qt"]["values"] = values
-        alerts_dict["qt"]["min"] = round(min(values))
-        alerts_dict["qt"]["max"] = round(max(values))
+        alerts_dict["qt"]["min"] = value_min
+        alerts_dict["qt"]["max"] = value_max
         alerts_dict["qt"]["mean"] = round(np.mean(values))
-        alerts_dict["qt"]["duration"] = -1
-        alerts_dict["qt"]["percentage"] = -1
+        if(value_max > QT_MAX_TH or value_min < QT_MIN_TH):
+            alerts_dict["qt"]["path"]  = RED_ALERT
+            alerts_dict["qt"]["exists"] = True
 
 def merge_on_times(df_1, df_2):
     df_result = pd.merge(df_1, df_2, how="outer", on="times")
@@ -436,7 +446,7 @@ def get_timestamp(id_:str):
 
     return output
 
-# # %% ------------- Test the main function-------------------------------------
+# %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
 # # -- Ludo
@@ -459,4 +469,4 @@ def get_timestamp(id_:str):
 #     api = API_KEY_PREPROD
 #     url = URL_CST_PREPROD
 
-# datas_3_days, results_dict = get_cst_data(user_id, date, api, url)
+# results_dict = get_cst_data(user_id, date, api, url)
