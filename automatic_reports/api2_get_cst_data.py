@@ -196,11 +196,11 @@ def add_temperature(date, datas, temperature_dict):
     mean_right = round(np.mean(left['values']))/100
     mean_left = round(np.mean(right['values']))/100
 
-    min_right = round(min(left['values']))/100
-    min_left = round(min(right['values']))/100
+    min_right = round(np.quantile(left['values'], 0.1))/100
+    min_left = round(np.quantile(right['values'], 0.1))/100
 
-    max_right = round(max(left['values']))/100
-    max_left = round(max(right['values']))/100
+    max_right = round(np.quantile(left['values'], 0.9))/100
+    max_left = round(np.quantile(right['values'], 0.9))/100
 
     temperature_dict['right'] = right
     temperature_dict['left'] = left
@@ -347,8 +347,8 @@ def add_anomalies(results_dict):
     values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
     
     if len(values) > 0:
-        value_max = round(max(values))
-        value_min = round(min(values))
+        value_max = round(np.quantile(values, 0.9))
+        value_min = round(np.quantile(values, 0.1))
         alerts_dict["qt"]["values"] = values
         alerts_dict["qt"]["min"] = value_min
         alerts_dict["qt"]["max"] = value_max
