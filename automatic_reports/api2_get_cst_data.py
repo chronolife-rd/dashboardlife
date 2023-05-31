@@ -309,7 +309,7 @@ def add_anomalies(results_dict):
         alerts_dict["tachypnea"]["values"] = values_tachy
         alerts_dict["tachypnea"]["mean"] = round(np.mean(values_tachy))
         alerts_dict["tachypnea"]["duration"] = len(values_tachy)
-        alerts_dict["tachypnea"]["percentage"] = len(values)/len(values_tachy)*100
+        alerts_dict["tachypnea"]["percentage"] = round(len(values_tachy)/len(values)*100, 1)
 
     values_brady = [i for i in values if i < BRADYPNEA_TH] 
     if len(values_brady) > 0:
@@ -318,7 +318,7 @@ def add_anomalies(results_dict):
         alerts_dict["bradypnea"]["values"] = values_brady
         alerts_dict["bradypnea"]["mean"] = round(np.mean(values_brady))
         alerts_dict["bradypnea"]["duration"] = len(values_brady)
-        alerts_dict["bradypnea"]["percentage"] = len(values)/len(values_brady)*100
+        alerts_dict["bradypnea"]["percentage"] = round(len(values_brady)/len(values)*100, 1)
 
     # Cardio Tachy/Brady
     df_aux = results_dict['cardio']['rate']
@@ -331,7 +331,7 @@ def add_anomalies(results_dict):
         alerts_dict["tachycardia"]["values"] = values_tachy
         alerts_dict["tachycardia"]["mean"] = round(np.mean(values_tachy))
         alerts_dict["tachycardia"]["duration"] = len(values_tachy)
-        alerts_dict["tachycardia"]["percentage"] = len(values)/len(values_tachy)*100
+        alerts_dict["tachycardia"]["percentage"] = round(len(values_tachy)/len(values)*100, 1)
 
     values_brady = [i for i in values if i < BRADYCARDIA_TH] 
     if len(values_brady) > 0:
@@ -340,7 +340,7 @@ def add_anomalies(results_dict):
         alerts_dict["bradycardia"]["values"] = values_brady
         alerts_dict["bradycardia"]["mean"] = round(np.mean(values_brady))
         alerts_dict["bradycardia"]["duration"] = len(values_brady)
-        alerts_dict["bradycardia"]["percentage"] = len(values)/len(values_brady)*100
+        alerts_dict["bradycardia"]["percentage"] = round(len(values_brady)/len(values)*100, 1)
     
     # Cardio QTc length TO CHANGE TO CHANGE when indicator is updateted !!!
     df_aux = results_dict['cardio']['qt']

@@ -51,7 +51,7 @@ def COLORS():
     COLORS['sleep_light']   = "#1878CF"
     COLORS['sleep_rem']     = "#9D0FB1"
     COLORS['sleep_awake']   = "#EB79D2"
-    
+
     COLORS['spo2']          = "#6BA439"
     COLORS['spo2_green']    = "#17A444"
     COLORS['spo2_low']      = "#F8CB4B"

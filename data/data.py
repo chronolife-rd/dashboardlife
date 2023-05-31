@@ -461,10 +461,10 @@ def get_bradypnea():
         output["percentage"]  = datas["anomalies"]["bradypnea"]["percentage"]
     
     if output["exists"]:
-        bradycardia_alert_icon = st.session_state.alert
+        bradypnea_alert_icon = st.session_state.alert
     else:
-        bradycardia_alert_icon = st.session_state.alert_no
-    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
+        bradypnea_alert_icon = st.session_state.alert_no
+    st.session_state.bradypnea_alert_icon = bradypnea_alert_icon
     
     return output
     
@@ -484,10 +484,10 @@ def get_tachypnea():
         output["percentage"]  = datas["anomalies"]["tachypnea"]["percentage"]
     
     if output["exists"]:
-        tachycardia_alert_icon = st.session_state.alert
+        tachypnea_alert_icon = st.session_state.alert
     else:
-        tachycardia_alert_icon = st.session_state.alert_no
-    st.session_state.tachycardia_alert_icon = tachycardia_alert_icon
+        tachypnea_alert_icon = st.session_state.alert_no
+    st.session_state.tachypnea_alert_icon = tachypnea_alert_icon
     
     return output
 

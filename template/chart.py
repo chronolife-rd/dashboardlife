@@ -7,7 +7,7 @@ import template.constant as constant
 from pylife.useful import unwrap
 from scipy.signal import medfilt
 import numpy as np
-import datetime
+import datetime 
 from template.util import img_to_bytes
 from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature, get_sleep
 import random
@@ -47,149 +47,64 @@ def temperature_mean():
 def sleep():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-
-    y = 90*np.random.rand(len(x))
-
-    thr_light     = 25
-    thr_rem     = 50
-    thr_awake    = 75
-
-    idx = np.where(y < thr_light)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rest = x[idx]
-    y_rest = y[idx]
-
-    idx = np.where((y > thr_light) & (y <= thr_rem))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_light = x[idx]
-    y_light = y[idx]
-
-    idx = np.where((y > thr_rem) & (y <= thr_awake))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rem = x[idx]
-    y_rem = y[idx]
-
-    idx = np.where(y > thr_awake)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_awake = x[idx]
-    y_awake = y[idx]
-
-    fig = go.Figure()
-    fig.add_trace(go.Bar(x=x_rest, 
-                         y=y_rest,
-                         marker_color=constant.COLORS()['sleep_deep'],
-                         name="Deep"))
-    fig.add_trace(go.Bar(x=x_light, 
-                         y=y_light,
-                         marker_color=constant.COLORS()['sleep_light'],
-                         name="Light"))
-    fig.add_trace(go.Bar(x=x_rem, 
-                         y=y_rem,
-                         marker_color=constant.COLORS()['sleep_rem'],
-                         name="REM"))
-    fig.add_trace(go.Bar(x=x_awake, 
-                         y=y_awake,
-                         marker_color=constant.COLORS()['sleep_awake'],
-                         name="Awake"))
-
-    fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title="Sleep Scores",
-                      font=dict(size=14,),
-                      height=300, 
-                      template="plotly_white",
-                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
-                      title="Sleep scores",
-                      showlegend=False,
-                      )
-    return fig
-
-def sleep_new():
-    
-    translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
+        
     map_sleep = get_sleep()['values']
     awake = map_sleep['awake']
     rem = map_sleep['rem']
     light = map_sleep['light']
     deep = map_sleep['deep']
 
-    idx = np.where(y < thr_light)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rest = x[idx]
-    y_rest = y[idx]
-
-    idx = np.where((y > thr_light) & (y <= thr_rem))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_light = x[idx]
-    y_light = y[idx]
-
-    idx = np.where((y > thr_rem) & (y <= thr_awake))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rem = x[idx]
-    y_rem = y[idx]
-
-    idx = np.where(y > thr_awake)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_awake = x[idx]
-    y_awake = y[idx]
-
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=x_rest, 
-                         y=y_rest,
-                         marker_color=constant.COLORS()['sleep_deep'],
-                         name="Deep"))
-    fig.add_trace(go.Bar(x=x_light, 
-                         y=y_light,
-                         marker_color=constant.COLORS()['sleep_light'],
-                         name="Light"))
-    fig.add_trace(go.Bar(x=x_rem, 
-                         y=y_rem,
-                         marker_color=constant.COLORS()['sleep_rem'],
-                         name="REM"))
-    fig.add_trace(go.Bar(x=x_awake, 
-                         y=y_awake,
-                         marker_color=constant.COLORS()['sleep_awake'],
-                         name="Awake"))
+    
+    # Add 2 point on the graph for refference
+    date = st.session_state.date
+    date_1 = datetime.datetime.strptime(date, "%Y-%m-%d")
+    date_2 = date_1 + datetime.timedelta(hours = 10)
+    fig.add_trace(go.Scatter(x=[date_1, date_2], y=[2, 2], marker_color="white"))
 
+    for interval in awake:
+        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+        fig.add_shape(type="rect", line_width=0,
+                        x0=xstart, y0=0, x1=xend, y1=8,
+                        fillcolor=constant.COLORS()['sleep_awake'])
+
+    for interval in rem:
+        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+        fig.add_shape(type="rect", line_width=0, 
+                        x0=xstart, y0=0, x1=xend, y1=6,
+                        fillcolor=constant.COLORS()['sleep_rem'])
+
+    for interval in light:
+        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+        fig.add_shape(type="rect", line_width=0, 
+                        x0=xstart, y0=0, x1=xend, y1=4,
+                        fillcolor=constant.COLORS()['sleep_light'])
+
+    for interval in deep:
+        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+        fig.add_shape(type="rect", line_width=0, 
+                        x0=xstart, y0=0, x1=xend, y1=2,
+                        fillcolor=constant.COLORS()['sleep_deep'])
+
+    fig.update_shapes(dict(xref='x', yref='y'))
     fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title="Sleep Scores",
-                      font=dict(size=14,),
-                      height=300, 
-                      template="plotly_white",
-                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
-                      title="Sleep scores",
-                      showlegend=False,
-                      )
+                    font=dict(size=14,),
+                    yaxis = dict(
+                            tickmode = 'array',
+                            tickvals = [2, 4, 6, 8],
+                            ticktext = ['Deep', 'Light', 'REM', 'Awake']
+                            ),
+                    height=300, 
+                    template="plotly_white",
+                    paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                    title="Sleep scores",
+                    showlegend=False,
+                    )
+
     return fig
 
 def bodybattery():
@@ -831,7 +746,7 @@ def steps_donut():
         
     elif (steps_score >= 100) :
         size_of_groups=[100]
-        plt.pie(size_of_groups, 
+        plt.pie(size_of_groups,  
         colors=["#13A943"], 
         startangle=90,
         counterclock=False)
