@@ -220,7 +220,7 @@ def add_activity(date, datas, activity_dict) :
     values = steps_number["values"]*0.76
     distance = pd.DataFrame({'times' : times, 'values' : values})
     
-    activity_dict['steps'] = steps_number
+    activity_dict['steps'] = data_per_15_min(steps_number)
     activity_dict['averaged_activity' ] = averaged_activity
     activity_dict['distance'] = distance
 
@@ -451,22 +451,44 @@ def get_timestamp(id_:str):
 
     return output
 
+def data_per_15_min(input_df):
+
+    output_df = pd.DataFrame({"times" : [], "values" : []})
+    first_minute = input_df["times"][0]
+    first_minute = pd.Timestamp(first_minute).round(freq='H') # round to minute
+
+    index_last_minut = input_df.tail(1).index[0]
+    last_minute = input_df["times"][index_last_minut]
+    last_minute = pd.Timestamp(last_minute).round(freq='T') # round to minute
+ 
+    while first_minute < last_minute:
+        values_df = input_df.loc[input_df['times'] >= first_minute, ]
+        values = values_df.loc[values_df['times'] < first_minute + timedelta(minutes = 15), 'values']
+
+        aux_df = pd.DataFrame({"times" : first_minute, "values" : np.mean(values)}, index=[0])
+
+        output_df = pd.concat([output_df, aux_df ])
+        first_minute += + timedelta(minutes = 15)
+       
+    return output_df.reset_index(drop=True)
+
+
 # %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
-# # -- Ludo
-# # user_id = "4vk5VJ"
-# # date = "2023-05-17"
-# # -- Fernando
-# # user_id = "5Nwwut"
-# # date = "2023-05-17"
-# # -- Michel
-# # user_id = "5Nwwut" 
-# # date = "2023-05-04" 
-# # -- Adriana
+# -- Ludo
+# user_id = "4vk5VJ"
+# date = "2023-05-17"
+# -- Fernando
+# user_id = "5Nwwut"
+# date = "2023-05-17"
+# -- Michel
+# user_id = "5Nwwut" 
+# date = "2023-05-04" 
+# -- Adriana
 
-# # user_id = "6o2Fzp"
-# # date = "2023-05-24"
+# user_id = "6o2Fzp"
+# date = "2023-05-24"
 # # Ludo
 # user_id = "4vk5VJ"
 # date = "2023-05-25" 

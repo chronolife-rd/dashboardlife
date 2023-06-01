@@ -336,6 +336,7 @@ def get_qt():
     
     output = {}
     output["exists"]  = False
+    output["values"]  = ""
     output["mean"]    = ""
     output["min"]     = ""
     output["max"]     = ""

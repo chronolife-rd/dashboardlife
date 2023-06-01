@@ -410,7 +410,7 @@ def data_per_min(input_df):
         output_df = pd.concat([output_df, aux_df ])
         first_minute += + timedelta(minutes = 1)
        
-    return output_df
+    return output_df.reset_index(drop=True)
 
 def initialize_dictionary_with_template() -> dict :  
     activity_dict = {
