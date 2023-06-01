@@ -438,16 +438,20 @@ def get_brv():
 
 def get_inexratio():
     datas = st.session_state.common_indicators
+    common_data = st.session_state.common_data
 
     output = {}
-    output["mean"]  = ""
-    output["min"]   = ""
-    output["max"]   = ""
+    output["values"] = ""
+    output["mean"]   = ""
+    output["min"]    = ""
+    output["max"]    = ""
 
     if len(datas) > 0 and isinstance(datas["breath"]["inspi_expi_mean"], str) == False:
-        output["mean"]  = datas["breath"]["inspi_expi_mean"]
-        output["min"]   = datas["breath"]["inspi_expi_min"]
-        output["max"]   = datas["breath"]["inspi_expi_max"]
+        
+        output["values"] = common_data["breath"]["inspi_expi"]
+        output["mean"]   = datas["breath"]["inspi_expi_mean"]
+        output["min"]    = datas["breath"]["inspi_expi_min"]
+        output["max"]    = datas["breath"]["inspi_expi_max"]
     return output
 
 def get_bradypnea():
