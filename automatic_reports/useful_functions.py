@@ -78,6 +78,29 @@ def timedelta_formatter(time_delta, convert = False):    # defining the function
     msg = "{}h, {}min".format(hour_count,minute_count)
     return msg 
 
+def unwrap_ratio_inspi_expi(values):
+    """ Unwrap values from list
+
+     Parameter
+    ----------
+    values:     Values to unwrap
+
+    Returns
+    ----------
+    new_values: unwrapped values
+
+    # """
+
+    new_values = []
+    for value in values:     
+        if value is not None and type(value)==float:            
+            new_values.append(value)
+        else:
+             if value is not None:
+                 new_values.extend(value) 
+
+    return np.array(new_values)
+
 def unwrap(values):
     """ Unwrap values from list
 
@@ -89,7 +112,7 @@ def unwrap(values):
     ----------
     new_values: unwrapped values
 
-    """
+    # """
     if not is_list_of_list(values):
         return values
 

@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap
+from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap, unwrap_ratio_inspi_expi
 from automatic_reports.config import CST_SIGNAL_TYPES
 from automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
 from automatic_reports.config import TACHYPNEA_TH, BRADYPNEA_TH, TACHYCARDIA_TH, BRADYCARDIA_TH,\
@@ -101,40 +101,40 @@ def error_management(date, reply) :
 
 def initialize_dictionary_with_template() -> dict :  
     activity_dict = {
-        'steps' : None,
-        'averaged_activity' : None,
-        'distance' : None,
+        'steps' : "",
+        'averaged_activity' : "",
+        'distance' : "",
         }
     anomalies_dict = initialize_alerts_with_template()
     breath_dict = {
-        'rate' : None, 
-        'rate_var' : None,
-        'inspi_expi' : None,
+        'rate' : "", 
+        'rate_var' : "",
+        'inspi_expi' : "",
         }
     cardio_dict = {
-        'rate' : None, 
-        'rate_var' : None,
+        'rate' : "", 
+        'rate_var' : "",
          }
     duration_dict = {
-        'intervals' : None, 
-        'collected' : None,
-        'day' : None, 
-        'night' : None,
-        'rest' : None,
-        'active' : None,
+        'intervals' : "", 
+        'collected' : "",
+        'day' : "", 
+        'night' : "",
+        'rest' : "",
+        'active' : "",
         }
     temperature_dict = {
-        'right' : None,
-        'left' : None,
-        'mean_left' : None, 
-        'mean_right' : None, 
-        'min_left' : None, 
-        'min_right' : None, 
-        'max_left' : None, 
-        'max_right' : None, 
+        'right' : "",
+        'left' : "",
+        'mean_left' : "", 
+        'mean_right' : "", 
+        'min_left' : "", 
+        'min_right' : "", 
+        'max_left' : "", 
+        'max_right' : "", 
     }
     dict_template = {
-                    'user_id' : None,
+                    'user_id' : "",
                     'activity': copy.deepcopy(activity_dict),
                     'anomalies': copy.deepcopy(anomalies_dict),
                     'breath': copy.deepcopy(breath_dict),
@@ -147,8 +147,8 @@ def initialize_dictionary_with_template() -> dict :
 def initialize_alerts_with_template() -> dict :
     pdf_info = {
         "path" : GREEN_ALERT,
-        "x" : None,
-        "y" : None,
+        "x" : "",
+        "y" : "",
         "w" : ALERT_SIZE,
         "h" : ALERT_SIZE,
         "exists" : False,
@@ -159,7 +159,7 @@ def initialize_alerts_with_template() -> dict :
         "resting" : "",
         "percentage" : "",
         "duration" : "",
-        "values" : []
+        "values" : ""
         }
 
     dict_template = {
@@ -174,7 +174,7 @@ def initialize_alerts_with_template() -> dict :
 def add_cardio(date, datas, cardio_dict):
     rate = get_cst_result_info(date, datas, result_type='heartbeat')
     rate_var = get_cst_result_info(date, datas, result_type='HRV')
-    qt = get_cst_result_info_segment(date, datas, result_type='qt_c_framingham_per_seg')
+    qt = get_cst_result_info_segment(date, datas, result_type='qt_c_framingham_per_seg', type = 'qt')
 
     cardio_dict['rate'] = rate
     cardio_dict['rate_var'] = rate_var
@@ -183,7 +183,7 @@ def add_cardio(date, datas, cardio_dict):
 def add_breath(date, datas, breath_dict):
     rate = get_cst_result_info(date, datas, result_type='breath_2_brpm')
     rate_var = get_cst_result_info(date, datas, result_type='breath_2_brv')
-    inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi') # TO CHANGE!!!
+    inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi', type = 'ratio')
 
     breath_dict['rate'] = rate
     breath_dict['rate_var'] = rate_var
@@ -349,11 +349,12 @@ def add_anomalies(results_dict):
     if len(values) > 0:
         value_max = round(np.quantile(values, 0.9))
         value_min = round(np.quantile(values, 0.1))
+        value_mean =  round(np.mean(values))
         alerts_dict["qt"]["values"] = values
         alerts_dict["qt"]["min"] = value_min
         alerts_dict["qt"]["max"] = value_max
-        alerts_dict["qt"]["mean"] = round(np.mean(values))
-        if(value_max > QT_MAX_TH or value_min < QT_MIN_TH):
+        alerts_dict["qt"]["mean"] = value_mean
+        if(value_mean > QT_MAX_TH or value_mean < QT_MIN_TH):
             alerts_dict["qt"]["path"]  = RED_ALERT
             alerts_dict["qt"]["exists"] = True
 
@@ -399,7 +400,7 @@ def get_cst_result_info(date, datas, result_type):
 
     return output
 
-def get_cst_result_info_segment(date, datas, result_type):
+def get_cst_result_info_segment(date, datas, result_type, type):
     times = []
     values = []
     output = pd.DataFrame({
@@ -411,7 +412,11 @@ def get_cst_result_info_segment(date, datas, result_type):
         if result_type == data['type']:
             timestamp = get_timestamp(data['_id'])
             times.append(timestamp)
-            segment_values = unwrap(data['values'])
+            if type == "ratio" : 
+                segment_values = unwrap_ratio_inspi_expi(data['values'])
+            else :
+                segment_values = unwrap(data['values'])
+
             if np.size(segment_values) > 1:         # Nan values have size = 1       
                 mean_value = round(np.mean(segment_values))
             else: mean_value = math.nan
@@ -459,8 +464,13 @@ def get_timestamp(id_:str):
 # # user_id = "5Nwwut" 
 # # date = "2023-05-04" 
 # # -- Adriana
-# user_id = "6o2Fzp"
-# date = "2023-05-24"
+
+# # user_id = "6o2Fzp"
+# # date = "2023-05-24"
+# # Ludo
+# user_id = "4vk5VJ"
+# date = "2023-05-25" 
+
 
 # if prod == True :
 #     api = API_KEY_PROD

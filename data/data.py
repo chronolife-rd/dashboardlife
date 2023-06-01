@@ -63,7 +63,7 @@ def get_bodybattery():
     output["high"]   = ""
     output["low"]    = ""
     
-    if len(datas) > 0 and datas["body_battery"]["highest"] is not None:
+    if len(datas) > 0 and isinstance(datas["body_battery"]["highest"], str) == False:
         output["values"] = datas["body_battery"]["all_values"]
         output["high"]   = datas["body_battery"]["highest"]
         output["low"]    = datas["body_battery"]["lowest"]
@@ -78,7 +78,7 @@ def get_calories():
     output["rest"]  = ""
     output["active"]   = ""
     
-    if len(datas) > 0 and datas["calories"]["total"] is not None:
+    if len(datas) > 0 and isinstance(datas["calories"]["total"], str) == False:
         output["total"]    = datas["calories"]["total"]
         output["rest"]  = datas["calories"]["resting"]
         output["active"]   = datas["calories"]["active"]
@@ -94,7 +94,7 @@ def get_intensity():
     output["moderate"]  = ""
     output["vigurous"]  = ""
     
-    if len(datas) > 0 and datas["intensity_min"]["total"] is not None:
+    if len(datas) > 0 and isinstance(datas["intensity_min"]["total"], str) == False:
             output["total"]    = td_to_hhmm_str(datas["intensity_min"]["total"])
             output["moderate"] = td_to_hhmm_str(datas["intensity_min"]["moderate"])
             output["vigurous"] = td_to_hhmm_str(datas["intensity_min"]["vigurous"])
@@ -106,6 +106,7 @@ def get_sleep():
     
     output = {}
     output["values"]            = ""
+    output["score"]             = ""
     output["quality"]           = ""
     output["duration"]          = ""
     output["duration_deep"]     = ""
@@ -117,7 +118,7 @@ def get_sleep():
     output["percentage_rem"]    = ""
     output["percentage_awake"]  = ""
     
-    if len(datas) > 0 and datas["sleep"]["score"] is not None:
+    if len(datas) > 0 and isinstance(datas["sleep"]["score"], str) == False:
         output["values"]            = datas["sleep"]["sleep_map"]
         output["score"]             = datas["sleep"]["score"]
         output["quality"]           = datas["sleep"]["quality"]
@@ -142,7 +143,7 @@ def get_spo2():
     output["min"]     = ""
     output["values"]  = ""
     
-    if len(datas) > 0 and datas["spo2"]["averege"] is not None:
+    if len(datas) > 0 and isinstance(datas["spo2"]["averege"], str) == False:
             output["mean"]    = datas["spo2"]["averege"]
             output["min"]     = datas["spo2"]["lowest"]
             output["values"]  = datas["spo2"]["all_values"]
@@ -165,7 +166,7 @@ def get_stress():
     output["percentage_medium"] = ""
     output["percentage_high"]   = ""
     
-    if len(datas) > 0 and datas["stress"]["recorded_time"] is not None:
+    if len(datas) > 0 and isinstance(datas["stress"]["recorded_time"], str) == False:
         output["values"]            = datas["stress"]["all_values"]
         output["score"]             = datas["stress"]["score"]
         output["duration"]          = datas["stress"]["recorded_time"]
@@ -193,7 +194,7 @@ def get_duration_chronolife():
     output["duration_rest"]     = "" 
     output["duration_activity"] = ""
     
-    if len(datas) > 0 and datas["duration"]["collected"] is not None:
+    if len(datas) > 0 :
         output["intervals"]         = datas["duration"]["intervals"] 
         output["duration"]          = datas["duration"]["collected"] 
         output["duration_day"]      = datas["duration"]["day"]
@@ -214,7 +215,7 @@ def get_duration_garmin():
     output["duration_rest"]     = "" 
     output["duration_activity"] = ""
     
-    if len(datas) > 0 and datas["duration"]["collected"] is not None:
+    if len(datas) > 0 :
         output["intervals"]         = datas["duration"]["intervals"] 
         output["duration"]          = datas["duration"]["collected"] 
         output["duration_day"]      = datas["duration"]["day"]
@@ -233,11 +234,15 @@ def get_steps():
     output["score"]     = ""
     output["distance"]  = ""
 
-    if len(datas) > 0 and datas["activity"]["distance"] is not None:
+    if len(datas) > 0 and isinstance(datas["activity"]["distance"], str) == False:
         output["number"]    = datas["activity"]["steps"] 
         output["goal"]      = datas["activity"]["goal"] 
         output["distance"]  = datas["activity"]["distance"] 
-        output["score"]     = int(output["number"]/output["goal"]*100)
+
+        if output["goal"] > 0:
+            output["score"] = int(output["number"]/output["goal"]*100)
+        else : 
+            output["score"] = 0
     
     return output
 
@@ -248,7 +253,7 @@ def get_temperature():
     output["min"]   = ""
     output["max"]   = ""
     
-    if len(datas) > 0 and datas["temperature"]["mean_left"] is not None:
+    if len(datas) > 0 and isinstance(datas["temperature"]["mean_left"], str) == False:
         output["values"] = datas["temperature"]["left"]
         output["mean"]   = datas["temperature"]["mean_left"]
         output["min"]    = datas["temperature"]["min_left"]
@@ -266,7 +271,7 @@ def get_bpm():
     output["rest"]    = ""
     output["high"]    = ""
     
-    if len(datas) > 0 and datas["cardio"]["rate_high"] is not None:
+    if len(datas) > 0 and isinstance(datas["cardio"]["rate_high"], str) == False:
         output["values"]  = datas["cardio"]["rate_mean"] 
         output["mean"]    = datas["cardio"]["rate_mean"] 
         output["min"]     = datas["cardio"]["rate_min"] 
@@ -279,7 +284,7 @@ def get_bpm():
 def get_bpm_values():
     datas = st.session_state.common_data
     output = []
-    if len(datas["cardio"]["rate"]) > 0 :
+    if isinstance(datas["cardio"]["rate"], str) == False:
         output = datas["cardio"]["rate"] 
 
     return output
@@ -287,7 +292,7 @@ def get_bpm_values():
 def get_hrv_values():
     datas = st.session_state.common_data
     output = []
-    if len(datas["cardio"]["rate_var"]) > 0 :
+    if isinstance(datas["cardio"]["rate_var"], str) == False:
         output = datas["cardio"]["rate_var"] 
     st.session_state.hrv_values = output
     return output
@@ -295,7 +300,7 @@ def get_hrv_values():
 def get_brpm_values():
     datas = st.session_state.common_data
     output = []
-    if len(datas["breath"]["rate"]) > 0 :
+    if isinstance(datas["breath"]["rate"], str) == False:
         output = datas["breath"]["rate"] 
     st.session_state.brpm_values = output
     return output
@@ -303,7 +308,7 @@ def get_brpm_values():
 def get_brv_values():
     datas = st.session_state.common_data
     output = []
-    if len(datas["breath"]["rate_var"]) > 0 :
+    if isinstance(datas["breath"]["rate_var"], str) == False:
         output = datas["breath"]["rate_var"] 
     st.session_state.brv_values = output
     return output
@@ -317,7 +322,7 @@ def get_hrv():
     output["rest"]  = ""
     output["high"]  = ""
 
-    if len(datas) > 0 and datas["cardio"]["rate_var_resting"] is not None:
+    if len(datas) > 0 and isinstance(datas["cardio"]["rate_var_resting"], str) == False:
         output["mean"]  = datas["cardio"]["rate_var_mean"] 
         output["min"]   = datas["cardio"]["rate_var_min"] 
         output["max"]   = datas["cardio"]["rate_var_max"] 
@@ -335,7 +340,7 @@ def get_qt():
     output["min"]     = ""
     output["max"]     = ""
     
-    if len(datas["anomalies"]["qt"]["values"]) > 0:
+    if isinstance(datas["anomalies"]["qt"]["values"], str) == False:
         output["exists"] = datas["anomalies"]["qt"]["exists"]
         output["mean"]   = datas["anomalies"]["qt"]["mean"]
         output["min"]    = datas["anomalies"]["qt"]["min"]
@@ -357,7 +362,7 @@ def get_bradycardia():
     output["duration"]    = ""
     output["percentage"]  = ""
     
-    if len(datas["anomalies"]["bradycardia"]["values"]) > 0:
+    if isinstance(datas["anomalies"]["bradycardia"]["values"], str) == False:
         output["exists"]      = datas["anomalies"]["bradycardia"]["exists"]
         output["mean"]        = datas["anomalies"]["bradycardia"]["mean"]
         output["duration"]    = datas["anomalies"]["bradycardia"]["duration"]
@@ -379,7 +384,7 @@ def get_tachycardia():
     output["duration"]    = ""
     output["percentage"]  = ""
 
-    if len(datas["anomalies"]["tachycardia"]["values"]) > 0:
+    if isinstance(datas["anomalies"]["tachycardia"]["values"], str) == False:
         output["exists"]      = datas["anomalies"]["tachycardia"]["exists"]
         output["mean"]        = datas["anomalies"]["tachycardia"]["mean"]
         output["duration"]    = datas["anomalies"]["tachycardia"]["duration"]
@@ -403,7 +408,7 @@ def get_brpm():
     output["rest"]  = ""
     output["high"]  = ""
     
-    if len(datas) > 0 and datas["breath"]["rate_high"] is not None:
+    if len(datas) > 0 and isinstance(datas["breath"]["rate_high"], str) == False:
         output["mean"]  = datas["breath"]["rate_mean"] 
         output["min"]   = datas["breath"]["rate_min"] 
         output["max"]   = datas["breath"]["rate_max"] 
@@ -422,7 +427,7 @@ def get_brv():
     output["rest"]  = ""
     output["high"]  = ""
 
-    if len(datas) > 0 and datas["breath"]["rate_var_resting"] is not None:
+    if len(datas) > 0 and isinstance(datas["breath"]["rate_var_resting"], str) == False:
         output["mean"]  = datas["breath"]["rate_var_mean"]
         output["min"]   = datas["breath"]["rate_var_min"]
         output["max"]   = datas["breath"]["rate_var_max"]
@@ -439,7 +444,7 @@ def get_inexratio():
     output["min"]   = ""
     output["max"]   = ""
 
-    if len(datas) > 0 and datas["breath"]["inspi_expi_mean"] is not None:
+    if len(datas) > 0 and isinstance(datas["breath"]["inspi_expi_mean"], str) == False:
         output["mean"]  = datas["breath"]["inspi_expi_mean"]
         output["min"]   = datas["breath"]["inspi_expi_min"]
         output["max"]   = datas["breath"]["inspi_expi_max"]
@@ -454,7 +459,7 @@ def get_bradypnea():
     output["duration"]    = ""
     output["percentage"]  = ""
 
-    if len(datas["anomalies"]["bradypnea"]["values"]) > 0:
+    if isinstance(datas["anomalies"]["bradypnea"]["values"], str) == False:
         output["exists"]      = datas["anomalies"]["bradypnea"]["exists"]
         output["mean"]        = datas["anomalies"]["bradypnea"]["mean"]
         output["duration"]    = datas["anomalies"]["bradypnea"]["duration"]
@@ -477,7 +482,7 @@ def get_tachypnea():
     output["duration"]    = ""
     output["percentage"]  = ""
 
-    if len(datas["anomalies"]["tachypnea"]["values"]) > 0:
+    if isinstance(datas["anomalies"]["tachypnea"]["values"], str) == False:
         output["exists"]      = datas["anomalies"]["tachypnea"]["exists"]
         output["mean"]        = datas["anomalies"]["tachypnea"]["mean"]
         output["duration"]    = datas["anomalies"]["tachypnea"]["duration"]

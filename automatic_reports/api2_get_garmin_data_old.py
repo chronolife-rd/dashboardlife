@@ -68,29 +68,27 @@ def save_datas_in_dict(date, user_id, datas, api, url) -> dict :
     results_dict = initialize_dictionary_with_template()
     # User id
     results_dict['user_id']  = user_id
+    # Activity 
+    add_activity(datas, results_dict['activity'])
+    # Body battery
+    add_body_battery(datas, results_dict["body_battery"])
+    # Breath
+    add_breath(datas, results_dict['breath'])
+    # Calories 
+    add_calories(datas, results_dict['calories'])
+    # Cardio 
+    add_cardio(datas, results_dict['cardio'])
+    # Compute durations
+    add_durations(date, results_dict)
+    # Intensity minutes
+    add_intensity_minutes(datas, results_dict['intensity_min'])
+    # Sleep
+    add_sleep(date, user_id, datas, results_dict['sleep'], api, url)
 
-    if len(datas) > 0:
-        # Activity 
-        add_activity(datas, results_dict['activity'])
-        # Body battery
-        add_body_battery(datas, results_dict["body_battery"])
-        # Breath
-        add_breath(datas, results_dict['breath'])
-        # Calories 
-        add_calories(datas, results_dict['calories'])
-        # Cardio 
-        add_cardio(datas, results_dict['cardio'])
-        # Compute durations
-        add_durations(date, results_dict)
-        # Intensity minutes
-        add_intensity_minutes(datas, results_dict['intensity_min'])
-        # Sleep
-        add_sleep(date, user_id, datas, results_dict['sleep'], api, url)
-
-        # Spo2 
-        add_spo2(datas, results_dict['spo2'])
-        # Stress
-        add_stress(datas, results_dict['stress'])
+    # Spo2 
+    add_spo2(datas, results_dict['spo2'])
+    # Stress
+    add_stress(datas, results_dict['stress'])
 
     return copy.deepcopy(results_dict)
 
@@ -395,87 +393,81 @@ def convert_dict_to_df(signal_data, start_time) -> pd.DataFrame:
 def data_per_min(input_df):
     output_df = pd.DataFrame({"times" : [], "values" : []})
     first_minute = input_df["times"][0]
-    first_minute = pd.Timestamp(first_minute).round(freq='T') # round to minute
-
-    index_last_minut = input_df.tail(1).index[0]
-    last_minute = input_df["times"][index_last_minut]
-    last_minute = pd.Timestamp(last_minute).round(freq='T') # round to minute
- 
-    while first_minute < last_minute:
-        values_df = input_df.loc[input_df['times'] >= first_minute, ]
-        values = values_df.loc[values_df['times'] < first_minute + timedelta(minutes = 1), 'values']
-
-        aux_df = pd.DataFrame({"times" : first_minute, "values" : np.mean(values)}, index=[0])
-
-        output_df = pd.concat([output_df, aux_df ])
-        first_minute += + timedelta(minutes = 1)
-       
+    last_minute = input_df["times"][-1]
+    i = 0
+    while first_minute <= last_minute:
+        values = input_df.loc[input_df['times'] == first_minute, 'values']
+        output_df["times"][i] = first_minute
+        output_df["values"][i] = np.mean(values)
+        first_minute += + timedelta(min = 1)
+        i +=1
+    
     return output_df
 
 def initialize_dictionary_with_template() -> dict :  
     activity_dict = {
-        "distance" : "",
-        "goal" : "",
-        "intensity" : "",
-        "steps" : ""
+        "distance" : [],
+        "goal" : [],
+        "intensity" : [],
+        "steps" : []
     }
     body_battery_dict = {
-        "all_values" : "",
-        "highest" : "",
-        "lowest" : "",
+        "all_values" : [],
+        "highest" : [],
+        "lowest" : [],
     }
     breath_dict = {
-        "rate" : ""
+        "rate" : []
     }
     calories_dict = {
-        "active" : "", 
-        "resting" : "", 
-        "total" : "", 
+        "active" : [], 
+        "resting" : [], 
+        "total" : [], 
     }
     cardio_dict = {
-        "rate" : ""
+        "rate" : []
     }
     duration_dict = {
-        'intervals' : "", 
-        'collected' : "",
-        'day' : "", 
-        'night' : "",
-        'rest' : "",
-        'active' : ""
+        'intervals' : [], 
+        'collected' : [],
+        'day' : [], 
+        'night' : [],
+        'rest' : [],
+        'active' : []
     }
     intensity_min_dict = {
-        "moderate" : "",
-        "total" : "", 
-        "vigurous" : "",
+        "moderate" : [],
+        "total" : [], 
+        "vigurous" : [],
     }
     sleep_dict = {
-        "sleep_map" : "",
-        "awake" : "",
-        "deep" : "", 
-        "light" : "", 
-        "quality" : "",
-        "recorded_time" : "",
-        "rem" : "",
-        "score" : "",
-        "timestamp_end" : "",
+        "sleep_map" : [],
+        "awake" : [], 
+        "deep" : [], 
+        "light" : [], 
+        "quality" : [],
+        "recorded_time" : [],
+        "rem" : [], 
+        "score" : [],
+        "timestamp_end" : [],
         'percentage_deep' : 0,
         'percentage_light' : 0,
         'percentage_rem' : 0,
         'percentage_awake' : 0,
     }
     spo2_dict = {
-        "all_values" : "",
-        "averege" : "",
-        "lowest" : "",
+        "all_values" : [],
+        "averege" : [],
+        "lowest" : [],
     }
     stress_dict = {
-        "all_values" : "",
-        "high" : "", 
-        "low" : "", 
-        "medium" : "",
-        "recorded_time" : "",
-        "rest" : "", 
-        "score" : "",
+        "all_values" : [],
+        "high" : [], 
+        "low" : [], 
+        "medium" : [],
+        "recorded_time" : [],
+        "rest" : [], 
+        "score" : [],
     }
     
     dict_template = {
@@ -489,30 +481,30 @@ def initialize_dictionary_with_template() -> dict :
                     'sleep'        : copy.deepcopy(sleep_dict),
                     'spo2'         : copy.deepcopy(spo2_dict),
                     'stress'       : copy.deepcopy(stress_dict),
-                    'user_id'      : "",
+                    'user_id'      : [],
                     }
     return copy.deepcopy(dict_template)
 
 # %% ---------------------------- Test function ------------------------------ 
 # ----------------------------------------------------------------------------
-# from config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD
-# prod = False
-# # Michel
-# # user_id = "5Nwwut" 
-# # date = "2023-05-04" 
-# # Adriana
+from config import API_KEY_PREPROD, API_KEY_PROD, URL_GARMIN_PREPROD, URL_GARMIN_PROD
+prod = False
+# Michel
+# user_id = "5Nwwut" 
+# date = "2023-05-04" 
+# Adriana
 # user_id = "6o2Fzp"
-# date = "2023-06-01"
+# date = "2023-05-24"
 
-# # -- Ludo
-# # user_id = "4vk5VJ"
-# # date = "2023-05-25"
+# -- Ludo
+user_id = "4vk5VJ"
+date = "2023-05-25"
 
-# if prod == True :
-#     api = API_KEY_PROD
-#     url = URL_GARMIN_PROD
-# else :
-#     api = API_KEY_PREPROD
-#     url = URL_GARMIN_PREPROD
-# results_dict =  get_garmin_data(user_id, date, api, url)
+if prod == True :
+    api = API_KEY_PROD
+    url = URL_GARMIN_PROD
+else :
+    api = API_KEY_PREPROD
+    url = URL_GARMIN_PREPROD
+results_dict =  get_garmin_data(user_id, date, api, url)
 

@@ -21,6 +21,7 @@ def temperature_mean():
 
     fig = go.Figure()
 
+    
     values_df = get_temperature()['values']
     if len(values_df) > 0:
         x = values_df["times"]
@@ -48,49 +49,51 @@ def sleep():
     
     translate = st.session_state.translate
         
-    map_sleep = get_sleep()['values']
-    awake = map_sleep['awake']
-    rem = map_sleep['rem']
-    light = map_sleep['light']
-    deep = map_sleep['deep']
-
     fig = go.Figure()
-    
-    # Add 2 point on the graph for refference
-    date = st.session_state.date
-    date_1 = datetime.datetime.strptime(date, "%Y-%m-%d")
-    date_2 = date_1 + datetime.timedelta(hours = 10)
-    fig.add_trace(go.Scatter(x=[date_1, date_2], y=[2, 2], marker_color="white"))
 
-    for interval in awake:
-        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-        fig.add_shape(type="rect", line_width=0,
-                        x0=xstart, y0=0, x1=xend, y1=8,
-                        fillcolor=constant.COLORS()['sleep_awake'])
+    map_sleep = get_sleep()['values']
+    if isinstance(map_sleep, str) == False:
+        awake = map_sleep['awake']
+        rem = map_sleep['rem']
+        light = map_sleep['light']
+        deep = map_sleep['deep']
+        
+        # Add 2 point on the graph for refference
+        date = st.session_state.date
+        date_1 = datetime.datetime.strptime(date, "%Y-%m-%d")
+        date_2 = date_1 + datetime.timedelta(hours = 10)
+        fig.add_trace(go.Scatter(x=[date_1, date_2], y=[2, 2], marker_color="white"))
 
-    for interval in rem:
-        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-        fig.add_shape(type="rect", line_width=0, 
-                        x0=xstart, y0=0, x1=xend, y1=6,
-                        fillcolor=constant.COLORS()['sleep_rem'])
+        for interval in awake:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0,
+                            x0=xstart, y0=0, x1=xend, y1=8,
+                            fillcolor=constant.COLORS()['sleep_awake'])
 
-    for interval in light:
-        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-        fig.add_shape(type="rect", line_width=0, 
-                        x0=xstart, y0=0, x1=xend, y1=4,
-                        fillcolor=constant.COLORS()['sleep_light'])
+        for interval in rem:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0, 
+                            x0=xstart, y0=0, x1=xend, y1=6,
+                            fillcolor=constant.COLORS()['sleep_rem'])
 
-    for interval in deep:
-        xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-        xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-        fig.add_shape(type="rect", line_width=0, 
-                        x0=xstart, y0=0, x1=xend, y1=2,
-                        fillcolor=constant.COLORS()['sleep_deep'])
+        for interval in light:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0, 
+                            x0=xstart, y0=0, x1=xend, y1=4,
+                            fillcolor=constant.COLORS()['sleep_light'])
 
-    fig.update_shapes(dict(xref='x', yref='y'))
+        for interval in deep:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0, 
+                            x0=xstart, y0=0, x1=xend, y1=2,
+                            fillcolor=constant.COLORS()['sleep_deep'])
+
+        fig.update_shapes(dict(xref='x', yref='y'))
+
     fig.update_layout(xaxis_title=translate["times"],
                     font=dict(size=14,),
                     yaxis = dict(
@@ -213,7 +216,6 @@ def pulseox():
     return fig
 
 def stress():
-    
     translate = st.session_state.translate
     thr_low     = 25
     thr_medium  = 50
@@ -222,70 +224,70 @@ def stress():
     fig = go.Figure()
 
     values_df = get_stress()['values']
-    values_df = values_df.loc[values_df["values"] > 0].dropna().reset_index(drop=True)
-    if len(values_df) > 0:
-        x = values_df["times"]
-        y = values_df["values"]
-    
-        idx = np.where(y < thr_low)
-        if len(idx[0]) > 0:
-            idx = idx[0]
-        else:
-            idx = []
-        x_rest = x[idx]
-        y_rest = y[idx]
+    if isinstance(values_df, str) == False: 
+        values_df = values_df.loc[values_df["values"] > 0].dropna().reset_index(drop=True)
+        if len(values_df) > 0:
+            x = values_df["times"]
+            y = values_df["values"]
         
-        idx = np.where((y > thr_low) & (y <= thr_medium))
-        if len(idx[0]) > 0:
-            idx = idx[0]
-        else:
-            idx = []
-        x_low = x[idx]
-        y_low = y[idx]
-        
-        idx = np.where((y > thr_medium) & (y <= thr_high))
-        if len(idx[0]) > 0:
-            idx = idx[0]
-        else:
-            idx = []
-        x_medium = x[idx]
-        y_medium = y[idx]
-        
-        idx = np.where(y > thr_high)
-        if len(idx[0]) > 0:
-            idx = idx[0]
-        else:
-            idx = []
-        x_high = x[idx]
-        y_high = y[idx]
-        
-    
-        fig.add_trace(go.Bar(x=x_rest, 
-                            y=y_rest,
-                            marker_color=constant.COLORS()['stress_rest'],
-                            name="Rest"))
-        fig.add_trace(go.Bar(x=x_low, 
-                            y=y_low,
-                            marker_color=constant.COLORS()['stress_low'],
-                            name="Low"))
-        fig.add_trace(go.Bar(x=x_medium, 
-                            y=y_medium,
-                            marker_color=constant.COLORS()['stress_medium'],
-                            name="Medium"))
-        fig.add_trace(go.Bar(x=x_high, 
-                            y=y_high,
-                            marker_color=constant.COLORS()['stress_high'],
-                            name="High"))
-        
+            idx = np.where(y < thr_low)
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_rest = x[idx]
+            y_rest = y[idx]
+            
+            idx = np.where((y > thr_low) & (y <= thr_medium))
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_low = x[idx]
+            y_low = y[idx]
+            
+            idx = np.where((y > thr_medium) & (y <= thr_high))
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_medium = x[idx]
+            y_medium = y[idx]
+            
+            idx = np.where(y > thr_high)
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_high = x[idx]
+            y_high = y[idx]
+                    
+            fig.add_trace(go.Bar(x=x_rest, 
+                                y=y_rest,
+                                marker_color=constant.COLORS()['stress_rest'],
+                                name="Rest"))
+            fig.add_trace(go.Bar(x=x_low, 
+                                y=y_low,
+                                marker_color=constant.COLORS()['stress_low'],
+                                name="Low"))
+            fig.add_trace(go.Bar(x=x_medium, 
+                                y=y_medium,
+                                marker_color=constant.COLORS()['stress_medium'],
+                                name="Medium"))
+            fig.add_trace(go.Bar(x=x_high, 
+                                y=y_high,
+                                marker_color=constant.COLORS()['stress_high'],
+                                name="High"))
+            
     fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title="Stress Scores",
-                      font=dict(size=14,),
-                      height=300, 
-                      template="plotly_white",
-                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
-                      title="Stress scores",
-                      showlegend=False,
-                      )
+                    yaxis_title="Stress Scores",
+                    font=dict(size=14,),
+                    height=300, 
+                    template="plotly_white",
+                    paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                    title="Stress scores",
+                    showlegend=False,
+                    )
     
     return fig
 
@@ -581,19 +583,20 @@ def sleep_donut():
     sleep       = data.get_sleep()
     
     recoded_time   = sleep["duration"]
-    if recoded_time > 1:
+    if isinstance(recoded_time, str) == False:
         deep    = sleep["percentage_deep"]
         light   = sleep["percentage_light"]
         rem     = sleep["percentage_rem"]
         awake   = sleep["percentage_awake"]
+        score   = sleep["score"]
+        quality = sleep["quality"]
     else:
         deep    = 25
         light   = 25
         rem     = 25
         awake   = 25
-
-    score   = sleep["score"]
-    quality = sleep["quality"]
+        score   = ""
+        quality = "no data"
     
     plt.rcParams['figure.facecolor'] = "white" #cycler(color="#F0F2F6")
     size_of_groups=[deep, light, rem, awake]
@@ -613,7 +616,7 @@ def sleep_donut():
     my_circle=plt.Circle( (0,0), 0.8, color="white")
     p=plt.gcf()
     p.gca().add_artist(my_circle)
-    if sleep["score"] == "":
+    if score == "":
         plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
                  horizontalalignment='center',verticalalignment='center')
         
