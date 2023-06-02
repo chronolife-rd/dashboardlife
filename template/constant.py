@@ -219,6 +219,7 @@ def RANGE():
     RANGE['spo2'] = []
     RANGE['pulseox'] = []
     RANGE['bodybattery'] = [-5, 110]
+    RANGE['bior']=[10,100]
     
     return RANGE
 

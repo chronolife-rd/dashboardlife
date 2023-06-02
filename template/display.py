@@ -450,6 +450,8 @@ def health_indicators():
         health_indicators_breath_brpm()
         # Breath Rate Variability
         health_indicators_breath_brv()
+        # Breath inspiration/ expiration ratio
+        health_indicators_breath_inex()
         # Tachypnea, Bradypnea, inspiration/expiration ration
         health_indicators_breath_tachy_brady_inexratio()
         
@@ -514,7 +516,18 @@ def health_indicators_breath_brv():
     fig = chart.breath_brv()
     config = {'displayModeBar': True}
     col2.plotly_chart(fig, config=config, use_container_width=True)
+
+def health_indicators_breath_inex():
+    """ Display in/ex ratio in health indicators section """
+    st.markdown(html.health_indicators_breath_inex_title(), unsafe_allow_html=True)
+    col1, col2 = st.columns([1,2])
+    col1.markdown(html.health_indicators_breath_inex_results(), unsafe_allow_html=True)
     
+    fig = chart.breath_inex()
+    config = {'displayModeBar': True}
+    col2.plotly_chart(fig, config=config, use_container_width=True)
+
+
 def health_indicators_breath_tachy_brady_inexratio():
     """ Display alerts and data for tachy/brady and ratio breath in/out in health indicators section """
     st.markdown(html.health_indicators_breath_tachy_brady_inexratio(), unsafe_allow_html=True)
