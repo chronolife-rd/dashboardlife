@@ -1,26 +1,27 @@
 
 import io
+import os
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4
-from PyPDF2 import PdfFileWriter, PdfFileReader, PdfMerger
+from PyPDF2 import PdfFileWriter, PdfFileReader
 
-from garmin_automatic_reports.config import PATH_PDF, PATH_SAVE_IMG
-from garmin_automatic_reports.config import GarminIndicator, CstIndicator, CommunIndicator, Alert, ImageForPdf
+from config import PATH_PDF
+from config import GarminIndicator, CstIndicator, CommonIndicator, ImageForPdf
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
-def generate_pdf(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict):
+def generate_pdf(cst_data_pdf, garmin_data_pdf, common_data_pdf, alerts_dict):
     in_pdf_path = PATH_PDF + "/empty.pdf"
     out_pdf_file = PATH_PDF + "/result.pdf"
 
-    generate_page(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict, in_pdf_path, out_pdf_file)
+    generate_page(cst_data_pdf, garmin_data_pdf, common_data_pdf, alerts_dict, in_pdf_path, out_pdf_file)
 
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
 
-def generate_page(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict, in_pdf_path, out_pdf_file):
+def generate_page(cst_data_pdf, garmin_data_pdf, common_data_pdf, alerts_dict, in_pdf_path, out_pdf_file):
 
     # Costrunct pdf   
     packet = io.BytesIO()
@@ -43,9 +44,9 @@ def generate_page(cst_data_pdf, garmin_data_pdf, commun_data_pdf, alerts_dict, i
                 can = can, 
                 text_parameters = dict_aux[key],
             )
-    # COMMUN
-    for commun_indicator in CommunIndicator:
-        dict_aux = commun_data_pdf[commun_indicator.value]
+    # COMMON
+    for common_indicator in CommonIndicator:
+        dict_aux = common_data_pdf[common_indicator.value]
         for key in dict_aux:
             _add_text(
                 can = can, 
@@ -94,13 +95,14 @@ def _add_text(can, text_parameters):
     font = text_parameters["font"]
     size = text_parameters["size"]
 
-    y_top = 11.69
-    x_start = x*inch
-    y_start = (y_top - y)*inch
-    
-    can.setFillColor(color)
-    can.setFont(font, size)
-    can.drawString(x_start, y_start, text)
+    if x is not None:
+        y_top = 11.69
+        x_start = x*inch
+        y_start = (y_top - y)*inch
+        
+        can.setFillColor(color)
+        can.setFont(font, size)
+        can.drawString(x_start, y_start, text)
 
 def _add_image(can, image_parameters):
     x = image_parameters["x"]
@@ -109,12 +111,13 @@ def _add_image(can, image_parameters):
     height = image_parameters["h"]
     path_img = image_parameters["path"]
 
-    width = width*inch 
-    height = height*inch
+    if x is not None and os.path.exists(path_img):
+        width = width*inch 
+        height = height*inch
 
-    y_top = 11.69
-    x_start = x*inch
-    y_start = (y_top - y)*inch 
+        y_top = 11.69
+        x_start = x*inch
+        y_start = (y_top - y)*inch 
 
-    can.drawImage(path_img, x_start, y_start, width, height,
-                  preserveAspectRatio = True, mask = 'auto')
+        can.drawImage(path_img, x_start, y_start, width, height,
+                    preserveAspectRatio = True, mask = 'auto')

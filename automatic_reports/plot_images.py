@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from garmin_automatic_reports.config import PATH_SAVE_IMG as path_save
+from automatic_reports.config import PATH_SAVE_IMG as path_save
 from datetime import datetime, timedelta
 
 # Constants (colors)
@@ -21,14 +21,17 @@ def plot_images(garmin_data, steps_dict,
     plot_duration(cst_time_intervals, garmin_time_intervals, date)
     
     # Close all images
-    plt.close("all")
+    # plt.close("all")
 
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
 
 # --- Steps ---
 def plot_steps(steps_dict, path_save):
-    steps_score = round(steps_dict["total_steps"]/steps_dict["goal"]*100)
+    if steps_dict["goal"].isdigit() > 0:
+        steps_score = round(steps_dict["total_steps"]/steps_dict["goal"]*100)
+    else : 
+        steps_score = 0
     
     plt.figure(figsize=(5,5))
     if (steps_score < 100):
@@ -59,9 +62,13 @@ def plot_spo2(spo2_dict, path_save):
     ORANGE = "#F77517"
     RED = "#CE4A14"
 
-    averege_score = spo2_dict["averege"]
-    lowest_score = spo2_dict["lowest"]
-    
+    if spo2_dict["averege"].isdigit():
+        averege_score = spo2_dict["averege"]
+        lowest_score = spo2_dict["lowest"]
+    else: 
+        averege_score = 30
+        lowest_score = 30
+
     size_of_groups=[4,23,23,23,23,4]
 
     plt.figure(figsize=(5,5))
@@ -102,38 +109,48 @@ def plot_spo2(spo2_dict, path_save):
 
 # --- Sleep ---
 def plot_sleep(sleep_dict, path_save):
-    score   = sleep_dict["score"]
-    quality = sleep_dict["quality"]
-    deep    = sleep_dict["deep"]/sleep_dict["recorded_time"]
-    light   = sleep_dict["light"]/sleep_dict["recorded_time"]
-    rem     = sleep_dict["rem"]/sleep_dict["recorded_time"]
-    awake   = sleep_dict["awake"]/sleep_dict["recorded_time"]
-
-    size_of_groups=[deep, light, rem, awake]
-    plt.figure(figsize=(5,5))
-    plt.pie(size_of_groups, 
-            colors = ['#044A9A', '#1878CF', '#9D0FB1', '#EB79D2'], 
-            startangle = 90,
-            counterclock = False,
-            wedgeprops = {"linewidth": 1, "edgecolor": "white"},
-           )
+    if sleep_dict["recorded_time"].isdigit():
+        score   = sleep_dict["score"]
+        quality = sleep_dict["quality"]
+        deep    = sleep_dict["deep"]/sleep_dict["recorded_time"]
+        light   = sleep_dict["light"]/sleep_dict["recorded_time"]
+        rem     = sleep_dict["rem"]/sleep_dict["recorded_time"]
+        awake   = sleep_dict["awake"]/sleep_dict["recorded_time"]
     
-    my_circle=plt.Circle( (0,0), 0.9, color="white")
-    p=plt.gcf()
-    p.gca().add_artist(my_circle)
-    plt.text(0, 0, (str(score) + '/100'), fontsize=30, color= BLUE,  horizontalalignment = "center")
-    plt.text(0, -.35, 'Quality:', fontsize=20, color=GREY,  horizontalalignment = "center")
-    plt.text(0, -.60, quality, fontsize=20, color=GREY,  horizontalalignment = "center")
-    plt.savefig(path_save + "/sleep.png", transparent=True)
+        size_of_groups=[deep, light, rem, awake]
+        plt.figure(figsize=(5,5))
+        plt.pie(size_of_groups, 
+                colors = ['#044A9A', '#1878CF', '#9D0FB1', '#EB79D2'], 
+                startangle = 90,
+                counterclock = False,
+                wedgeprops = {"linewidth": 1, "edgecolor": "white"},
+               )
+        
+        my_circle=plt.Circle( (0,0), 0.9, color="white")
+        p=plt.gcf()
+        p.gca().add_artist(my_circle)
+        plt.text(0, 0, (str(score) + '/100'), fontsize=30, color= BLUE,  horizontalalignment = "center")
+        plt.text(0, -.35, 'Quality:', fontsize=20, color=GREY,  horizontalalignment = "center")
+        plt.text(0, -.60, quality, fontsize=20, color=GREY,  horizontalalignment = "center")
+        plt.savefig(path_save + "/sleep.png", transparent=True)
     
 # --- Stress ---
 def plot_stress(stress_dict, path_save):
-    stress_score = stress_dict["score"]
+
     recorded_time = stress_dict["recorded_time"]
-    rest = stress_dict["rest"]/recorded_time
-    low = stress_dict["low"]/recorded_time
-    medium = stress_dict["medium"]/recorded_time
-    high = stress_dict["high"]/recorded_time
+    if recorded_time.isdigit():
+        stress_score = stress_dict["score"]
+        rest = stress_dict["rest"]/recorded_time
+        low = stress_dict["low"]/recorded_time
+        medium = stress_dict["medium"]/recorded_time
+        high = stress_dict["high"]/recorded_time
+
+    else : 
+        stress_score = 0
+        rest = 25
+        low = 25
+        medium = 25
+        high = 25
 
     size_of_groups=[rest, low, medium, high]
 

@@ -31,7 +31,7 @@ def health_indicators_to_excel():
     worksheet = writer.sheets['Results']
     format1 = workbook.add_format({'num_format': '0.00'}) 
     worksheet.set_column('A:A', None, format1)  
-    writer.save()
+    writer.close()
     data = output.getvalue()
     return data
 
@@ -54,7 +54,7 @@ def raw_data_to_excel():
     worksheet = writer.sheets['Acceleration']
     format1 = workbook.add_format({'num_format': '0.00'}) 
     worksheet.set_column('A:A', None, format1)  
-    writer.save()
+    writer.close()
     data = output.getvalue()
     return data
 

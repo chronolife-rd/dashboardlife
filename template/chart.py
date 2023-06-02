@@ -7,35 +7,38 @@ import template.constant as constant
 from pylife.useful import unwrap
 from scipy.signal import medfilt
 import numpy as np
-import datetime
+import datetime 
 from template.util import img_to_bytes
+from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature, get_sleep, get_brv,get_inex_values
 import random
 
+BGCOLOR = 'rgba(255,255,255,1)'
+
 def temperature_mean():
-    
+
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(334, 355)/10)
     line_width = 2
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, 
-                             y=y,
-                        mode='lines',
-                        line=dict(color=constant.COLORS()['temp'], width=line_width),
-                        name='tmp'))
+
     
+    values_df = get_temperature()['values']
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]/100
+    
+        fig.add_trace(go.Scatter(x=x, 
+                                y=y,
+                                mode='lines',
+                                line=dict(color=constant.COLORS()['temp'], width=line_width),
+                                name='tmp'))
+        
     fig.update_layout(xaxis_title = translate["times"],
                       yaxis_title=constant.UNIT()['temp'],
                       font=dict(size=14,),
                       height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['temp'],
                        yaxis = dict(range=constant.RANGE()['temp']),
                       )
@@ -45,106 +48,92 @@ def temperature_mean():
 def sleep():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-
-    y = 90*np.random.rand(len(x))
-
-    thr_light     = 25
-    thr_rem     = 50
-    thr_awake    = 75
-
-    idx = np.where(y < thr_light)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rest = x[idx]
-    y_rest = y[idx]
-
-    idx = np.where((y > thr_light) & (y <= thr_rem))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_light = x[idx]
-    y_light = y[idx]
-
-    idx = np.where((y > thr_rem) & (y <= thr_awake))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rem = x[idx]
-    y_rem = y[idx]
-
-    idx = np.where(y > thr_awake)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_awake = x[idx]
-    y_awake = y[idx]
-
+        
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=x_rest, 
-                         y=y_rest,
-                         marker_color=constant.COLORS()['sleep_deep'],
-                         name="Deep"))
-    fig.add_trace(go.Bar(x=x_light, 
-                         y=y_light,
-                         marker_color=constant.COLORS()['sleep_light'],
-                         name="Light"))
-    fig.add_trace(go.Bar(x=x_rem, 
-                         y=y_rem,
-                         marker_color=constant.COLORS()['sleep_rem'],
-                         name="REM"))
-    fig.add_trace(go.Bar(x=x_awake, 
-                         y=y_awake,
-                         marker_color=constant.COLORS()['sleep_awake'],
-                         name="Awake"))
+
+    map_sleep = get_sleep()['values']
+    if isinstance(map_sleep, str) == False:
+        awake = map_sleep['awake']
+        rem = map_sleep['rem']
+        light = map_sleep['light']
+        deep = map_sleep['deep']
+        
+        # Add 2 point on the graph for refference
+        date = st.session_state.date
+        date_1 = datetime.datetime.strptime(date, "%Y-%m-%d")
+        date_2 = date_1 + datetime.timedelta(hours = 10)
+        fig.add_trace(go.Scatter(x=[date_1, date_2], y=[2, 2], marker_color="white"))
+
+        for interval in awake:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0,
+                            x0=xstart, y0=0, x1=xend, y1=8,
+                            fillcolor=constant.COLORS()['sleep_awake'])
+
+        for interval in rem:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0, 
+                            x0=xstart, y0=0, x1=xend, y1=6,
+                            fillcolor=constant.COLORS()['sleep_rem'])
+
+        for interval in light:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0, 
+                            x0=xstart, y0=0, x1=xend, y1=4,
+                            fillcolor=constant.COLORS()['sleep_light'])
+
+        for interval in deep:
+            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+            fig.add_shape(type="rect", line_width=0, 
+                            x0=xstart, y0=0, x1=xend, y1=2,
+                            fillcolor=constant.COLORS()['sleep_deep'])
+
+        fig.update_shapes(dict(xref='x', yref='y'))
 
     fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title="Sleep Scores",
-                      font=dict(size=14,),
-                      height=300, 
-                      template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
-                      title="Sleep scores",
-                      showlegend=False,
-                      )
-    
+                    font=dict(size=14,),
+                    yaxis = dict(
+                            tickmode = 'array',
+                            tickvals = [2, 4, 6, 8],
+                            ticktext = ['Deep', 'Light', 'REM', 'Awake']
+                            ),
+                    height=300, 
+                    template="plotly_white",
+                    paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                    title="Sleep scores",
+                    showlegend=False,
+                    )
+
     return fig
 
 def bodybattery():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    y0=98
-    for i in range(len(x)):
-        y.append(y0-i/3+np.random.randn())
-    
     line_width = 2
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, 
-                             y=y,
-                        mode='lines',
-                        line=dict(color=constant.COLORS()['bodybattery'], width=line_width),
-                        name='tmp'))
+   
+    values_df = get_bodybattery()['values']
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]
+        
+        fig.add_trace(go.Scatter(x=x, 
+                                    y=y,
+                            mode='lines',
+                            line=dict(color=constant.COLORS()['bodybattery'], width=line_width),
+                            name='tmp'))
     
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['bodybattery'],
                       font=dict(size=14,),
                       height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['bodybattery'],
                       yaxis = dict(range=constant.RANGE()['bodybattery']),
                       )
@@ -154,152 +143,151 @@ def bodybattery():
 def pulseox():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-
-    y = 150*np.random.rand(len(x))
-
     thr_low     = 90
     thr_medium  = 80
     thr_high    = 70
 
-    idx = np.where(y >= thr_low)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rest = x[idx]
-    y_rest = y[idx]
-
-    idx = np.where((y < thr_low) & (y >= thr_medium))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_low = x[idx]
-    y_low = y[idx]
-
-    idx = np.where((y < thr_medium) & (y >= thr_high))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_medium = x[idx]
-    y_medium = y[idx]
-
-    idx = np.where(y < thr_high)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_high = x[idx]
-    y_high = y[idx]
-
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=x_rest, 
-                         y=y_rest,
-                         marker_color=constant.COLORS()['spo2_green'],
-                         name="Normal"))
-    fig.add_trace(go.Bar(x=x_low, 
-                         y=y_low,
-                         marker_color=constant.COLORS()['spo2_low'],
-                         name="Low"))
-    fig.add_trace(go.Bar(x=x_medium, 
-                         y=y_medium,
-                         marker_color=constant.COLORS()['spo2_medium'],
-                         name="Very Low"))
-    fig.add_trace(go.Bar(x=x_high, 
-                         y=y_high,
-                         marker_color=constant.COLORS()['spo2_high'],
-                         name="Extremely low"))
-
-    fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title="SpO2",
-                      font=dict(size=14,),
-                      height=300, 
-                      template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
-                      title="Pulse Ox Scores",
-                      showlegend=False,
-                      )
     
+    values_df = get_spo2()['values']
+
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]
+    
+        idx = np.where(y >= thr_low)
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_rest = x[idx]
+        y_rest = y[idx]
+
+        idx = np.where((y < thr_low) & (y >= thr_medium))
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_low = x[idx]
+        y_low = y[idx]
+
+        idx = np.where((y < thr_medium) & (y >= thr_high))
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_medium = x[idx]
+        y_medium = y[idx]
+
+        idx = np.where(y < thr_high)
+        if len(idx[0]) > 0:
+            idx = idx[0]
+        else:
+            idx = []
+        x_high = x[idx]
+        y_high = y[idx]
+
+        fig.add_trace(go.Bar(x=x_rest, 
+                            y=y_rest,
+                            marker_color=constant.COLORS()['spo2_green'],
+                            name="Normal"))
+        fig.add_trace(go.Bar(x=x_low, 
+                            y=y_low,
+                            marker_color=constant.COLORS()['spo2_low'],
+                            name="Low"))
+        fig.add_trace(go.Bar(x=x_medium, 
+                            y=y_medium,
+                            marker_color=constant.COLORS()['spo2_medium'],
+                            name="Very Low"))
+        fig.add_trace(go.Bar(x=x_high, 
+                            y=y_high,
+                            marker_color=constant.COLORS()['spo2_high'],
+                            name="Extremely low"))
+        
+    fig.update_layout(xaxis_title=translate["times"],
+                yaxis_title="SpO2",
+                font=dict(size=14,),
+                height=300, 
+                template="plotly_white",
+                paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                title="Pulse Ox Scores",
+                showlegend=False,
+                )
     return fig
 
 def stress():
-    
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y = 90*np.random.rand(len(x))
-    
     thr_low     = 25
     thr_medium  = 50
     thr_high    = 75
-    
-    idx = np.where(y < thr_low)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_rest = x[idx]
-    y_rest = y[idx]
-    
-    idx = np.where((y > thr_low) & (y <= thr_medium))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_low = x[idx]
-    y_low = y[idx]
-    
-    idx = np.where((y > thr_medium) & (y <= thr_high))
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_medium = x[idx]
-    y_medium = y[idx]
-    
-    idx = np.where(y > thr_high)
-    if len(idx[0]) > 0:
-        idx = idx[0]
-    else:
-        idx = []
-    x_high = x[idx]
-    y_high = y[idx]
-    
+
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=x_rest, 
-                         y=y_rest,
-                         marker_color=constant.COLORS()['stress_rest'],
-                         name="Rest"))
-    fig.add_trace(go.Bar(x=x_low, 
-                         y=y_low,
-                         marker_color=constant.COLORS()['stress_low'],
-                         name="Low"))
-    fig.add_trace(go.Bar(x=x_medium, 
-                         y=y_medium,
-                         marker_color=constant.COLORS()['stress_medium'],
-                         name="Medium"))
-    fig.add_trace(go.Bar(x=x_high, 
-                         y=y_high,
-                         marker_color=constant.COLORS()['stress_high'],
-                         name="High"))
-    
+
+    values_df = get_stress()['values']
+    if isinstance(values_df, str) == False: 
+        values_df = values_df.loc[values_df["values"] > 0].dropna().reset_index(drop=True)
+        if len(values_df) > 0:
+            x = values_df["times"]
+            y = values_df["values"]
+        
+            idx = np.where(y < thr_low)
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_rest = x[idx]
+            y_rest = y[idx]
+            
+            idx = np.where((y > thr_low) & (y <= thr_medium))
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_low = x[idx]
+            y_low = y[idx]
+            
+            idx = np.where((y > thr_medium) & (y <= thr_high))
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_medium = x[idx]
+            y_medium = y[idx]
+            
+            idx = np.where(y > thr_high)
+            if len(idx[0]) > 0:
+                idx = idx[0]
+            else:
+                idx = []
+            x_high = x[idx]
+            y_high = y[idx]
+                    
+            fig.add_trace(go.Bar(x=x_rest, 
+                                y=y_rest,
+                                marker_color=constant.COLORS()['stress_rest'],
+                                name="Rest"))
+            fig.add_trace(go.Bar(x=x_low, 
+                                y=y_low,
+                                marker_color=constant.COLORS()['stress_low'],
+                                name="Low"))
+            fig.add_trace(go.Bar(x=x_medium, 
+                                y=y_medium,
+                                marker_color=constant.COLORS()['stress_medium'],
+                                name="Medium"))
+            fig.add_trace(go.Bar(x=x_high, 
+                                y=y_high,
+                                marker_color=constant.COLORS()['stress_high'],
+                                name="High"))
+            
     fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title="Stress Scores",
-                      font=dict(size=14,),
-                      height=300, 
-                      template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
-                      title="Stress scores",
-                      showlegend=False,
-                      )
+                    yaxis_title="Stress Scores",
+                    font=dict(size=14,),
+                    height=300, 
+                    template="plotly_white",
+                    paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                    title="Stress scores",
+                    showlegend=False,
+                    )
     
     return fig
 
@@ -308,13 +296,10 @@ def breath_brv():
     translate = st.session_state.translate
     
     # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(0, 12)/10)
-    y[int(len(x)/2)] = 2.7
+    values_df = get_brv_values()
+    x = values_df["times"]
+    y = values_df["values"]
+
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -326,13 +311,10 @@ def breath_brv():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['brv'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['brv'],
                        yaxis = dict(range=constant.RANGE()['brv']),
                       )
@@ -343,14 +325,9 @@ def breath_brpm():
     
     translate = st.session_state.translate
     
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(14, 17))
-    y[int(len(x)/2)] = 25
+    values_df = get_brpm_values()
+    x = values_df["times"]
+    y = values_df["values"]
     
     line_width = 2
     fig = go.Figure()
@@ -363,31 +340,54 @@ def breath_brpm():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['brpm'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14,))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['brpm'],
                        yaxis = dict(range=constant.RANGE()['brpm']),
                       )
     
     return fig
 
+def breath_inex():
+    
+    translate = st.session_state.translate
+    
+    values_df = get_inex_values()
+    x = values_df["times"]
+    y = values_df["values"]
+    
+    line_width = 2
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, 
+                             y=y,
+                        mode='lines',
+                        line=dict(color=constant.COLORS()['breath'], width=line_width),
+                        name='tmp'))
+    
+    fig.update_layout(xaxis_title=translate["times"],
+                      yaxis_title='',
+                      height=400,
+                      font=dict(size=14,))
+    fig.update_layout(height=300, 
+                      template="plotly_white",
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                      title=constant.SHORTCUT()['bior'],
+                       yaxis = dict(range=constant.RANGE()['bior']),
+                      )
+    
+    return fig
+
+
+
 def heart_hrv():
     
     translate = st.session_state.translate
     
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    
-    y=[]
-    for i in range(len(x)):
-        y.append(random.randint(120, 200))
-    y[int(len(x)/2)] = 50
+    values_df = get_hrv_values()
+    x = values_df["times"]
+    y = values_df["values"]
     
     line_width = 2
     fig = go.Figure()
@@ -400,13 +400,10 @@ def heart_hrv():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['hrv'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14,))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['hrv'],
                        yaxis = dict(range=constant.RANGE()['hrv']),
                       )
@@ -417,15 +414,10 @@ def heart_bpm():
     
     translate = st.session_state.translate
     
-    # !!! TO BE UPDATED WITH REAL DATA !!!
-    base = datetime.datetime(2023, 4, 19)
-    x = np.array([base + datetime.timedelta(minutes=i) for i in range(0,24*60,5)])
-    y = []
-    for i in range(len(x)):
-        y.append(random.randint(60, 65))
-    
-    y[int(len(x)/2)] = 120
-    
+    values_df = get_bpm_values()
+    x = values_df["times"]
+    y = values_df["values"]
+        
     line_width = 2
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, 
@@ -437,13 +429,10 @@ def heart_bpm():
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['bpm'],
                       height=400,
-                      font=dict(
-                          # family="Courier New, monospace",
-                          size=14,
-                          ))
+                      font=dict(size=14))
     fig.update_layout(height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['bpm'],
                        yaxis = dict(range=constant.RANGE()['bpm']),
                       )
@@ -453,17 +442,19 @@ def heart_bpm():
 def duration():
     
     translate = st.session_state.translate
-    
-    # !!! TO BE UPDATED WITH REAL DATA !!!
+
     date = st.session_state.date
-    date = datetime.datetime.strptime(date, "%Y-%m-%d")
+    date = datetime.datetime.strptime(date, "%Y-%m-%d")   
     xmin = date
-    xmax = xmin + datetime.timedelta(days=1)
-    
+    xmax = date + datetime.timedelta(days = 1)
+        
     y_chronolife    = np.repeat("Smart Textile", 2)
     y_garmin        = np.repeat("Garmin", 2)
     y_empty         = np.repeat(" ", 2)
     y_empty2        = np.repeat("", 2)
+
+    x_garmin        = get_duration_garmin()['intervals']
+    x_chronolife    = get_duration_chronolife()['intervals']
     
     width = 20
     fig = go.Figure()
@@ -472,40 +463,23 @@ def duration():
                                  datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
                               mode="lines", line=dict(color="white",width=width)))
     
-    fig.add_trace(go.Scatter(y=y_garmin,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 6, 0, 0)],
-                              mode="lines", line=dict(color=constant.COLORS()["garmin"],width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
-                             mode="lines",line=dict(color="white",width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
-                             mode="lines",line=dict(color=constant.COLORS()["garmin"],width=width)))
-    fig.add_trace(go.Scatter(y=y_garmin,
-                             x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                             mode="lines",line=dict(color="white",width=width)))
-    
-    
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                              x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
-                                 datetime.datetime(date.year, date.month, date.day, 6, 0, 0)],
-                              mode="lines", line=dict(color=constant.COLORS()["chronolife"],width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 6, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 9, 0, 0)],
-                             mode="lines",line=dict(color="white",width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 9, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 13, 0, 0)],
-                             mode="lines",line=dict(color=constant.COLORS()["chronolife"],width=width)))
-    fig.add_trace(go.Scatter(y=y_chronolife,
-                             x=[datetime.datetime(date.year, date.month, date.day, 13, 0, 0),
-                               datetime.datetime(date.year, date.month, date.day, 23, 59, 59)],
-                             mode="lines",line=dict(color="white",width=width)))
+    # Add Garmin
+    for i in range(len(x_garmin)):
+        interval = x_garmin[i][:]
+        if (len(interval) > 10):
+            interval_start = interval.iloc[0]
+            interval_end = interval.iloc[-1]
+            fig.add_trace(go.Scatter(y = y_garmin, x=[interval_start, interval_end],
+                        mode="lines", line=dict(color=constant.COLORS()["garmin"],width=width)))
+
+    # Add Chronolife
+    for i in range(len(x_chronolife)):
+        interval = x_chronolife[i][:]
+        if (len(interval) > 10):
+            interval_start = interval.iloc[0]
+            interval_end = interval.iloc[-1]
+            fig.add_trace(go.Scatter(y = y_chronolife, x=[interval_start, interval_end],
+                        mode="lines", line=dict(color=constant.COLORS()["chronolife"],width=width)))
     
     fig.add_trace(go.Scatter(y=y_empty2,
                               x=[datetime.datetime(date.year, date.month, date.day, 00, 0, 0),
@@ -514,7 +488,7 @@ def duration():
     
     fig.update_layout(barmode='stack', height=300, 
                       template="plotly_white",
-                      paper_bgcolor='rgba(255,255,255,1)', plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       showlegend=False,
                       title="<span style='font-size:20px;'>" + translate["data_collection_duration"] + "</span>",
                       xaxis = dict(range=[xmin, xmax]), 
@@ -522,7 +496,7 @@ def duration():
     
     return fig
 
-def smart_textile_raw_data(layout=False):
+def smart_textile_raw_data():
 
     cst_raw_data.get_raw_data()
     
@@ -539,7 +513,7 @@ def smart_textile_raw_data(layout=False):
     
     fig_ecg     = ecg_signal(template=template, width_line=width_line, height=height)
     fig_breath  = breath_signal(template=template, width_line=width_line, height=height)
-    # fig_acc     = acceleration_signal(template=template, width_line=width_line, height=height)
+    #/ fig_acc     = acceleration_signal(template=template, width_line=width_line, height=height)
     
     st.plotly_chart(fig_ecg, use_container_width=True)
     st.plotly_chart(fig_breath, use_container_width=True)
@@ -559,8 +533,8 @@ def ecg_signal(template='plotly_white', width_line=2, height=500):
                       title='Electrocardiogram',
                       yaxis = dict(range=[ymin, ymax]), 
                       template=template,
-                      paper_bgcolor='rgba(255,255,255,1)', 
-                      plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, 
+                      plot_bgcolor=BGCOLOR,
                       showlegend=False,
                       )
     
@@ -582,8 +556,8 @@ def breath_signal(template='plotly_white', width_line=2, height=500):
     fig.update_layout(height=height, 
                       template=template, 
                       title='Breath',
-                      paper_bgcolor='rgba(255,255,255,1)', 
-                      plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, 
+                      plot_bgcolor=BGCOLOR,
                       showlegend=True,
                       legend=dict(yanchor="top",
                                   y=0.99, xanchor="left", 
@@ -611,8 +585,8 @@ def acceleration_signal(template='plotly_white', width_line=2, height=500):
                       template=template, 
                       yaxis = dict(range=[ymin, ymax]),
                       title='Acceleration',
-                      paper_bgcolor='rgba(255,255,255,1)', 
-                      plot_bgcolor='rgba(255,255,255,1)',
+                      paper_bgcolor=BGCOLOR, 
+                      plot_bgcolor=BGCOLOR,
                       showlegend=False,
                       )
     
@@ -639,18 +613,21 @@ def sleep_donut():
     translate   = st.session_state.translate
     sleep       = data.get_sleep()
     
-    score   = sleep["score"]
-    if sleep["score"] == "":
-        deep    = 25
-        light   = 25
-        rem     = 25
-        awake   = 25
-    else:
+    recoded_time   = sleep["duration"]
+    if isinstance(recoded_time, str) == False:
         deep    = sleep["percentage_deep"]
         light   = sleep["percentage_light"]
         rem     = sleep["percentage_rem"]
         awake   = sleep["percentage_awake"]
-    quality = sleep["quality"]
+        score   = sleep["score"]
+        quality = sleep["quality"]
+    else:
+        deep    = 25
+        light   = 25
+        rem     = 25
+        awake   = 25
+        score   = ""
+        quality = "no data"
     
     plt.rcParams['figure.facecolor'] = "white" #cycler(color="#F0F2F6")
     size_of_groups=[deep, light, rem, awake]
@@ -670,7 +647,7 @@ def sleep_donut():
     my_circle=plt.Circle( (0,0), 0.8, color="white")
     p=plt.gcf()
     p.gca().add_artist(my_circle)
-    if sleep["score"] == "":
+    if score == "":
         plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
                  horizontalalignment='center',verticalalignment='center')
         
@@ -746,7 +723,7 @@ def spo2_donut():
     plt.savefig("template/images/spo2_donut.png", transparent=True)
     st.session_state.spo2_donut = img_to_bytes('template/images/spo2_donut.png')
     
-def steps_donut():
+def steps_donut_old():
     
     translate = st.session_state.translate
     steps           = data.get_steps()
@@ -767,6 +744,57 @@ def steps_donut():
             startangle=90,
             counterclock=False,
             wedgeprops=wedgeprops)
+    my_circle=plt.Circle( (0,0), 0.8, color="white")
+    
+    if steps["score"] == "":
+        plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
+                 horizontalalignment='center',verticalalignment='center')
+    else:
+        plt.text(0, 0, (str(steps_score) + '%'), fontsize=40, color=color_text,
+                 horizontalalignment='center')
+        
+    p=plt.gcf()
+    p.gca().add_artist(my_circle)
+    
+    plt.savefig("template/images/steps_donut.png", transparent=True)
+    st.session_state.steps_donut = img_to_bytes('template/images/steps_donut.png')
+
+
+def steps_donut():
+    
+    translate = st.session_state.translate
+    steps           = data.get_steps()
+    steps_score     = steps["score"]
+    
+    color_text = '#3E738D'
+    
+    if steps_score == "":
+        size_of_groups=[0, 100]
+
+    elif (steps_score < 100):
+        size_of_groups=[steps_score, 100-steps_score]
+        plt.pie(size_of_groups, 
+                colors=["#4393B4", "#E6E6E6"], 
+                startangle=90,
+                counterclock=False)
+        
+    elif (steps_score >= 100) :
+        size_of_groups=[100]
+        plt.pie(size_of_groups,  
+        colors=["#13A943"], 
+        startangle=90,
+        counterclock=False)
+        
+    wedgeprops = {"linewidth": 1, "edgecolor": "white"}
+    plt.close('all')
+    plt.figure()
+    plt.pie(size_of_groups, 
+            colors=['green', "#e8e8e8"], 
+            startangle=90,
+            counterclock=False,
+            wedgeprops=wedgeprops)
+    
+
     my_circle=plt.Circle( (0,0), 0.8, color="white")
     
     if steps["score"] == "":

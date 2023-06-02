@@ -1,12 +1,5 @@
 from enum import Enum
 from datetime import timedelta
-
-# Path save reports images  
-PATH_SAVE_IMG = "data/report_images"
-
-# Path to the pdf results folder 
-PATH_PDF = "pdf_results"
-
 # Request data from servers inputs 
 API_KEY_PROD = 'CLjfUipLb32dfMC8ZCCwUA' 
 API_KEY_PREPROD = '3-1krbPQoufnmNVN6semRA'
@@ -16,22 +9,37 @@ URL_CST_PREPROD = "https://preprod.chronolife.net/api/2/data"
 URL_GARMIN_PROD = "https://prod.chronolife.net/api/2/garmin/data" 
 URL_GARMIN_PREPROD = "https://preprod.chronolife.net/api/2/garmin/data" 
 
-# Path to alerts images
+CST_SIGNAL_TYPES = 'heartbeat,HRV,qt_c_framingham_per_seg,breath_2_brpm,breath_2_brv,breath_2_inspi_over_expi,averaged_activity,steps_number,temp_1,temp_2' 
+GARMIN_SIGNAL_TYPES = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pulseox'
+
+# Constants used in functions 
+ACTIVITY_THREASHOLD = 18 # constant used in computing alerts
+BRADYPNEA_TH = 6
+TACHYPNEA_TH = 20
+
+BRADYCARDIA_TH = 60
+TACHYCARDIA_TH = 100
+
+QT_MIN_TH = 350
+QT_MAX_TH = 500
+
+DELTA_TIME = timedelta(minutes = 3) # constant used in computing times intervals 
+
+# Path to the pdf results folder 
+PATH_PDF = "pdf_results"
+# Path save reports images  
+PATH_SAVE_IMG = "report_images"
+# Path to alerts images for PDF
 RED_ALERT = PATH_SAVE_IMG + "/alerts/red.png"
 GREEN_ALERT = PATH_SAVE_IMG + "/alerts/green.png"
 
-# Constants
-ACTIVITY_THREASHOLD = 18 
-DELTA_TIME = timedelta(minutes = 5) # constant used in computing times intervals 
+# Constants for PDF
 ICON_SIZE = 0.17
 ALERT_SIZE = 0.16
 HEIGHT_CIRCLE = 2
 WIDTH_CIRCLE = 2
 
-CST_SIGNAL_TYPES = 'heartbeat,HRV,respiratory_rate,averaged_activity,steps_number' 
-GARMIN_SIGNAL_TYPES = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pulseox'
-
-# Garmin Indicators variables
+# Garmin Indicators variables for PDF
 class GarminIndicator(Enum):
     DURATION = "duration"
     STRESS = "stress"
@@ -44,7 +52,7 @@ class CstIndicator(Enum):
     HEADER = "header"
     DURATION = "duration"
 
-class CommunIndicator(Enum):
+class CommonIndicator(Enum):
     CARDIO = "cardio"
     BREATH = "breath"
     ACTIVITY = "activity"
@@ -56,10 +64,9 @@ class Alert(Enum):
     TACHYCARDIA = "tachycardia"
     QT = "qt"
 
-# Images parameters
+# Images parameters for PDF
 class ImageForPdf(Enum):
     STEPS = {
-        
         "path" : PATH_SAVE_IMG + "/steps.png",
         "x" : 6.23,
         "y" : 6.63 + HEIGHT_CIRCLE,
@@ -127,7 +134,6 @@ class ImageForPdf(Enum):
         "w" : ICON_SIZE, 
         "h" : ICON_SIZE,
     }
-
     NIGHT_ICON_RIGHT = { 
         "path" : PATH_SAVE_IMG + "/icons/night.png",
         "x" : 6.15,

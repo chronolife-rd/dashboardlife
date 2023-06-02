@@ -223,7 +223,13 @@ def init():
             
     if 'commun_indicators' not in st.session_state:
             st.session_state.commun_indicators = []
-            
+
+    if 'commun_data' not in st.session_state:
+            st.session_state.commun_data = []
+    
+    if 'steps_dict' not in st.session_state:
+            st.session_state.steps_dict = []
+                
     if 'translate' not in st.session_state:
         st.session_state.translate = ''
         
