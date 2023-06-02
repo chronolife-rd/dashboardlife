@@ -193,14 +193,23 @@ def add_temperature(date, datas, temperature_dict):
     right = get_cst_result_info(date, datas, result_type='temp_1')
     left = get_cst_result_info(date, datas, result_type='temp_2')
     
-    mean_right = round(np.mean(left['values']))/100
-    mean_left = round(np.mean(right['values']))/100
+    mean_right = ""
+    min_right = ""
+    max_right = ""
 
-    min_right = round(np.quantile(left['values'], 0.1))/100
-    min_left = round(np.quantile(right['values'], 0.1))/100
+    mean_left = ""
+    min_left = ""
+    max_left = ""
 
-    max_right = round(np.quantile(left['values'], 0.9))/100
-    max_left = round(np.quantile(right['values'], 0.9))/100
+    if len(right) > 0:
+        mean_right = round(np.mean(left['values']))/100
+        min_right = round(np.quantile(left['values'], 0.1))/100
+        max_right = round(np.quantile(left['values'], 0.9))/100
+
+    if len(left) > 0:
+        mean_left = round(np.mean(right['values']))/100
+        min_left = round(np.quantile(right['values'], 0.1))/100
+        max_left = round(np.quantile(right['values'], 0.9))/100
 
     temperature_dict['right'] = right
     temperature_dict['left'] = left
@@ -251,32 +260,33 @@ def add_durations(date, results_dict):
 
     ref_df = results_dict['activity']['averaged_activity']
 
-    day_times    = ref_df.loc[ref_df["times"] > NIGHT_LIMIT,
-                               "times"].reset_index(drop=True)
-    night_times  = ref_df.loc[ref_df["times"] < NIGHT_LIMIT, 
-                                    "times"].reset_index(drop=True)
-    
-    rest_times   = ref_df.loc[ref_df["values"] <= ACTIVITY_THREASHOLD,
-                            "times"].reset_index(drop=True)   
-    
-    time_intervals = find_time_intervals(ref_df['times'])
-    day_time_intervals = find_time_intervals(day_times)
-    night_time_intervals = find_time_intervals(night_times)
-    rest_time_intervals = find_time_intervals(rest_times)
-    
-    collected_in_s = sum_time_intervals(time_intervals)
-    day_in_s = sum_time_intervals(day_time_intervals)
-    night_in_s = sum_time_intervals(night_time_intervals)
-    rest_in_s = sum_time_intervals(rest_time_intervals)
-    active_in_s = collected_in_s - rest_in_s
-    
-    duration_dict = results_dict["duration"]
-    duration_dict["intervals"] = time_intervals
-    duration_dict["collected"] = timedelta_formatter(collected_in_s)
-    duration_dict["day"] = timedelta_formatter(day_in_s)
-    duration_dict["night"] = timedelta_formatter(night_in_s)
-    duration_dict["rest"] = timedelta_formatter(rest_in_s)
-    duration_dict["active"] = timedelta_formatter(active_in_s)
+    if len(ref_df)>0:
+        day_times    = ref_df.loc[ref_df["times"] > NIGHT_LIMIT,
+                                "times"].reset_index(drop=True)
+        night_times  = ref_df.loc[ref_df["times"] < NIGHT_LIMIT, 
+                                        "times"].reset_index(drop=True)
+        
+        rest_times   = ref_df.loc[ref_df["values"] <= ACTIVITY_THREASHOLD,
+                                "times"].reset_index(drop=True)   
+        
+        time_intervals = find_time_intervals(ref_df['times'])
+        day_time_intervals = find_time_intervals(day_times)
+        night_time_intervals = find_time_intervals(night_times)
+        rest_time_intervals = find_time_intervals(rest_times)
+        
+        collected_in_s = sum_time_intervals(time_intervals)
+        day_in_s = sum_time_intervals(day_time_intervals)
+        night_in_s = sum_time_intervals(night_time_intervals)
+        rest_in_s = sum_time_intervals(rest_time_intervals)
+        active_in_s = collected_in_s - rest_in_s
+        
+        duration_dict = results_dict["duration"]
+        duration_dict["intervals"] = time_intervals
+        duration_dict["collected"] = timedelta_formatter(collected_in_s)
+        duration_dict["day"] = timedelta_formatter(day_in_s)
+        duration_dict["night"] = timedelta_formatter(night_in_s)
+        duration_dict["rest"] = timedelta_formatter(rest_in_s)
+        duration_dict["active"] = timedelta_formatter(active_in_s)
     
 def add_anomalies(results_dict):
     alerts_dict = results_dict['anomalies']
@@ -454,45 +464,43 @@ def get_timestamp(id_:str):
 def data_per_15_min(input_df):
 
     output_df = pd.DataFrame({"times" : [], "values" : []})
-    first_minute = input_df["times"][0]
-    first_minute = pd.Timestamp(first_minute).round(freq='H') # round to minute
 
-    index_last_minut = input_df.tail(1).index[0]
-    last_minute = input_df["times"][index_last_minut]
-    last_minute = pd.Timestamp(last_minute).round(freq='T') # round to minute
- 
-    while first_minute < last_minute:
-        values_df = input_df.loc[input_df['times'] >= first_minute, ]
-        values = values_df.loc[values_df['times'] < first_minute + timedelta(minutes = 15), 'values']
+    if len(input_df) > 0 : 
+        first_minute = input_df["times"][0]
+        first_minute = pd.Timestamp(first_minute).round(freq='H') # round to minute
 
-        aux_df = pd.DataFrame({"times" : first_minute, "values" : np.mean(values)}, index=[0])
+        index_last_minut = input_df.tail(1).index[0]
+        last_minute = input_df["times"][index_last_minut]
+        last_minute = pd.Timestamp(last_minute).round(freq='T') # round to minute
+    
+        while first_minute < last_minute:
+            values_df = input_df.loc[input_df['times'] >= first_minute, ]
+            values = values_df.loc[values_df['times'] < first_minute + timedelta(minutes = 15), 'values']
 
-        output_df = pd.concat([output_df, aux_df ])
-        first_minute += + timedelta(minutes = 15)
-       
-    return output_df.reset_index(drop=True)
+            aux_df = pd.DataFrame({"times" : first_minute, "values" : np.mean(values)}, index=[0])
+
+            output_df = pd.concat([output_df, aux_df ])
+            first_minute += + timedelta(minutes = 15)
+        output_df = output_df.reset_index(drop=True)
+
+    return output_df
 
 
 # %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
-# -- Ludo
-# user_id = "4vk5VJ"
-# date = "2023-05-17"
-# -- Fernando
-# user_id = "5Nwwut"
-# date = "2023-05-17"
-# -- Michel
-# user_id = "5Nwwut" 
-# date = "2023-05-04" 
-# -- Adriana
-
+# # -- Ludo
+# # user_id = "4vk5VJ"
+# # date = "2023-05-17"
+# # -- Fernando
+# # user_id = "5Nwwut"
+# # date = "2023-05-17"
+# # -- Michel
+# # user_id = "5Nwwut" 
+# # date = "2023-05-04" 
+# # -- Adriana
 # user_id = "6o2Fzp"
-# date = "2023-05-24"
-# # Ludo
-# user_id = "4vk5VJ"
-# date = "2023-05-25" 
-
+# date = "2023-06-02"
 
 # if prod == True :
 #     api = API_KEY_PROD
