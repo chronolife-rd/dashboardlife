@@ -306,6 +306,16 @@ def get_brpm_values():
     st.session_state.brpm_values = output
     return output
 
+def get_inex_values():
+    datas = st.session_state.common_data
+    output = []
+    if isinstance(datas["breath"]["inspi_expi"], str) == False:
+        output = datas["breath"]["inspi_expi"] 
+    st.session_state.inex_values = output
+    return output
+
+
+
 def get_brv_values():
     datas = st.session_state.common_data
     output = []
@@ -453,7 +463,7 @@ def get_inexratio():
         output["values"] = common_data["breath"]["inspi_expi"]
         output["mean"]   = datas["breath"]["inspi_expi_mean"]
         output["min"]    = datas["breath"]["inspi_expi_min"]
-        output["max"]    = datas["breath"]["inspi_expi_max"]
+        output["max"]    = datas["breath"]["inspi_expi_max"]     
     return output
 
 def get_bradypnea():

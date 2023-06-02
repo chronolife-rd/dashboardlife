@@ -9,7 +9,7 @@ from scipy.signal import medfilt
 import numpy as np
 import datetime 
 from template.util import img_to_bytes
-from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature, get_sleep
+from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature, get_sleep, get_brv,get_inex_values
 import random
 
 BGCOLOR = 'rgba(255,255,255,1)'
@@ -347,6 +347,37 @@ def breath_brpm():
                       )
     
     return fig
+
+def breath_inex():
+    
+    translate = st.session_state.translate
+    
+    values_df = get_inex_values()
+    x = values_df["times"]
+    y = values_df["values"]
+    
+    line_width = 2
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, 
+                             y=y,
+                        mode='lines',
+                        line=dict(color=constant.COLORS()['breath'], width=line_width),
+                        name='tmp'))
+    
+    fig.update_layout(xaxis_title=translate["times"],
+                      yaxis_title='',
+                      height=400,
+                      font=dict(size=14,))
+    fig.update_layout(height=300, 
+                      template="plotly_white",
+                      paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
+                      title=constant.SHORTCUT()['bior'],
+                       yaxis = dict(range=constant.RANGE()['bior']),
+                      )
+    
+    return fig
+
+
 
 def heart_hrv():
     

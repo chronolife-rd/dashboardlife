@@ -1077,6 +1077,45 @@ def health_indicators_breath_brv_results():
     
     return html
 
+# TO DO
+
+def health_indicators_breath_inex_title():
+    
+    translate = st.session_state.translate
+    
+    html = f"""
+    <div class="second_title">
+        <img class=icon src='data:image/png;base64,{st.session_state.breath_icon}'/> 
+        <p>{translate["inout_length_ratio"]}</p>
+    </div>
+    """
+    
+    return html
+
+def health_indicators_breath_inex_results():
+    
+    translate = st.session_state.translate
+    
+    inex         = data.get_inexratio()
+    inex_mean    = inex["mean"]
+    inex_min     = inex["min"]
+    inex_max     = inex["max"]
+    
+    html = f"""
+    <div class=col1_indicators>
+        <p>{translate["median"]}</p>
+        <p class="indicator_main_value">{str(inex_mean)} s</p>
+        <p>{translate["min"]}</p>
+        <p class="indicator_value">{str(inex_min)} s</p>
+        <p>{translate["max"]}</p>
+        <p class="indicator_value">{str(inex_max)} s</p>
+    </div>
+    """
+    
+    return html
+
+
+
 def health_indicators_breath_tachy_brady_inexratio():
     
     translate = st.session_state.translate
@@ -1160,34 +1199,7 @@ def health_indicators_breath_tachy_brady_inexratio():
                 </div>
             </div>
         </div>
-        <div class='{col_section}'>
-            <div class='health_section'> 
-                <div class="row">
-                    <div class='{col_title}'>
-                        <img class=icon src='data:image/png;base64,{st.session_state.qt_alert_icon}'/> 
-                        <p class='indicator_name'>{translate["inout_length_ratio"]}</p>
-                    </div>
-                    <div class='{col_key}'>
-                        <p>{translate["median"]}</p>
-                    </div>
-                    <div class='{col_val}'>
-                        <p class='{class_val}'>{str(inexratio_mean)}</p>
-                    </div>
-                    <div class='{col_key}'>
-                        <p>{translate["min"]}</p>
-                    </div>
-                    <div class='{col_val}'>
-                        <p class='{class_val}'>{str(inexratio_min)}</p>
-                    </div>
-                    <div class='{col_key}'>
-                        <p>{translate["max"]}</p>
-                    </div>
-                    <div class='{col_val}'>
-                        <p class='{class_val}'>{str(inexratio_max)}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </div>
     """
     
