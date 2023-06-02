@@ -249,9 +249,10 @@ def get_steps():
 def get_temperature():
     datas = st.session_state.chronolife_indicators
     output = {}
-    output["mean"]  = ""
-    output["min"]   = ""
-    output["max"]   = ""
+    output["mean"]   = ""
+    output["min"]    = ""
+    output["max"]    = ""
+    output["values"] = ""
     
     if len(datas) > 0 and isinstance(datas["temperature"]["mean_left"], str) == False:
         output["values"] = datas["temperature"]["left"]

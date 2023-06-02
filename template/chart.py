@@ -22,7 +22,8 @@ def temperature_mean():
     fig = go.Figure()
 
     
-    values_df = get_temperature()['values']
+    values_df = get_temperature()["values"]
+
     if len(values_df) > 0:
         x = values_df["times"]
         y = values_df["values"]/100
@@ -46,51 +47,46 @@ def temperature_mean():
     return fig
 
 def sleep():
-    
     translate = st.session_state.translate
         
     fig = go.Figure()
-
     map_sleep = get_sleep()['values']
     if isinstance(map_sleep, str) == False:
-        awake = map_sleep['awake']
-        rem = map_sleep['rem']
-        light = map_sleep['light']
-        deep = map_sleep['deep']
-        
+
         # Add 2 point on the graph for refference
         date = st.session_state.date
         date_1 = datetime.datetime.strptime(date, "%Y-%m-%d")
         date_2 = date_1 + datetime.timedelta(hours = 10)
         fig.add_trace(go.Scatter(x=[date_1, date_2], y=[2, 2], marker_color="white"))
 
-        for interval in awake:
-            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-            fig.add_shape(type="rect", line_width=0,
-                            x0=xstart, y0=0, x1=xend, y1=8,
-                            fillcolor=constant.COLORS()['sleep_awake'])
-
-        for interval in rem:
-            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-            fig.add_shape(type="rect", line_width=0, 
-                            x0=xstart, y0=0, x1=xend, y1=6,
-                            fillcolor=constant.COLORS()['sleep_rem'])
-
-        for interval in light:
-            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-            fig.add_shape(type="rect", line_width=0, 
-                            x0=xstart, y0=0, x1=xend, y1=4,
-                            fillcolor=constant.COLORS()['sleep_light'])
-
-        for interval in deep:
-            xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
-            xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
-            fig.add_shape(type="rect", line_width=0, 
-                            x0=xstart, y0=0, x1=xend, y1=2,
-                            fillcolor=constant.COLORS()['sleep_deep'])
+        if "awake" in map_sleep:
+            for interval in map_sleep['awake']:
+                xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+                xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+                fig.add_shape(type="rect", line_width=0,
+                                x0=xstart, y0=0, x1=xend, y1=8,
+                                fillcolor=constant.COLORS()['sleep_awake'])
+        if "rem" in map_sleep:
+            for interval in map_sleep['rem']:
+                xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+                xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+                fig.add_shape(type="rect", line_width=0, 
+                                x0=xstart, y0=0, x1=xend, y1=6,
+                                fillcolor=constant.COLORS()['sleep_rem'])
+        if "light" in map_sleep:
+            for interval in map_sleep['light']:
+                xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+                xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+                fig.add_shape(type="rect", line_width=0, 
+                                x0=xstart, y0=0, x1=xend, y1=4,
+                                fillcolor=constant.COLORS()['sleep_light'])
+        if "deep" in map_sleep:
+            for interval in map_sleep['deep']:
+                xend = datetime.datetime.fromtimestamp(interval["endTimeInSeconds"])
+                xstart = datetime.datetime.fromtimestamp(interval["startTimeInSeconds"])
+                fig.add_shape(type="rect", line_width=0, 
+                                x0=xstart, y0=0, x1=xend, y1=2,
+                                fillcolor=constant.COLORS()['sleep_deep'])
 
         fig.update_shapes(dict(xref='x', yref='y'))
 
@@ -323,19 +319,21 @@ def breath_brv():
 
 def breath_brpm():
     
-    translate = st.session_state.translate
-    
-    values_df = get_brpm_values()
-    x = values_df["times"]
-    y = values_df["values"]
-    
+    translate = st.session_state.translate    
     line_width = 2
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, 
-                             y=y,
-                        mode='lines',
-                        line=dict(color=constant.COLORS()['breath'], width=line_width),
-                        name='tmp'))
+
+    values_df = get_brpm_values()
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]
+
+        fig.add_trace(go.Scatter(x=x, 
+                                y=y,
+                            mode='lines',
+                            line=dict(color=constant.COLORS()['breath'], width=line_width),
+                            name='tmp'))
     
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['brpm'],
@@ -413,18 +411,19 @@ def heart_hrv():
 def heart_bpm():
     
     translate = st.session_state.translate
-    
-    values_df = get_bpm_values()
-    x = values_df["times"]
-    y = values_df["values"]
-        
+           
     line_width = 2
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, 
-                             y=y,
-                        mode='lines',
-                        line=dict(color=constant.COLORS()['ecg'], width=line_width),
-                        name='tmp'))
+
+    values_df = get_bpm_values()
+    if len(values_df) > 0:
+        x = values_df["times"]
+        y = values_df["values"]
+        fig.add_trace(go.Scatter(x=x, 
+                                y=y,
+                            mode='lines',
+                            line=dict(color=constant.COLORS()['ecg'], width=line_width),
+                            name='tmp'))
     
     fig.update_layout(xaxis_title=translate["times"],
                       yaxis_title=constant.UNIT()['bpm'],
