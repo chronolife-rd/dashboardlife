@@ -403,10 +403,11 @@ def get_cst_result_info(date, datas, result_type):
     output = output.loc[mask]
     output = output.reset_index(drop=True)
 
-    # Round times to minutes
-    output['times'] = output["times"].dt.round("min")
-    # Format type from pandas._libs.tslibs.timestamps.Timestamp to datetime
-    output['times'] = output["times"]
+    if len(output['times']) > 0:
+        # Round times to minutes
+        output['times'] = output["times"].dt.round("min")
+        # Format type from pandas._libs.tslibs.timestamps.Timestamp to datetime
+        output['times'] = output["times"]
 
     return output
 
@@ -446,10 +447,11 @@ def get_cst_result_info_segment(date, datas, result_type, type):
     output = output.loc[mask]
     output = output.reset_index(drop=True)
 
-    # Round times to minutes
-    output['times'] = output["times"].dt.round("min")
-    # Format type from pandas._libs.tslibs.timestamps.Timestamp to datetime
-    output['times'] = output["times"]
+    if len(output['times']) > 0:
+        # Round times to minutes
+        output['times'] = output["times"].dt.round("min")
+        # Format type from pandas._libs.tslibs.timestamps.Timestamp to datetime
+        output['times'] = output["times"]
 
     return output
 
