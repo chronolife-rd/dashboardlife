@@ -9,7 +9,7 @@ from scipy.signal import medfilt
 import numpy as np
 import datetime 
 from template.util import img_to_bytes
-from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature, get_sleep, get_brv,get_inex_values
+from data.data import get_bpm_values, get_brpm_values, get_hrv_values, get_brv_values, get_duration_chronolife, get_duration_garmin, get_stress, get_spo2, get_bodybattery, get_temperature, get_sleep, get_brv,get_inex_values, get_steps
 import random
 
 BGCOLOR = 'rgba(255,255,255,1)'
@@ -26,7 +26,7 @@ def temperature_mean():
 
     if len(values_df) > 0:
         x = values_df["times"]
-        y = values_df["values"]/100
+        y = values_df["temperature_values"]/100
     
         fig.add_trace(go.Scatter(x=x, 
                                 y=y,
@@ -365,7 +365,7 @@ def breath_inex():
                         name='tmp'))
     
     fig.update_layout(xaxis_title=translate["times"],
-                      yaxis_title='',
+                      yaxis_title=constant.UNIT()['inspi_expi'],
                       height=400,
                       font=dict(size=14,))
     fig.update_layout(height=300, 
@@ -723,28 +723,33 @@ def spo2_donut():
     st.session_state.spo2_donut = img_to_bytes('template/images/spo2_donut.png')
     
 def steps_donut_old():
-    
-    translate = st.session_state.translate
-    steps           = data.get_steps()
-    steps_score     = steps["score"]
-    
-    color_text = '#3E738D'
-    
-    if steps["score"] == "":
-        size_of_groups=[0, 100]
-    else:
-        size_of_groups=[steps_score, 100-steps_score]
-        
-    wedgeprops = {"linewidth": 1, "edgecolor": "white"}
     plt.close('all')
-    plt.figure()
-    plt.pie(size_of_groups, 
-            colors=['green', "#e8e8e8"], 
-            startangle=90,
-            counterclock=False,
-            wedgeprops=wedgeprops)
-    my_circle=plt.Circle( (0,0), 0.8, color="white")
+    color_text = '#3E738D'
+
+    translate = st.session_state.translate
+    steps           = get_steps()
+    steps_score     = steps["score"]
+            
+    wedgeprops = {"linewidth": 1, "edgecolor": "white"}
     
+    plt.figure()
+    if isinstance(steps_score, str) == False:
+        if (steps_score < 100):
+            size_of_groups=[steps_score, 100-steps_score]
+            plt.pie(size_of_groups, 
+                    colors=["#4393B4", "#E6E6E6"], 
+                    startangle=90,
+                    counterclock=False,
+                    wedgeprops=wedgeprops)
+        if (steps_score >= 100) :
+            size_of_groups=[100]
+            plt.pie(size_of_groups, 
+                colors=["#13A943"], 
+                startangle=90,
+                counterclock=False,
+                wedgeprops=wedgeprops)  
+
+    my_circle=plt.Circle( (0,0), 0.8, color="white")
     if steps["score"] == "":
         plt.text(0, -1.5, translate["no_data"], fontsize=40, color=constant.COLORS()["text"],
                  horizontalalignment='center',verticalalignment='center')

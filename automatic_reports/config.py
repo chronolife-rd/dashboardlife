@@ -13,6 +13,7 @@ CST_SIGNAL_TYPES = 'heartbeat,HRV,qt_c_framingham_per_seg,breath_2_brpm,breath_2
 GARMIN_SIGNAL_TYPES = 'dailies,epochs,sleeps,allDayRespiration,stressDetails,pulseox'
 
 # Constants used in functions 
+TEMPERATURE_THREASHOLD = 2500 # min temperature of weared t-shirt
 ACTIVITY_THREASHOLD = 18 # constant used in computing alerts
 BRADYPNEA_TH = 6
 TACHYPNEA_TH = 20
@@ -26,9 +27,9 @@ QT_MAX_TH = 500
 DELTA_TIME = timedelta(minutes = 3) # constant used in computing times intervals 
 
 # Path to the pdf results folder 
-PATH_PDF = "pdf_results"
+PATH_PDF = "automatic_reports/pdf_results"
 # Path save reports images  
-PATH_SAVE_IMG = "report_images"
+PATH_SAVE_IMG = "automatic_reports/report_images"
 # Path to alerts images for PDF
 RED_ALERT = PATH_SAVE_IMG + "/alerts/red.png"
 GREEN_ALERT = PATH_SAVE_IMG + "/alerts/green.png"

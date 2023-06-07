@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap, unwrap_ratio_inspi_expi
 from automatic_reports.config import CST_SIGNAL_TYPES
-from automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD
+from automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD, TEMPERATURE_THREASHOLD
 from automatic_reports.config import TACHYPNEA_TH, BRADYPNEA_TH, TACHYCARDIA_TH, BRADYCARDIA_TH,\
     QT_MAX_TH, QT_MIN_TH
     
@@ -43,10 +43,13 @@ def get_cst_data(user_id, date, api, url):
     # Add activity level to each indicator
     results_dict_2 = add_activity_to_indicators(copy.deepcopy(results_dict))
 
+    # Add temperature to each indicator
+    results_dict_3 = add_temperature_to_indicators(copy.deepcopy(results_dict_2))
+
     # Add anomalie (alerts)
-    add_anomalies(results_dict_2)
+    add_anomalies(results_dict_3)
       
-    return results_dict_2
+    return results_dict_3
 
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
@@ -124,14 +127,10 @@ def initialize_dictionary_with_template() -> dict :
         'active' : "",
         }
     temperature_dict = {
-        'right' : "",
-        'left' : "",
-        'mean_left' : "", 
-        'mean_right' : "", 
-        'min_left' : "", 
-        'min_right' : "", 
-        'max_left' : "", 
-        'max_right' : "", 
+        'values' : "",
+        'mean' : "", 
+        'min' : "", 
+        'max' : "", 
     }
     dict_template = {
                     'user_id' : "",
@@ -192,33 +191,25 @@ def add_breath(date, datas, breath_dict):
 def add_temperature(date, datas, temperature_dict):
     right = get_cst_result_info(date, datas, result_type='temp_1')
     left = get_cst_result_info(date, datas, result_type='temp_2')
-    
-    mean_right = ""
-    min_right = ""
-    max_right = ""
 
-    mean_left = ""
-    min_left = ""
-    max_left = ""
+    right = right.drop_duplicates(subset=['times'])
+    left = left.drop_duplicates(subset=['times'])
+    values = merge_on_times(right, left)
+    values = get_max_values(values)
 
-    if len(right) > 0:
-        mean_right = round(np.mean(left['values']))/100
-        min_right = round(np.quantile(left['values'], 0.1))/100
-        max_right = round(np.quantile(left['values'], 0.9))/100
+    mean_value = ""
+    min_value = ""
+    max_values = ""
 
-    if len(left) > 0:
-        mean_left = round(np.mean(right['values']))/100
-        min_left = round(np.quantile(right['values'], 0.1))/100
-        max_left = round(np.quantile(right['values'], 0.9))/100
+    if len(values) > 0:
+        mean_value = round(np.mean(values['values']))/100
+        min_value = round(np.quantile(values['values'], 0.1))/100
+        max_values = round(np.quantile(values['values'], 0.9))/100
 
-    temperature_dict['right'] = right
-    temperature_dict['left'] = left
-    temperature_dict['mean_right'] = mean_right
-    temperature_dict['mean_left'] = mean_left
-    temperature_dict['min_right'] = min_right
-    temperature_dict['min_left'] = min_left
-    temperature_dict['max_right'] = max_right
-    temperature_dict['max_left'] = max_left
+    temperature_dict['values'] = values
+    temperature_dict['mean'] = mean_value
+    temperature_dict['min'] = min_value
+    temperature_dict['max'] = max_values
 
 def add_activity(date, datas, activity_dict) : 
     averaged_activity = get_cst_result_info(date, datas, result_type='averaged_activity')
@@ -250,6 +241,33 @@ def add_activity_to_indicators(results_dict) -> dict:
     sig_indicators["inspi_expi"] = merge_on_times(sig_indicators["inspi_expi"], averaged_activity_df)
 
     return copy.deepcopy(results_dict)
+
+def add_temperature_to_indicators(results_dict_2) -> dict:
+
+    temperature_df = results_dict_2["temperature"]["values"]
+    temperature_df.rename(columns={"values": "temperature_values"}, inplace=True)
+    
+    # ECG indicators
+    sig_indicators = results_dict_2["cardio"]
+    rate = merge_on_times(sig_indicators["rate"], temperature_df)
+    sig_indicators["rate"] = temperature_filter(rate)
+
+    rate_var = merge_on_times(sig_indicators["rate_var"], temperature_df)
+    sig_indicators["rate_var"] = temperature_filter(rate_var)
+
+    qt = merge_on_times(sig_indicators["qt"], temperature_df)
+    sig_indicators["qt"] = temperature_filter(qt)
+    
+    # Breath 
+    sig_indicators = results_dict_2["breath"]
+    rate= merge_on_times(sig_indicators["rate"], temperature_df)
+    sig_indicators["rate"] = temperature_filter(rate)
+    rate_var = merge_on_times(sig_indicators["rate_var"], temperature_df)
+    sig_indicators["rate_var"] = temperature_filter(rate_var)
+    inspi_expi = merge_on_times(sig_indicators["inspi_expi"], temperature_df)
+    sig_indicators["inspi_expi"] = temperature_filter(inspi_expi)
+
+    return copy.deepcopy(results_dict_2)
 
 def add_durations(date, results_dict):
     # Times constants
@@ -487,10 +505,25 @@ def data_per_15_min(input_df):
 
     return output_df
 
+def get_max_values(input_df):
+    input_df["values"] = input_df[["values_x", "values_y"]].max(axis=1)
+
+    output_df = input_df[["times", "values"]]
+
+    output_df = output_df.reset_index(drop=True)
+
+    return output_df
+
+def temperature_filter(input_df) :
+    
+    output_df = input_df.loc[input_df["temperature_values"] > TEMPERATURE_THREASHOLD].dropna().reset_index(drop=True)
+
+    return output_df 
 
 # %% ------------- Test the main function-------------------------------------
 # from config import API_KEY_PREPROD, API_KEY_PROD, URL_CST_PREPROD, URL_CST_PROD
 # prod = False
+
 # # -- Ludo
 # # user_id = "4vk5VJ"
 # # date = "2023-05-17"
@@ -502,7 +535,7 @@ def data_per_15_min(input_df):
 # # date = "2023-05-04" 
 # # -- Adriana
 # user_id = "6o2Fzp"
-# date = "2023-06-02"
+# date = "2023-06-01"
 
 # if prod == True :
 #     api = API_KEY_PROD

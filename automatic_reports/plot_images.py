@@ -3,6 +3,7 @@ import numpy as np
 
 from automatic_reports.config import PATH_SAVE_IMG as path_save
 from datetime import datetime, timedelta
+import os
 
 # Constants (colors)
 BLUE ='#3E738D'
@@ -10,49 +11,49 @@ GREY = '#6F6F6F'
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
-def plot_images(garmin_data, steps_dict, 
-                cst_time_intervals, garmin_time_intervals, date):
+def plot_images(garmin_data, cst_time_intervals, garmin_time_intervals, date, steps_score):
     plt.close("all")
-    plot_steps(steps_dict, path_save)
+    plot_steps(path_save, steps_score)
     plot_sleep(garmin_data["sleep"], path_save)
     plot_stress(garmin_data["stress"], path_save)
     plot_spo2(garmin_data["spo2"], path_save)
     
     plot_duration(cst_time_intervals, garmin_time_intervals, date)
     
-    # Close all images
-    # plt.close("all")
 
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
 
 # --- Steps ---
-def plot_steps(steps_dict, path_save):
-    if steps_dict["goal"].isdigit() > 0:
-        steps_score = round(steps_dict["total_steps"]/steps_dict["goal"]*100)
-    else : 
-        steps_score = 0
-    
+def plot_steps(path_save, steps_score):
+    image_path = path_save +"/steps.png"
+
+    # Delete image if exists
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
     plt.figure(figsize=(5,5))
-    if (steps_score < 100):
-        size_of_groups=[steps_score, 100-steps_score]
-        plt.pie(size_of_groups, 
-                colors=["#4393B4", "#E6E6E6"], 
-                startangle=90,
-                counterclock=False)
-    if (steps_score >= 100) :
-        size_of_groups=[100]
-        plt.pie(size_of_groups, 
-        colors=["#13A943"], 
-        startangle=90,
-        counterclock=False)
+
+    if isinstance(steps_score, str) == False:
+        if (steps_score < 100):
+            size_of_groups=[steps_score, 100-steps_score]
+            plt.pie(size_of_groups, 
+                    colors=["#4393B4", "#E6E6E6"], 
+                    startangle=90,
+                    counterclock=False)
+        if (steps_score >= 100) :
+            size_of_groups=[100]
+            plt.pie(size_of_groups, 
+            colors=["#13A943"], 
+            startangle=90,
+            counterclock=False)
 
     my_circle=plt.Circle( (0,0), 0.9, color="white")
     plt.text(0, 0, (str(steps_score) + '%'), fontsize=30, color=BLUE, horizontalalignment = "center")
     plt.text(0, -0.25, 'of Goal', fontsize=20, color=GREY,  horizontalalignment = "center")
     p=plt.gcf()
     p.gca().add_artist(my_circle)
-    plt.savefig(path_save +"/steps.png", transparent=True)
+    plt.savefig(image_path, transparent=True)
     
 # --- Spo2 ---
 def plot_spo2(spo2_dict, path_save):
@@ -62,7 +63,13 @@ def plot_spo2(spo2_dict, path_save):
     ORANGE = "#F77517"
     RED = "#CE4A14"
 
-    if spo2_dict["averege"].isdigit():
+    image_path = path_save +"/spo2.png"
+
+    # Delete image if exists
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    if isinstance(spo2_dict["averege"], str) == False:
         averege_score = spo2_dict["averege"]
         lowest_score = spo2_dict["lowest"]
     else: 
@@ -105,11 +112,17 @@ def plot_spo2(spo2_dict, path_save):
     plt.polar(rad, radius, '.', markersize=60, color=color_spo2_score)
     plt.polar(rad, 1, '.', color = "white")
     plt.axis('off')
-    plt.savefig(path_save + "/spo2.png", transparent=True)
+    plt.savefig(image_path, transparent=True)
 
 # --- Sleep ---
 def plot_sleep(sleep_dict, path_save):
-    if sleep_dict["recorded_time"].isdigit():
+    image_path = path_save +"/sleep.png"
+
+    # Delete image if exists
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    if isinstance(sleep_dict["recorded_time"], str) == False:
         score   = sleep_dict["score"]
         quality = sleep_dict["quality"]
         deep    = sleep_dict["deep"]/sleep_dict["recorded_time"]
@@ -132,13 +145,18 @@ def plot_sleep(sleep_dict, path_save):
         plt.text(0, 0, (str(score) + '/100'), fontsize=30, color= BLUE,  horizontalalignment = "center")
         plt.text(0, -.35, 'Quality:', fontsize=20, color=GREY,  horizontalalignment = "center")
         plt.text(0, -.60, quality, fontsize=20, color=GREY,  horizontalalignment = "center")
-        plt.savefig(path_save + "/sleep.png", transparent=True)
+        plt.savefig(image_path, transparent=True)
     
 # --- Stress ---
 def plot_stress(stress_dict, path_save):
+    image_path = path_save +"/stress.png"
+
+    # Delete image if exists
+    if os.path.exists(image_path):
+        os.remove(image_path)
 
     recorded_time = stress_dict["recorded_time"]
-    if recorded_time.isdigit():
+    if isinstance(recorded_time, str) == False:
         stress_score = stress_dict["score"]
         rest = stress_dict["rest"]/recorded_time
         low = stress_dict["low"]/recorded_time
@@ -165,10 +183,16 @@ def plot_stress(stress_dict, path_save):
     p.gca().add_artist(my_circle)
     plt.text(0, 0, (str(stress_score)), fontsize=30, color=BLUE, horizontalalignment = "center")
     plt.text(0, -0.25, 'Overall', fontsize=20, color=GREY, horizontalalignment = "center")
-    plt.savefig(path_save + "/stress.png", transparent=True)
+    plt.savefig(image_path, transparent=True)
     
 # --- Duration ---
 def plot_duration(cst_times, garmin_times, date):
+    image_path = path_save +"/duration.png"
+
+    # Delete image if exists
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
     # Set the figure parameters
     GARMIN_COLOR = "#6CCFF6"
     CST_COLOR = "#F7921E"
@@ -230,5 +254,5 @@ def plot_duration(cst_times, garmin_times, date):
         plt.tight_layout()
         
         # Save as image
-        plt.savefig(path_save +"/duration.png", transparent=True)
+        plt.savefig(image_path, transparent=True)
         

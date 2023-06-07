@@ -1104,11 +1104,11 @@ def health_indicators_breath_inex_results():
     html = f"""
     <div class=col1_indicators>
         <p>{translate["median"]}</p>
-        <p class="indicator_main_value">{str(inex_mean)} s</p>
+        <p class="indicator_main_value">{str(inex_mean)} %</p>
         <p>{translate["min"]}</p>
-        <p class="indicator_value">{str(inex_min)} s</p>
+        <p class="indicator_value">{str(inex_min)} %</p>
         <p>{translate["max"]}</p>
-        <p class="indicator_value">{str(inex_max)} s</p>
+        <p class="indicator_value">{str(inex_max)} %</p>
     </div>
     """
     

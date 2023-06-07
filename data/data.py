@@ -14,8 +14,10 @@ import time
 from automatic_reports.api2_get_cst_data import get_cst_data
 from automatic_reports.api2_get_garmin_data import get_garmin_data
 from automatic_reports.compute_common_for_html import get_common_indicators
-from automatic_reports.plot_images import plot_images
-
+from automatic_reports.compute_common_for_pdf import get_common_indicators_pdf
+from automatic_reports.compute_cst_for_pdf import cst_data_for_pdf
+from automatic_reports.compute_garmin_for_pdf import garmin_data_for_pdf
+from automatic_reports.useful_functions import combine_data
 
 def get_health_indicators():
     
@@ -45,15 +47,29 @@ def get_health_indicators():
         url = url_garmin
         )
     
-    # Compute common data
-    common_data, common_indicators,\
-    steps_dict = get_common_indicators(cst_data, garmin_data) 
+    # Compute common data 
+    common_data = combine_data(cst_data, garmin_data)
 
-    st.session_state.garmin_indicators      = garmin_data
-    st.session_state.chronolife_indicators  = cst_data
-    st.session_state.common_data            = common_data       # New
-    st.session_state.common_indicators      = common_indicators # New
-    st.session_state.steps_dict             = steps_dict        # New
+    # Compute common indicators for html
+    common_indicators = get_common_indicators(common_data) 
+
+    # Compute common indicators for pdf
+    common_indicators_pdf = get_common_indicators_pdf(common_data) 
+
+    # Format CST's text that will be added to pdf 
+    chronolife_indicators_pdf = cst_data_for_pdf(end_user, date, cst_data)
+
+    # Format Garmin's text that will be added to pdf 
+    garmin_indicators_pdf = garmin_data_for_pdf(garmin_data)
+
+
+    st.session_state.garmin_indicators          = garmin_data
+    st.session_state.chronolife_indicators      = cst_data
+    st.session_state.common_data                = common_data             # New
+    st.session_state.common_indicators          = common_indicators       # New
+    st.session_state.common_indicators_pdf      = common_indicators_pdf   # New
+    st.session_state.garmin_indicators_pdf      = garmin_indicators_pdf   # New
+    st.session_state.chronolife_indicators_pdf  = chronolife_indicators_pdf   # New
 
 def get_bodybattery():
     datas = st.session_state.garmin_indicators
@@ -230,7 +246,7 @@ def get_steps():
   
     output = {}
     output["number"]    = ""
-    output["goal"]      = ""
+    output["goal"]      = 3000
     output["score"]     = ""
     output["distance"]  = ""
 
@@ -238,12 +254,8 @@ def get_steps():
         output["number"]    = datas["activity"]["steps"] 
         output["goal"]      = datas["activity"]["goal"] 
         output["distance"]  = datas["activity"]["distance"] 
+        output["score"] = int(output["number"]/output["goal"]*100)
 
-        if output["goal"] > 0:
-            output["score"] = int(output["number"]/output["goal"]*100)
-        else : 
-            output["score"] = 0
-    
     return output
 
 def get_temperature():
@@ -254,11 +266,11 @@ def get_temperature():
     output["max"]    = ""
     output["values"] = ""
     
-    if len(datas) > 0 and isinstance(datas["temperature"]["mean_left"], str) == False:
-        output["values"] = datas["temperature"]["left"]
-        output["mean"]   = datas["temperature"]["mean_left"]
-        output["min"]    = datas["temperature"]["min_left"]
-        output["max"]    = datas["temperature"]["max_left"]
+    if len(datas) > 0 and isinstance(datas["temperature"]["mean"], str) == False:
+        output["values"] = datas["temperature"]["values"]
+        output["mean"]   = datas["temperature"]["mean"]
+        output["min"]    = datas["temperature"]["min"]
+        output["max"]    = datas["temperature"]["max"]
 
     return output
 

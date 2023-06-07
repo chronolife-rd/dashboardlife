@@ -221,15 +221,21 @@ def init():
     if 'chronolife_indicators' not in st.session_state:
             st.session_state.chronolife_indicators = []
             
-    if 'commun_indicators' not in st.session_state:
-            st.session_state.commun_indicators = []
-
-    if 'commun_data' not in st.session_state:
-            st.session_state.commun_data = []
+    if 'common_data' not in st.session_state:
+            st.session_state.common_data = []
     
-    if 'steps_dict' not in st.session_state:
-            st.session_state.steps_dict = []
-                
+    if 'common_indicators' not in st.session_state:
+            st.session_state.common_indicators = []
+
+    if 'common_indicators_pdf' not in st.session_state:
+            st.session_state.common_indicators_pdf = []
+
+    if 'garmin_indicators_pdf' not in st.session_state:
+            st.session_state.garmin_indicators_pdf = []
+
+    if 'chronolife_indicators_pdf' not in st.session_state:
+            st.session_state.chronolife_indicators_pdf = []
+                        
     if 'translate' not in st.session_state:
         st.session_state.translate = ''
         

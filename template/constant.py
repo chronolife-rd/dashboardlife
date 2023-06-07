@@ -134,6 +134,7 @@ def UNIT():
     UNIT['spo2'] = ''
     UNIT['pulseox'] = ''
     UNIT['bodybattery'] = '%'
+    UNIT['inspi_expi'] = '%'
     
     return UNIT
 

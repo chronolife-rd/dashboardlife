@@ -4,3 +4,4 @@ __pycache__/
 /template/images/spo2_donut.png
 /template/images/steps_donut.png
 /template/images/stress_donut.png
+/automatic_reports/pdf_results/result.pdf
