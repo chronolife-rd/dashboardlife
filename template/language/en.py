@@ -61,7 +61,10 @@ def translate():
     translate["day"]                        = "Day"
     translate["rest"]                       = "Rest"
     translate["activity"]                   = "Activity"
-    
+
+    translate["morning"]                    = "Morning"
+    translate["evening"]                    = "Evening"
+
     translate["health_indicators_overview"] = "Health Indicators Overview"
     translate["cardiology"]                 = "Cardiology"
     translate["tachycardia"]                = "Tachycardia"
@@ -133,7 +136,7 @@ def translate():
     translate["median"]     = "Median"
     translate["min"]        = "Min"
     translate["max"]        = "Max"
-    
+   
     translate["health_indicators_heart_bpm_title"]      = "Heart Beat Per Minute (HR)"
     translate["health_indicators_heart_hrv_title"]      = "Heart Rate Variability (HRV)"
     translate["health_indicators_breath_brpm_title"]    = "Breath Rate Per Minute (BR)"

@@ -360,15 +360,15 @@ def get_qt():
     output = {}
     output["exists"]  = False
     output["values"]  = ""
-    output["mean"]    = ""
-    output["min"]     = ""
-    output["max"]     = ""
+    output["night"]    = ""
+    output["morning"]     = ""
+    output["evening"]     = ""
     
     if isinstance(datas["anomalies"]["qt"]["values"], str) == False:
         output["exists"] = datas["anomalies"]["qt"]["exists"]
-        output["mean"]   = datas["anomalies"]["qt"]["mean"]
-        output["min"]    = datas["anomalies"]["qt"]["min"]
-        output["max"]    = datas["anomalies"]["qt"]["max"]
+        output["night"]   = datas["anomalies"]["qt"]["night"]
+        output["morning"]    = datas["anomalies"]["qt"]["morning"]
+        output["evening"]    = datas["anomalies"]["qt"]["evening"]
     
     if output["exists"]:
         qt_alert_icon = st.session_state.alert

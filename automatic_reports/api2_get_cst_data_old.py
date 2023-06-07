@@ -6,7 +6,6 @@ import math
 import requests
 import pandas as pd
 import numpy as np
-import statistics
 from datetime import datetime, timedelta
 
 from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap, unwrap_ratio_inspi_expi
@@ -48,7 +47,7 @@ def get_cst_data(user_id, date, api, url):
     results_dict_3 = add_temperature_to_indicators(copy.deepcopy(results_dict_2))
 
     # Add anomalie (alerts)
-    add_anomalies(results_dict_3, date)
+    add_anomalies(results_dict_3)
       
     return results_dict_3
 
@@ -152,10 +151,11 @@ def initialize_alerts_with_template() -> dict :
         "w" : ALERT_SIZE,
         "h" : ALERT_SIZE,
         "exists" : False,
-        "night" : "",
-        "morning" : "",
-        "evening" : "",
+        "min" : "",
+        "max" : "",
         "mean" : "",
+        "high" : "",
+        "resting" : "",
         "percentage" : "",
         "duration" : "",
         "values" : ""
@@ -306,7 +306,7 @@ def add_durations(date, results_dict):
         duration_dict["rest"] = timedelta_formatter(rest_in_s)
         duration_dict["active"] = timedelta_formatter(active_in_s)
     
-def add_anomalies(results_dict, date):
+def add_anomalies(results_dict):
     alerts_dict = results_dict['anomalies']
     # --- Set alerts image positions ---
     # Tachypnea
@@ -371,47 +371,20 @@ def add_anomalies(results_dict, date):
         alerts_dict["bradycardia"]["percentage"] = round(len(values_brady)/len(values)*100, 1)
     
     # Cardio QTc length TO CHANGE TO CHANGE when indicator is updateted !!!
-    YEAR = int(date[:4])
-    M = int(date[5:7])
-    D = int(date[8:10])
-    night_limit = datetime(YEAR, M, D, 6, 0, 0)
-    morning_limit = datetime(YEAR, M, D, 12, 0, 0)
-    
     df_aux = results_dict['cardio']['qt']
-    df_night = df_aux.loc[df_aux["times"] <= night_limit].dropna().reset_index(drop=True)
-    df_morning = df_aux.loc[df_aux["times"] > night_limit].dropna().reset_index(drop=True)
-    df_morning = df_morning.loc[df_morning["times"] <= morning_limit].dropna().reset_index(drop=True)
-    df_evening = df_aux.loc[df_aux["times"] > morning_limit].dropna().reset_index(drop=True)
-
-    values_night = df_night.loc[df_night["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
-    values_morning = df_morning.loc[df_morning["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
-    values_evening = df_evening.loc[df_evening["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
+    values = df_aux.loc[df_aux["activity_values"] <= ACTIVITY_THREASHOLD, "values"].dropna().reset_index(drop=True)
     
-    qt_alert = False
     if len(values) > 0:
+        value_max = round(np.quantile(values, 0.9))
+        value_min = round(np.quantile(values, 0.1))
+        value_mean =  round(np.mean(values))
         alerts_dict["qt"]["values"] = values
-
-    if len(values_night) > 0:
-        qt_night  = round(statistics.median(values_night))
-        alerts_dict["qt"]["night"] = qt_night
-        if qt_night > QT_MAX_TH:
-            qt_alert = True
-
-    if len(values_morning) > 0:
-        qt_morning  = round(statistics.median(values_morning))
-        alerts_dict["qt"]["morning"] = qt_morning
-        if qt_morning > QT_MAX_TH:
-            qt_alert = True
-
-    if len(values_evening) > 0:
-        qt_evening  = round(statistics.median(values_evening))
-        alerts_dict["qt"]["evening"] = qt_evening
-        if qt_evening > QT_MAX_TH:
-            qt_alert = True
-
-    if qt_alert:
-        alerts_dict["qt"]["path"]  = RED_ALERT
-        alerts_dict["qt"]["exists"] = True
+        alerts_dict["qt"]["min"] = value_min
+        alerts_dict["qt"]["max"] = value_max
+        alerts_dict["qt"]["mean"] = value_mean
+        if(value_mean > QT_MAX_TH or value_mean < QT_MIN_TH):
+            alerts_dict["qt"]["path"]  = RED_ALERT
+            alerts_dict["qt"]["exists"] = True
 
 def merge_on_times(df_1, df_2):
     df_result = pd.merge(df_1, df_2, how="outer", on="times")

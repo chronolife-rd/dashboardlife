@@ -61,6 +61,9 @@ def translate():
     translate["day"]                        = "Jour"
     translate["rest"]                       = "Repos"
     translate["activity"]                   = "Activité"
+
+    translate["morning"]                    = "Matin"
+    translate["evening"]                    = "Soir"
     
     translate["health_indicators_overview"] = "Aperçu des indicateurs de santé"
     translate["cardiology"]                 = "Cardiologie"
