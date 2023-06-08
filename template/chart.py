@@ -403,7 +403,6 @@ def heart_hrv():
                       template="plotly_white",
                       paper_bgcolor=BGCOLOR, plot_bgcolor=BGCOLOR,
                       title=constant.SHORTCUT()['hrv'],
-                       yaxis = dict(range=constant.RANGE()['hrv']),
                       )
     
     return fig

@@ -28,6 +28,7 @@ def data_report_pdf():
     chronolife_indicators_pdf   = st.session_state.chronolife_indicators_pdf 
     garmin_indicators_pdf       = st.session_state.garmin_indicators_pdf 
   
+    print(date)
     # Get intervals and alerts
     garmin_time_intervals = garmin_data['duration']['intervals']
     cst_time_intervals = chronolife_data['duration']['intervals']

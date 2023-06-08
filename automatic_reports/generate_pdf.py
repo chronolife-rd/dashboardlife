@@ -100,7 +100,7 @@ def _add_text(can, text_parameters):
     font = text_parameters["font"]
     size = text_parameters["size"]
 
-    if x is not None:
+    if isinstance(x, str) == False:
         y_top = 11.69
         x_start = x*inch
         y_start = (y_top - y)*inch
@@ -116,7 +116,7 @@ def _add_image(can, image_parameters):
     height = image_parameters["h"]
     path_img = image_parameters["path"]
 
-    if x is not None and os.path.exists(path_img):
+    if isinstance(x, str) == False and os.path.exists(path_img):
         width = width*inch 
         height = height*inch
 

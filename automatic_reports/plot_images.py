@@ -33,6 +33,7 @@ def plot_steps(path_save, steps_score):
         os.remove(image_path)
 
     plt.figure(figsize=(5,5))
+    plt.axis('off')
 
     if isinstance(steps_score, str) == False:
         if (steps_score < 100):
@@ -44,15 +45,22 @@ def plot_steps(path_save, steps_score):
         if (steps_score >= 100) :
             size_of_groups=[100]
             plt.pie(size_of_groups, 
-            colors=["#13A943"], 
-            startangle=90,
-            counterclock=False)
+                    colors=["#13A943"], 
+                    startangle=90,
+                    counterclock=False)
+            
+        my_circle=plt.Circle( (0,0), 0.9, color="green")
+        p=plt.gcf()
+        p.gca().add_artist(my_circle)  
 
-    my_circle=plt.Circle( (0,0), 0.9, color="white")
-    plt.text(0, 0, (str(steps_score) + '%'), fontsize=30, color=BLUE, horizontalalignment = "center")
-    plt.text(0, -0.25, 'of Goal', fontsize=20, color=GREY,  horizontalalignment = "center")
-    p=plt.gcf()
-    p.gca().add_artist(my_circle)
+        plt.text(0, 0, (str(steps_score) + '%'), fontsize=30, color=BLUE,
+                  horizontalalignment = "center")
+        plt.text(0, -0.25, 'of Goal', fontsize=20, color=GREY,  
+                 horizontalalignment = "center") 
+
+    else:
+        plt.text(0, -1.5, "no data", fontsize=40, color=BLUE,
+                 horizontalalignment='center')
     plt.savefig(image_path, transparent=True)
     
 # --- Spo2 ---
@@ -69,48 +77,46 @@ def plot_spo2(spo2_dict, path_save):
     if os.path.exists(image_path):
         os.remove(image_path)
 
-    if isinstance(spo2_dict["averege"], str) == False:
-        averege_score = spo2_dict["averege"]
-        lowest_score = spo2_dict["lowest"]
-    else: 
-        averege_score = 30
-        lowest_score = 30
-
     size_of_groups=[4,23,23,23,23,4]
 
     plt.figure(figsize=(5,5))
-    plt.pie(size_of_groups, 
-            colors=["white", GREEN, YELLOW, ORANGE, RED, "white"], 
-            startangle=270)
-    
-    my_circle=plt.Circle( (0,0), 0.9, color="white")
-    p=plt.gcf()
-    p.gca().add_artist(my_circle)
+    if isinstance(spo2_dict["averege"], str) == False:
+        averege_score = spo2_dict["averege"]
+        lowest_score = spo2_dict["lowest"]
 
-    plt.text(0, 0.30, 'Averege Spo2', fontsize=18, color=GREY,  horizontalalignment = "center")
-    plt.text(0, 0, (str(averege_score) + '%'), fontsize=30, color = BLUE, horizontalalignment = "center")
-    plt.text(0, -0.40, 'Lowest', fontsize=18, color=GREY,  horizontalalignment = "center")
-    plt.text(0, -0.65, (str(lowest_score) + '%'), fontsize=20, color=BLUE,  horizontalalignment = "center")
-
-    # setting the axes projection as polar
-    plt.axes(projection = 'polar')
-    radius = 0.75
-
-    score_reshape = ((100 - 0)/(100-60)) * (averege_score - 60)
-    deg = (270-(4/100*360)) - score_reshape/100*(92/100*360)
-    rad = np.deg2rad(deg)
-
-    if averege_score < 70:
-        color_spo2_score=RED
-    elif 70 <= averege_score < 80:
-        color_spo2_score=ORANGE
-    elif 80 <= averege_score < 90:
-        color_spo2_score=YELLOW
-    elif 90 <= averege_score <= 100:
-        color_spo2_score=GREEN
+        plt.pie(size_of_groups, 
+                colors=["white", GREEN, YELLOW, ORANGE, RED, "white"], 
+                startangle=270)
         
-    plt.polar(rad, radius, '.', markersize=60, color=color_spo2_score)
-    plt.polar(rad, 1, '.', color = "white")
+        my_circle=plt.Circle( (0,0), 0.9, color="white")
+        p=plt.gcf()
+        p.gca().add_artist(my_circle)
+
+        plt.text(0, 0.30, 'Averege Spo2', fontsize=18, color=GREY,  horizontalalignment = "center")
+        plt.text(0, 0, (str(averege_score) + '%'), fontsize=30, color = BLUE, horizontalalignment = "center")
+        plt.text(0, -0.40, 'Lowest', fontsize=18, color=GREY,  horizontalalignment = "center")
+        plt.text(0, -0.65, (str(lowest_score) + '%'), fontsize=20, color=BLUE,  horizontalalignment = "center")
+
+        # setting the axes projection as polar
+        plt.axes(projection = 'polar')
+        radius = 0.75
+
+        score_reshape = ((100 - 0)/(100-60)) * (averege_score - 60)
+        deg = (270-(4/100*360)) - score_reshape/100*(92/100*360)
+        rad = np.deg2rad(deg)
+
+        if averege_score < 70:
+            color_spo2_score=RED
+        elif 70 <= averege_score < 80:
+            color_spo2_score=ORANGE
+        elif 80 <= averege_score < 90:
+            color_spo2_score=YELLOW
+        elif 90 <= averege_score <= 100:
+            color_spo2_score=GREEN
+            
+        plt.polar(rad, radius, '.', markersize=60, color=color_spo2_score)
+        plt.polar(rad, 1, '.', color = "white")
+
     plt.axis('off')
     plt.savefig(image_path, transparent=True)
 
@@ -156,6 +162,8 @@ def plot_stress(stress_dict, path_save):
         os.remove(image_path)
 
     recorded_time = stress_dict["recorded_time"]
+    plt.figure(figsize=(5,5))
+    plt.axis('off')
     if isinstance(recorded_time, str) == False:
         stress_score = stress_dict["score"]
         rest = stress_dict["rest"]/recorded_time
@@ -163,26 +171,17 @@ def plot_stress(stress_dict, path_save):
         medium = stress_dict["medium"]/recorded_time
         high = stress_dict["high"]/recorded_time
 
-    else : 
-        stress_score = 0
-        rest = 25
-        low = 25
-        medium = 25
-        high = 25
-
-    size_of_groups=[rest, low, medium, high]
-
-    plt.figure(figsize=(5,5))
-    plt.pie(size_of_groups, 
-            colors=['#4594F3', '#FFAF54', '#F97516', '#DD5809'], 
-            startangle=90,
-            counterclock=False,
-            wedgeprops = {"linewidth": 1, "edgecolor": "white"})
-    my_circle=plt.Circle( (0,0), 0.9, color="white")
-    p=plt.gcf()
-    p.gca().add_artist(my_circle)
-    plt.text(0, 0, (str(stress_score)), fontsize=30, color=BLUE, horizontalalignment = "center")
-    plt.text(0, -0.25, 'Overall', fontsize=20, color=GREY, horizontalalignment = "center")
+        size_of_groups=[rest, low, medium, high]
+        plt.pie(size_of_groups, 
+                colors=['#4594F3', '#FFAF54', '#F97516', '#DD5809'], 
+                startangle=90,
+                counterclock=False,
+                wedgeprops = {"linewidth": 1, "edgecolor": "white"})
+        my_circle=plt.Circle( (0,0), 0.9, color="white")
+        p=plt.gcf()
+        p.gca().add_artist(my_circle)
+        plt.text(0, 0, (str(stress_score)), fontsize=30, color=BLUE, horizontalalignment = "center")
+        plt.text(0, -0.25, 'Overall', fontsize=20, color=GREY, horizontalalignment = "center")
     plt.savefig(image_path, transparent=True)
     
 # --- Duration ---
