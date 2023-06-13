@@ -518,6 +518,12 @@ def smart_textile_raw_data():
     # st.plotly_chart(fig_acc, use_container_width=True)
     
 def ecg_signal(template='plotly_white', width_line=2, height=500):
+    
+    # offset = data.get_offset
+    # if isinstance(offset["value"], str) == False:
+    #     value = offset["value"]
+    #     sign = offset["sign"]
+    
     # ECG
     raw_data = st.session_state.smart_textile_raw_data[constant.TYPE()['ECG']]
     ymin = max([min(unwrap(raw_data['sig']))*1.1, -1000])

@@ -3,19 +3,39 @@ import template.constant as constant
 import template.test as test
 import requests
 import json
+from datetime import datetime, timedelta
 from pylife.api_functions import map_data
 from pylife.api_functions import map_data_filt
 from pylife.api_functions import get_sig_info
+from data.data import get_offset
    
 def get_raw_data():
+    offset_info = get_offset()
     
     url         = st.session_state.url_data
     api_key     = st.session_state.api_key
     user        = st.session_state.end_user
     types       = constant.TYPE()["SIGNALS"]
     date        = st.session_state.date
-    time_gte    = st.session_state.start_time + ":00"
-    time_lt     = st.session_state.end_time + ":00"
+    start_time  = st.session_state.start_time + ":00" # str
+    end_time    = st.session_state.end_time + ":00"   # str
+
+    time_gte    = start_time 
+    time_lt     = end_time
+
+    if isinstance(offset_info["value"], str) == False:
+        sign = offset_info["sign"] 
+        format_datetime = "%H:%M:%S"
+        # Str to datetime
+        start_time = datetime.strptime(start_time, format_datetime) # datetime
+        end_time   = datetime.strptime(end_time, format_datetime)   # datetime
+        
+        time_gte  = start_time + sign*timedelta(seconds = offset_info["value"])
+        time_lt   = end_time + sign*timedelta(seconds = offset_info["value"])
+
+        # Datetime to str 
+        time_gte = datetime.strftime(time_gte, format_datetime)  # str
+        time_lt  = datetime.strftime(time_lt, format_datetime)   # str
     
     params = {
            'user':      user, # sub-user username
@@ -27,7 +47,7 @@ def get_raw_data():
     
     # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).
     reply = get_reply(params, url, api_key)
-    message, status_code = test.api_status(reply)
+    _, status_code = test.api_status(reply)
 
     raw_data = request_datas(reply, status_code)
 
@@ -58,6 +78,7 @@ def request_datas(reply, status_code):
         
         # --- Map filtered data 
         map_filtered_data(datas, raw_data)
+        print(raw_data)
     
     return raw_data
 

@@ -40,6 +40,7 @@ def get_cst_data(user_id, date, api, url):
     add_activity(date, datas_3_days, results_dict['activity'])
     add_temperature(date, datas_3_days, results_dict['temperature'])
     add_durations(date, results_dict)
+    add_offset(datas, results_dict['offset'])
     
     # Add activity level to each indicator
     results_dict_2 = add_activity_to_indicators(copy.deepcopy(results_dict))
@@ -133,8 +134,13 @@ def initialize_dictionary_with_template() -> dict :
         'min' : "", 
         'max' : "", 
     }
+    offset_dict = {
+        'value' : "",
+        'sign' : ""}
+
     dict_template = {
                     'user_id' : "",
+                    'offset' : copy.deepcopy(offset_dict),
                     'activity': copy.deepcopy(activity_dict),
                     'anomalies': copy.deepcopy(anomalies_dict),
                     'breath': copy.deepcopy(breath_dict),
@@ -306,6 +312,26 @@ def add_durations(date, results_dict):
         duration_dict["rest"] = timedelta_formatter(rest_in_s)
         duration_dict["active"] = timedelta_formatter(active_in_s)
     
+def add_offset(datas, offset_dict):
+    if len(datas) > 0 : 
+        dict_aux = datas[0]
+        id_date = dict_aux['_id']
+        date_local = id_date[:id_date.index(".")]
+        date_local = int(date_local)
+        
+        date_utc = datetime.strptime(dict_aux['mtimestamp'], "%Y-%m-%dT%H:%M:%S") 
+        date_utc = int(round(date_utc.timestamp())) 
+
+        offset = date_utc - date_local # in hours
+        
+        if date_utc < date_local:
+            sign = -1   # before utc
+        else: sign = +1 # after utc
+        
+        offset_dict['value'] = abs(offset)
+        offset_dict['sign'] = sign 
+        
+
 def add_anomalies(results_dict, date):
     alerts_dict = results_dict['anomalies']
     # --- Set alerts image positions ---
@@ -562,7 +588,7 @@ def temperature_filter(input_df) :
 # # date = "2023-05-04" 
 # # -- Adriana
 # user_id = "6o2Fzp"
-# date = "2023-06-01"
+# date = "2023-06-13"
 
 # if prod == True :
 #     api = API_KEY_PROD

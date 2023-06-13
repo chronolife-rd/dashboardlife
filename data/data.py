@@ -71,11 +71,24 @@ def get_health_indicators():
     st.session_state.garmin_indicators_pdf      = garmin_indicators_pdf   # New
     st.session_state.chronolife_indicators_pdf  = chronolife_indicators_pdf   # New
 
+def get_offset():
+    datas = st.session_state.chronolife_indicators
+
+    output = {}
+    output["value"] = ""
+    output["sign"] = ""
+
+    if len(datas) > 0  and isinstance(datas["offset"]["value"], str) == False:
+        output["value"]   = datas["offset"]["value"]
+        output["sign"]   = datas["offset"]["sign"]
+    
+    return output
+
 def get_bodybattery():
     datas = st.session_state.garmin_indicators
 
     output = {}
-    output['values'] = ""
+    output["values"] = ""
     output["high"]   = ""
     output["low"]    = ""
     
