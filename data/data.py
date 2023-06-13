@@ -134,7 +134,7 @@ def get_sleep():
     output["percentage_rem"]    = ""
     output["percentage_awake"]  = ""
     
-    if len(datas) > 0 and isinstance(datas["sleep"]["score"], str) == False:
+    if isinstance(datas["sleep"]["score"], str) == False and datas["sleep"]["recorded_time"]>0:
         output["values"]            = datas["sleep"]["sleep_map"]
         output["score"]             = datas["sleep"]["score"]
         output["quality"]           = datas["sleep"]["quality"]
