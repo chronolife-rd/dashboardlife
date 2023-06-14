@@ -1,5 +1,6 @@
 # Path to pylife
-path_root = 'C:/Users/MichelClet/Desktop/mcl/python/'
+#path_root = 'C:/Users/MichelClet/Desktop/mcl/python/'
+path_root = 'C:/Users/blandrieu/OneDrive - Passage innovation/Documents/GitHub'
 
 import sys
 sys.path.append(path_root)
@@ -19,16 +20,18 @@ from pylife.api_functions import get_result_info
 
 #%%
 
-api_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-url     = "https://prod.chronolife.net/api/2/data"
+api_key = 'n6xNYQ4ECxCe_bY0saocvA'
+#url     = "https://prod.chronolife.net/api/2/data"
+url     = "https://preprod.chronolife.net/api/2/data"
 
 # Build the query parameters object.
+#/!\ the calc params are only calculted every 10 minutes based on UTC clock (ie : at X heures 0 minutes, X heures 10 minutes, X heures 20 minutes etc.)
 params = {
-       'user':      "3Dxqaw", # sub-user username
-       'types':     ['ecg'], 
-       'date':      '2021-09-20',
-       'time_gte':  '10:00:00', # UTC
-       'time_lt':   '14:21:00'  # UTC
+       'user':      "5Nwwut", # sub-user username
+       'types':    'qt_length_median_corrected' ,#'steps_number',#'ecg,temp_1',#'ecg','hrv','steps_number,temp_1' 'averaged_activity'],# ['ecg'], #key words de process functions
+       'date':      '2023-05-04',
+       'time_gte':  '14:00:00', # UTC
+       'time_lt':   '16:55:00'  # UTC
      }
 
 # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).

@@ -83,6 +83,7 @@ def process_data_interval(dict_params):
     dict_result = {}
     
     if not dl.accs.is_empty_:
+        print('accx')
         if isinstance(dl.accs.mean_activity_level_, float):
             averaged_activity = round(dl.accs.mean_activity_)
         else:
@@ -90,10 +91,11 @@ def process_data_interval(dict_params):
             
         dict_result["steps_number"]             = dl.accs.n_steps_
         dict_result["averaged_activity"]        = averaged_activity
-        dict_result["activity_level"]           = [item.tolist() for item in (dl.accs.activity_level_)]
+        dict_result["activity_level"]           = [[round(respj,4) for respj in respij] for respij in dl.accs.activity_level_] #[item.tolist() for item in (dl.accs.activity_level_)]
         dict_result["activity_level_times"]     = [times[0].astype(datetime.datetime).replace(tzinfo=datetime.timezone.utc) for times in dl.accx.times_]
         
     if not dl.breath_1.is_empty_:
+        print('breath_1')
         brpm = None
         brv_s = None
         if len(dl.breath_1.rpm_) > 0:
@@ -105,11 +107,11 @@ def process_data_interval(dict_params):
             brv_s = int(round(brv_s))
          
         def get_first_time_value(times):
-            return [time[0].astype(datetime.datetime).replace(tzinfo=datetime.timezone.utc) for time in times]
+            return [time[0].astype(datetime.datetime).replace(tzinfo=datetime.timezone.utc) if len(time)>0 else [] for time in times ]
 
         #/ times, br_filtered, indic   = dl.breath_1.select_on_sig('filt')
         
-        dict_result["breath_1_filtered"]                = [item.tolist() for item in (dl.breath_1.sig_clean_)]           # This is Sig clean !!!!
+        dict_result["breath_1_filtered"]                = [[round(respj,4) for respj in respij] for respij in dl.breath_1.sig_clean_] #[item.tolist() for item in (dl.breath_1.sig_clean_)]           # This is Sig clean !!!!
         dict_result["breath_1_filtered_times"]          = get_first_time_value(dl.breath_1.times_clean_)                 # breath_1_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ? 
         
         dict_result["respiratory_rate_quality_index"]   = 0 if brpm is None else 1                                       # Should be renamed to breath_1_brpm_quality_index ? 
@@ -119,12 +121,19 @@ def process_data_interval(dict_params):
         dict_result["respiratory_rate"]                 = brpm                                                           # This should be deleted at the next release !!!!
         dict_result["breath_1_brpm"]                    = brpm                          ####
         dict_result["breath_1_brv"]                     = brv_s                         #### 
+        
+        print('breath_1 new indic')
+        insp_expi = None
+        if len(dl.breath_1.inspi_over_expi_) > 0:
+            insp_expi = dl.breath_1.inspi_over_expi_     # RPM: respirations per minute "how many cycles in a minute?"
+            insp_expi      = [[int(round(inspex*100)) for inspex in insp_expij] for insp_expij in insp_expi]
 
-        dict_result["breath_1_peaks"]                   = dl.breath_1.peaks_            ####
-        dict_result["breath_1_valleys"]                 = dl.breath_1.valleys_          ####
-        dict_result["breath_1_inspi_over_expi"]         = dl.breath_1.inspi_over_expi_  ####
+        dict_result["breath_1_peaks"]                   = [[int(itemj) for itemj in itemij] for itemij in dl.breath_1.peaks_]             ####
+        dict_result["breath_1_valleys"]                 = [[int(itemj) for itemj in itemij] for itemij in dl.breath_1.valleys_]                       ####
+        dict_result["breath_1_inspi_over_expi"]         = insp_expi  ####
     
     if not dl.breath_2.is_empty_:
+        print('breath_2')
         brpm = None
         brv_s = None
         if len(dl.breath_2.rpm_) > 0:
@@ -135,21 +144,33 @@ def process_data_interval(dict_params):
             brv_s = dl.breath_2.rpm_var_s_[0]        # "Variation of lengh breath cycles (in seconds)"
             brv_s = int(round(brv_s))
 
+<<<<<<< HEAD
         dict_result["breath_2_filtered"]                = [item.tolist() for item in (dl.breath_2.sig_clean_)]           # This is Sig clean !!!!
         dict_result["breath_2_filtered_times"]          = get_first_time_value(dl.breath_2.times_clean_)                 # breath_2_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ? 
+=======
+        dict_result["breath_2_filtered"]                = [[round(respj,4) for respj in respij] for respij in dl.breath_2.sig_clean_] #[item.tolist() for item in (dl.breath_2.sig_clean_)]           # This is Sig clean !!!!
+        
+        dict_result["breath_2_filtered_times"]          = get_first_time_value(dl.breath_2.times_clean_)      ####       breath_2_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ? 
+>>>>>>> 545ac0ace607eb7b831ee8eb5f19d1b8784eee1d
 
         dict_result["respiratory_rate_2_quality_index"] = 0 if brpm is None else 1                                       # Should be renamed to breath_2_brpm_quality_index ? 
 
         dict_result["breath_2_brpm"]                    = brpm                          ####
         dict_result["breath_2_brv"]                     = brv_s                         #### 
-
-        dict_result["breath_2_peaks"]                   = dl.breath_2.peaks_            ####
-        dict_result["breath_2_valleys"]                 = dl.breath_2.valleys_          ####
-        dict_result["breath_2_inspi_over_expi"]         = dl.breath_2.inspi_over_expi_  #### 
+        
+        insp_expi = None
+        if len(dl.breath_2.inspi_over_expi_) > 0:
+            insp_expi = dl.breath_2.inspi_over_expi_     # RPM: respirations per minute "how many cycles in a minute?"
+            insp_expi      = [[int(round(inspex*100)) for inspex in insp_expij] for insp_expij in insp_expi]
+        print('breath_2 new indic')
+        dict_result["breath_2_peaks"]                   = [[int(itemj) for itemj in itemij] for itemij in dl.breath_2.peaks_]        ####
+        dict_result["breath_2_valleys"]                 = [[int(itemj) for itemj in itemij] for itemij in dl.breath_2.valleys_ ]     ####
+        dict_result["breath_2_inspi_over_expi"]         = insp_expi  #### 
 
         
 
     if not dl.ecg.is_empty_:
+        print('ecg')
         hr = None
         if len(dl.ecg.bpm_) > 0:
             hr      = dl.ecg.bpm_[0]
@@ -187,15 +208,16 @@ def process_data_interval(dict_params):
             
         r_peak = None
         if len(dl.ecg.peaks_) > 0:
-            r_peak  = dl.ecg.peaks_
-        
+            r_peak =  dl.ecg.peaks_  
+               
+        print('ecg new indic')
         q_start = None
         if len(dl.ecg.q_start_time_) > 0:
-            q_start   = dl.ecg.q_start_index_
+            q_start   =  dl.ecg.q_start_index_ 
             
         t_stop = None
         if len(dl.ecg.t_stop_time_) > 0:
-            t_stop   = dl.ecg.t_stop_index_
+            t_stop   = dl.ecg.t_stop_index_ 
             
         qt_length_median_corrected = None
         if len(dl.ecg.qt_length_median_corrected_) > 0:
@@ -204,13 +226,27 @@ def process_data_interval(dict_params):
             
         qt_c_framingham_per_seg = None
         if len(dl.ecg.qt_c_framingham_per_seg_) > 0:
-            qt_c_framingham_per_seg   = dl.ecg.qt_c_framingham_per_seg_
-            
+            #print(dl.ecg.qt_c_framingham_per_seg_)
+            qt_c_framingham_per_seg   = dl.ecg.qt_c_framingham_per_seg_[0]#.tolist() 
+            #print('type(dl.ecg.qt_c_framingham_per_seg_', type(dl.ecg.qt_c_framingham_per_seg_))
+            if  (type(qt_c_framingham_per_seg)==list) :
+                qt_c_framingham_per_seg = [int(itemj) if itemj>0 else itemj for itemj in qt_c_framingham_per_seg]  # list with one value for each clean segment
+                #qt_c_framingham_per_seg   = qt_c_framingham_per_seg.tolist() 
+            else :
+                qt_c_framingham_per_seg = [int(qt_c_framingham_per_seg) if qt_c_framingham_per_seg>0 else qt_c_framingham_per_seg]
+        
+        print('ecg dict fill')
         dict_result["heartbeat"]                    = hr
         dict_result["HRV"]                          = hrv
+<<<<<<< HEAD
         dict_result["ecg_filtered"]                 = [item.tolist() for item in (dl.ecg.sig_clean_)]                    # This is Sig clean !!!!
         dict_result["ecg_filtered_times"]           = get_first_time_value(dl.ecg.times_clean_)                          # ecg_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ?
         dict_result["heartbeat_quality_index"]      = 0 if hrv is None else 1 
+=======
+        dict_result["ecg_filtered"]                 = [[round(itemj,4) for itemj in itemij] for itemij in dl.ecg.sig_clean_] #[item.tolist() for item in (dl.ecg.sig_clean_)]                    # This is Sig clean !!!!
+        dict_result["ecg_filtered_times"]           = get_first_time_value(dl.ecg.times_clean_)   # ecg_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ?
+        dict_result["heartbeat_quality_index"]      = 0 if hrv is None else 1
+>>>>>>> 545ac0ace607eb7b831ee8eb5f19d1b8784eee1d
         dict_result["ecg_quality_index"]            = (dl.ecg.indicators_seconds_).tolist()
         dict_result["HRV_quality_index"]            = 0 if hrv is None else 1
                                                  
@@ -221,19 +257,19 @@ def process_data_interval(dict_params):
         dict_result["lnrmssd"]                      = lnrmssd
         dict_result["pnn50"]                        = pnn50
         
-        dict_result["q_start"]                      = q_start  # lists of indexes for each clean segment, the index number restart from 0 at each segment  ####
-        dict_result["r_peak"]                       = r_peak ####
-        dict_result["t_stop"]                       = t_stop ####
+        dict_result["q_start"]                      = [[int(itemj) for itemj in itemij] for itemij in q_start ] # lists of indexes for each clean segment, the index number restart from 0 at each segment  ####
+        dict_result["r_peak"]                       = [[int(itemj) for itemj in itemij] for itemij in r_peak ]  ####
+        dict_result["t_stop"]                       = [[int(itemj) for itemj in itemij] for itemij in t_stop ]  ####
         dict_result["qt_length_median_corrected"]   = qt_length_median_corrected ####
-        dict_result["qt_c_framingham_per_seg"]      = qt_c_framingham_per_seg[0]
+        dict_result["qt_c_framingham_per_seg"]      = qt_c_framingham_per_seg
         
     if not dl.temp_1.is_empty_:
-        dict_result["averaged_temp_1"] = round(dl.temp_1.mean_*1e4)/1e2
+        dict_result["averaged_temp_1"] = int(round(dl.temp_1.mean_*1e4))/1e2
         
     if not dl.temp_2.is_empty_:
-        dict_result["averaged_temp_2"] = round(dl.temp_2.mean_*1e4)/1e2
+        dict_result["averaged_temp_2"] = int(round(dl.temp_2.mean_*1e4))/1e2
         
-    dict_result["is_worn"] = 1 if dl.is_worn_ else 0
+    dict_result["is_worn"] = int(1) if dl.is_worn_ else int(0)
     
     
     # print every key in the dictionary to provide logs for debug 
@@ -248,6 +284,20 @@ def process_data_interval(dict_params):
                 print(key, res[:maxview])
         else :
             print(key, res)
+            
+            
+                    
+        
     
     return dict_result
 
+#%%
+
+# for key in dict_result:
+#     res = dict_result[key]
+#     if (isinstance(res, np.int64)):
+#         print(key)
+#         if (isinstance(res[0],  np.int64)) :
+#             print(key)
+# a = np.int64(4)
+# isinstance(a, np.int64)

@@ -1683,12 +1683,12 @@ class Breath(SiglifePeriodic):
         #                                                        strict=True)
         
         # ---- Clean 1: Clean for breath rate processing ----
-        times_clean, sig_clean, indicators_clean = remove_no_rsp_signal_unwrap(                                         # verify thar times clean is in microseconds(us) and not bigger than that like nanoseconds
+        times_clean, sig_clean, indicators_clean = remove_no_rsp_signal_unwrap(     # verify that times clean is in microseconds(us) and not bigger than that like nanoseconds
                                                     times,
                                                     sig,
                                                     fs, 
-                                                    window_s=8,
-                                                    rsp_amp_min = 3 # changed from 2 to 3 as it did let too much noise in not worn tshirt
+                                                    window_s=20,
+                                                    rsp_amp_min = 4 # changed from 2 to 3 as it did let too much noise in not worn tshirt # changed to 4 with a 20s window instead of 8s
                                                     )
         
         # ---- Peaks detection inspired from neurokit (Khodadad) ----
