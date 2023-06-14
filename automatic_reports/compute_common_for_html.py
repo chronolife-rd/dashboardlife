@@ -6,23 +6,18 @@ Last updated on 01/06/2023
 """
 import copy
 import numpy as np
-import pandas as pd 
 from collections import deque
 from automatic_reports.config import ACTIVITY_THREASHOLD
-from datetime import datetime
 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
-def get_common_indicators(cst_data:dict, garmin_data:dict) :
-    # Compute the combination of Garmin and cst data 
-    common_data = combine_data(cst_data, garmin_data)
+def get_common_indicators(common_data) :
 
     # Initialize the dictionary where the new data will be saved
     common_indicators = initialize_dictionary_with_template()
 
     # ========================== Cardio dict ===============================
     # ----------------------------- rate -------------------------------------
-    
     if len(common_data["cardio"]["rate"]) >0:
     # Add rate high and max
         values_df = common_data["cardio"]["rate"]["values"].dropna()
@@ -135,117 +130,16 @@ def get_common_indicators(cst_data:dict, garmin_data:dict) :
         steps_dict_for_plot["total_steps"] = value
 
         # Goal        
-        if garmin_data["activity"]["goal"] == "":
-            value = 3000
-        else :
-            value = garmin_data["activity"]["goal"]
-
-        common_indicators["activity"]["goal"] = value
-        steps_dict_for_plot["goal"] = value
+        common_indicators["activity"]["goal"] = common_data["activity"]["goal"]
 
         # Distance
         value = round(sum(common_data["activity"]["distance"]["values"].dropna()))
         common_indicators["activity"]["distance"] = value
 
-    return common_data, common_indicators, steps_dict_for_plot
+    return common_indicators
 
 # ----------------------- Internal functions ---------------------------------
 # ----------------------------------------------------------------------------
-def  combine_data(cst_data, garmin_data):
-    
-    cardio_dict = {
-        "rate" : "",
-        "rate_var" : "",
-        }
-    breath_dict = {
-        "rate" : "",
-        }
-    activity_dict = {
-        "steps" : "",
-        "distance" : "",
-        }
-    
-    common_data = {  
-        "cardio" : cardio_dict,
-        "breath" : breath_dict,
-        "activity" : activity_dict,
-        }
-    
-    # --- Cardio ---
-    # Rate 
-    garmin_df = garmin_data["cardio"]["rate"]
-    cst_df = cst_data["cardio"]["rate"]
-
-    if len(garmin_df)>0 and len(cst_df)>0:
-        common_data["cardio"]["rate"] = merge_cst_and_garmin_data(cst_df[["times", "values"]], garmin_df)
-    elif len(garmin_df) == 0 and  len(cst_df)>0:
-        common_data["cardio"]["rate"] = cst_df[["times", "values"]]
-    elif len(garmin_df) > 0 and  len(cst_df) == 0:
-        common_data["cardio"]["rate"] = garmin_df
-
-    # Rate variability
-    cst_df = cst_data["cardio"]["rate_var"]
-    common_data["cardio"]["rate_var"] = cst_df
-    
-    # --- Breath ---
-    # Rate 
-    garmin_df = garmin_data["breath"]["rate"]
-    cst_df    = cst_data["breath"]["rate"]
-    
-    if len(garmin_df)>0 and len(cst_df)>0:
-        common_data["breath"]["rate"] = merge_cst_and_garmin_data(cst_df[["times", "values"]], garmin_df)
-    elif len(garmin_df) == 0 and  len(cst_df)>0:
-        common_data["breath"]["rate"] = cst_df[["times", "values"]]
-    elif len(garmin_df) > 0 and  len(cst_df) == 0:
-        common_data["breath"]["rate"] = garmin_df
-
-    # Rate variability
-    cst_df = cst_data["breath"]["rate_var"]
-    common_data["breath"]["rate_var"] = cst_df
-
-    # Ratio inspi/expi
-    cst_df = cst_data["breath"]["inspi_expi"]
-    common_data["breath"]["inspi_expi"] = cst_df
-    
-    # --- Activity ---
-    # Steps 
-    cst_df    = cst_data["activity"]["steps"]
-    garmin_df = garmin_data["activity"]["intensity"]
-    
-    if len(garmin_df)>0 and len(cst_df)>0:
-        garmin_df = garmin_df[["times", "steps"]]
-        garmin_df = garmin_df.rename(columns={"steps": "values"})
-        
-        common_data["activity"]["steps"] = merge_cst_and_garmin_data(garmin_df, cst_df)
-    
-    elif len(garmin_df) == 0 and  len(cst_df)>0:
-        common_data["activity"]["steps"] = cst_df
-
-    elif len(garmin_df) > 0 and  len(cst_df) == 0:
-        garmin_df = garmin_df[["times", "steps"]]
-        garmin_df = garmin_df.rename(columns={"steps": "values"})
-        common_data["activity"]["steps"] = garmin_df
-
-    # Distance 
-    cst_df    = cst_data["activity"]["distance"]
-    garmin_df = garmin_data["activity"]["intensity"]
-    
-    if len(garmin_df)>0 and len(cst_df)>0:
-        garmin_df = garmin_df[["times", "distance"]]
-        garmin_df.rename(columns = {'distance':'values'}, inplace = True)
-
-        common_data["activity"]["distance"] = merge_cst_and_garmin_data(garmin_df, cst_df)
-    
-    elif len(garmin_df) == 0 and  len(cst_df)>0:
-        common_data["activity"]["distance"] = cst_df
-
-    elif len(garmin_df) > 0 and  len(cst_df) == 0:
-        garmin_df = garmin_df[["times", "distance"]]
-        garmin_df = garmin_df.rename(columns={"distance": "values"})
-        common_data["activity"]["distance"] = garmin_df
-
-    return copy.deepcopy(common_data)
-
 def initialize_dictionary_with_template() -> dict :
     cardio_dict = {
         "rate_high"        : "",
@@ -289,29 +183,6 @@ def initialize_dictionary_with_template() -> dict :
                     }
     return copy.deepcopy(dict_template)
 
-def merge_cst_and_garmin_data(df_1, df_2): 
-    format_time = '%Y-%m-%d %H:%M'
-    df_1["times"] = df_1["times"].apply(lambda x: datetime.strftime(x, format_time))
-    df_2["times"] = df_2["times"].apply(lambda x: datetime.strftime(x, format_time))
-        
-    #  Find outer data of df_2
-    df_2_outer = pd.merge(df_1, df_2, how='outer', on='times', 
-                indicator=True).query('_merge=="right_only"').drop(columns='_merge')
-    
-    # Rename columns    
-    df_2_outer = df_2_outer[["times", "values_y"]]
-    df_2_outer = df_2_outer.rename(columns={"values_y": "values"})
-    # Add outer data of df_2 to df_1
-    df_result = pd.concat([df_1, df_2_outer]) 
-    df_result = df_result.drop_duplicates(subset=['times'])
-    # Change type : str -> datetime
-    df_result["times"] = df_result["times"].apply(lambda x: datetime.strptime(x, format_time))
-    # Sort and reset
-    df_result = df_result.sort_values("times")
-    df_result = df_result.reset_index(drop= True)
-    
-    return df_result
-    
 # Sliding window to compute the average rate on 30 min sliding window
 # TO CHANGE !! adapt to time intervals (when the session is interrupted)
 def sliding_window(sequence, minutes):

@@ -84,12 +84,12 @@ def cst_data_for_pdf(uder_id:str, date:str, cst_data:dict) -> dict:
 
 def initialize_dictionary_with_template() -> dict :
     pdf_info = {
-        "text" : None, 
-        "x" : None,
-        "y" : None,
-        "font" : None,
-        "size" : None,
-        "color" : None,
+        "text" : "", 
+        "x" : "",
+        "y" : "",
+        "font" : "",
+        "size" : "",
+        "color" : "",
         }
     
     header_dict = {

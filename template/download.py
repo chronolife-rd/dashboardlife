@@ -1,18 +1,50 @@
 import streamlit as st
 import io
+import os
 import pandas as pd
 import template.constant as constant
+
+from data.data import get_health_indicators
+from automatic_reports.generate_pdf import generate_pdf
+from automatic_reports.compute_garmin_for_pdf import garmin_data_for_pdf
+from automatic_reports.compute_cst_for_pdf import cst_data_for_pdf
+from automatic_reports.compute_common_for_pdf import get_common_indicators_pdf
+from automatic_reports.plot_images import plot_images
+from data.data import get_steps
 
 from pylife.useful import unwrap
 
 @st.cache_data
 def data_report_pdf():
-    # !!! TO BE UPDATED !!!
+    
+    # Delete pdf if exists
+    if os.path.exists(constant.PDF_FILE):
+        os.remove(constant.PDF_FILE)
+
+    date                        = st.session_state.date
+    garmin_data                 = st.session_state.garmin_indicators    
+    chronolife_data             = st.session_state.chronolife_indicators  
+    common_indicators_pdf       = st.session_state.common_indicators_pdf 
+    chronolife_indicators_pdf   = st.session_state.chronolife_indicators_pdf 
+    garmin_indicators_pdf       = st.session_state.garmin_indicators_pdf 
+  
+    print(date)
+    # Get intervals and alerts
+    garmin_time_intervals = garmin_data['duration']['intervals']
+    cst_time_intervals = chronolife_data['duration']['intervals']
+    alerts_dict = chronolife_data['anomalies']
+    steps           = get_steps()
+    steps_score     = steps["score"]
+    
+    # Plot and save graphs
+    plot_images(garmin_data, cst_time_intervals, garmin_time_intervals, date, steps_score)
+    
+    # Construct pdf
+    generate_pdf(chronolife_indicators_pdf, garmin_indicators_pdf, common_indicators_pdf, alerts_dict)
     
     with open(constant.PDF_FILE, "rb") as pdf_file:
-        PDFbyte = pdf_file.read()
-    return PDFbyte
-    
+        return pdf_file.read()
+      
 @st.cache_data
 def health_indicators_to_excel():
     # !!! TO BE UPDATED !!!

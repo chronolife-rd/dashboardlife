@@ -59,10 +59,11 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
     dict_aux["color"] = BLUE_COLOR
     
     # ========================== stress dict =================================
-    if garmin_data["stress"]["recorded_time"] > 0:
+    recorded_time = garmin_data["stress"]["recorded_time"]
+    if isinstance(recorded_time, str) == False and recorded_time > 0:
         # Add rest info
         td_str = td_to_hhmm_str(garmin_data["stress"]["rest"])
-        percentage = garmin_data["stress"]["rest"]/garmin_data["stress"]["recorded_time"]*100
+        percentage = garmin_data["stress"]["rest"]/recorded_time*100
         dict_aux = garmin_data_pdf["stress"]["rest"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 0.6
@@ -73,7 +74,7 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
         # Add low info
         td_str = td_to_hhmm_str(garmin_data["stress"]["low"])
-        percentage = garmin_data["stress"]["low"]/garmin_data["stress"]["recorded_time"]*100
+        percentage = garmin_data["stress"]["low"]/recorded_time*100
         dict_aux = garmin_data_pdf["stress"]["low"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 0.6
@@ -84,7 +85,7 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
         # Add medium info
         td_str = td_to_hhmm_str(garmin_data["stress"]["medium"])
-        percentage = garmin_data["stress"]["medium"]/garmin_data["stress"]["recorded_time"]*100
+        percentage = garmin_data["stress"]["medium"]/recorded_time*100
         dict_aux = garmin_data_pdf["stress"]["medium"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 0.6
@@ -95,7 +96,7 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
         # Add high info
         td_str = td_to_hhmm_str(garmin_data["stress"]["high"])
-        percentage = garmin_data["stress"]["high"]/garmin_data["stress"]["recorded_time"]*100
+        percentage = garmin_data["stress"]["high"]/recorded_time*100
         dict_aux = garmin_data_pdf["stress"]["high"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 0.6
@@ -105,10 +106,11 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
         dict_aux["color"] = BLUE_COLOR
 
     # ========================== sleep dict ==================================
-    if garmin_data["sleep"]["recorded_time"] > 0:
+    recorded_time = garmin_data["sleep"]["recorded_time"]
+    if isinstance(recorded_time, str) == False and recorded_time > 0:
         # Add deep info
         td_str = td_to_hhmm_str(garmin_data["sleep"]["deep"])
-        percentage = garmin_data["sleep"]["deep"]/garmin_data["sleep"]["recorded_time"]*100
+        percentage = garmin_data["sleep"]["deep"]/recorded_time*100
         dict_aux = garmin_data_pdf["sleep"]["deep"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 5.85
@@ -119,7 +121,7 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
         # Add light info
         td_str = td_to_hhmm_str(garmin_data["sleep"]["light"])
-        percentage = garmin_data["sleep"]["light"]/garmin_data["sleep"]["recorded_time"]*100
+        percentage = garmin_data["sleep"]["light"]/recorded_time*100
         dict_aux = garmin_data_pdf["sleep"]["light"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 5.85
@@ -130,7 +132,7 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
         # Add rem info
         td_str = td_to_hhmm_str(garmin_data["sleep"]["rem"])
-        percentage = garmin_data["sleep"]["rem"]/garmin_data["sleep"]["recorded_time"]*100
+        percentage = garmin_data["sleep"]["rem"]/recorded_time*100
         dict_aux = garmin_data_pdf["sleep"]["rem"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 5.85
@@ -141,7 +143,7 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
         # Add awake info
         td_str = td_to_hhmm_str(garmin_data["sleep"]["awake"])
-        percentage = garmin_data["sleep"]["awake"]/garmin_data["sleep"]["recorded_time"]*100
+        percentage = garmin_data["sleep"]["awake"]/recorded_time*100
         dict_aux = garmin_data_pdf["sleep"]["awake"]
         dict_aux["text"] = td_str + " (" + str(round(percentage)) + "%)"
         dict_aux["x"] = 5.85
@@ -181,7 +183,9 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
     # ====================== Intensity min dict ==============================
     # Add moderate info
     dict_aux = garmin_data_pdf["intensity_min"]["moderate"]
-    dict_aux["text"] = td_to_hhmm_str(garmin_data["intensity_min"]["moderate"])
+    value = garmin_data["intensity_min"]["moderate"]
+    if isinstance(value, str) == False:
+        dict_aux["text"] = td_to_hhmm_str(value)
     dict_aux["x"] = 3.11
     dict_aux["y"] = 11.14
     dict_aux["font"] = TEXT_FONT
@@ -190,7 +194,9 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
     # Add vigurous info
     dict_aux = garmin_data_pdf["intensity_min"]["vigurous"]
-    dict_aux["text"] = td_to_hhmm_str(garmin_data["intensity_min"]["vigurous"])
+    value = garmin_data["intensity_min"]["vigurous"]
+    if isinstance(value, str) == False:
+        dict_aux["text"] = td_to_hhmm_str(value)
     dict_aux["x"] = 3.83
     dict_aux["y"] = 11.14
     dict_aux["font"] = TEXT_FONT
@@ -199,7 +205,9 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
     # Add total info
     dict_aux = garmin_data_pdf["intensity_min"]["total"]
-    dict_aux["text"] = td_to_hhmm_str(garmin_data["intensity_min"]["total"])
+    value = garmin_data["intensity_min"]["total"]
+    if isinstance(value, str) == False:
+        dict_aux["text"] = td_to_hhmm_str(value)
     dict_aux["x"] = 4.55
     dict_aux["y"] = 11.14
     dict_aux["font"] = TEXT_FONT
@@ -230,12 +238,12 @@ def garmin_data_for_pdf(garmin_data:dict) -> dict:
 
 def initialize_dictionary_with_template() -> dict :
     pdf_info = {
-        "text" : None, 
-        "x" : None,
-        "y" : None,
-        "font" : None,
-        "size" : None,
-        "color" : None,
+        "text" : "", 
+        "x" : "",
+        "y" : "",
+        "font" : "",
+        "size" : "",
+        "color" : "",
         }
  
     duration_dict = {

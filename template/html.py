@@ -906,9 +906,9 @@ def health_indicators_heart_tachy_brady_qt():
     brady_percentage    = bradycardia["percentage"]
     
     qt = data.get_qt()
-    qt_mean             = qt["mean"]
-    qt_min              = qt["min"]
-    qt_max              = qt["max"]
+    qt_night            = qt["night"]
+    qt_morning          = qt["morning"]
+    qt_evening          = qt["evening"]
     
     col_section = "col-lg-4 col-md-6 col-sm-12"
     col_title   = "col-12"
@@ -982,22 +982,22 @@ def health_indicators_heart_tachy_brady_qt():
                         <p class='indicator_name'>{translate["qt_length"]}</p>
                     </div>
                     <div class='{col_key}'>
-                        <p>{translate["median"]}</p>
+                        <p>{translate["night"]}</p>
                     </div>
                     <div class='{col_val}'>
-                        <p class='{class_val}'>{str(qt_mean)} ms</p>
+                        <p class='{class_val}'>{str(qt_night)} ms</p>
                     </div>
                     <div class='{col_key}'>
-                        <p>{translate["min"]}</p>
+                        <p>{translate["morning"]}</p>
                     </div>
                     <div class='{col_val}'>
-                        <p class='{class_val}'>{str(qt_min)} ms</p>
+                        <p class='{class_val}'>{str(qt_morning)} ms</p>
                     </div>
                     <div class='{col_key}'>
-                        <p>{translate["max"]}</p>
+                        <p>{translate["evening"]}</p>
                     </div>
                     <div class='{col_val}'>
-                        <p class='{class_val}'>{str(qt_max)} ms</p>
+                        <p class='{class_val}'>{str(qt_evening)} ms</p>
                     </div>
                 </div>
             </div>
@@ -1104,11 +1104,11 @@ def health_indicators_breath_inex_results():
     html = f"""
     <div class=col1_indicators>
         <p>{translate["median"]}</p>
-        <p class="indicator_main_value">{str(inex_mean)} s</p>
+        <p class="indicator_main_value">{str(inex_mean)} %</p>
         <p>{translate["min"]}</p>
-        <p class="indicator_value">{str(inex_min)} s</p>
+        <p class="indicator_value">{str(inex_min)} %</p>
         <p>{translate["max"]}</p>
-        <p class="indicator_value">{str(inex_max)} s</p>
+        <p class="indicator_value">{str(inex_max)} %</p>
     </div>
     """
     
