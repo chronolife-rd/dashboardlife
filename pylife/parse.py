@@ -232,10 +232,9 @@ def parse_data(datas, signal_type, fs, rm_db=0, rm_dc=False,
     sig     = np.array(data['sig'])
     times   = np.array(data['times'])
     
-    # TO CHANGE for disconnections
-    # if rm_dc and not is_empty:
-    #     times, sig, stat_ = remove_disconnection(times, sig, 
-    #                                              fs, stat_)
+    if rm_dc and not is_empty:
+        times, sig, stat_ = remove_disconnection(times, sig, 
+                                                 fs, stat_)
 
     output = {}
     output['times']                 = times

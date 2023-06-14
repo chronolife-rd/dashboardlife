@@ -4,7 +4,7 @@ DEV = get_env()
 if DEV:
     pass
 # import numpy as np
-import datetime
+#import datetime
 from pylife.siglife import Acceleration_x
 from pylife.siglife import Acceleration_y
 from pylife.siglife import Acceleration_z
@@ -17,8 +17,9 @@ from pylife.siglife import Temperature_1
 from pylife.siglife import Temperature_2
 from pylife.siglife import Temperatures
 from pylife.datalife import Datalife
-# from pylife.useful import compute_signal_mean
-import math
+#import math
+import numpy as np
+import datetime
 
 def process_data_interval(dict_params):
     """ Process data for a given end_user in a time interval 
@@ -88,56 +89,64 @@ def process_data_interval(dict_params):
             averaged_activity = 0
             
         dict_result["steps_number"]             = dl.accs.n_steps_
-        dict_result["activity_level"]           = [item.tolist() for item in dl.accs.activity_level_]
         dict_result["averaged_activity"]        = averaged_activity
-        dict_result["activity_level_times"]     =[item.tolist() for item in dl.accx.times_] #[time_sequence[0].astype(datetime.datetime).replace(tzinfo=datetime.timezone.utc)
- #                                                  for time_sequence in dl.accx.times_]
+        dict_result["activity_level"]           = [item.tolist() for item in (dl.accs.activity_level_)]
+        dict_result["activity_level_times"]     = [times[0].astype(datetime.datetime).replace(tzinfo=datetime.timezone.utc) for times in dl.accx.times_]
         
-    
     if not dl.breath_1.is_empty_:
-        rpm = None
+        brpm = None
+        brv_s = None
         if len(dl.breath_1.rpm_) > 0:
-            rpm      = dl.breath_1.rpm_[0]
-            rpm      = int(round(rpm))
-            rpm_s    = dl.breath_1.rpm_s_[0]
-            rpm_s      = int(round(rpm_s))
+            brpm      = dl.breath_1.rpm_[0]     # RPM: respirations per minute "how many cycles in a minute?"
+            brpm      = int(round(brpm))
            
-        times, br_filtered, indic   = dl.breath_1.select_on_sig('filt')
-        dict_result["respiratory_rate"]                 = rpm
-        dict_result["breath_1_filtered"]                = [item.tolist() for item in dl.breath_1.sig_filt_]
-        dict_result["respiratory_rate_quality_index"]   = 0 if rpm is None else 1
-        dict_result["breath_quality_index"]             = dl.breath_1.indicators_seconds_
-        dict_result["breath_1_filtered_times"]          = [item.tolist() for item in times] 
-        dict_result["breath_quality_index_frequency"]   = dl.breath_1.indicators_frequency_
-        dict_result["breath_1_rate"]                    = rpm_s # duree moyenne de la respiration (en secondes)
+        if len(dl.breath_1.rpm_var_) > 0:       
+            brv_s = dl.breath_1.rpm_var_s_[0]   # "Variation of lengh breath cycles (in seconds)"
+            brv_s = int(round(brv_s))
+         
+        def get_first_time_value(times):
+            return [time[0].astype(datetime.datetime).replace(tzinfo=datetime.timezone.utc) for time in times]
+
+        #/ times, br_filtered, indic   = dl.breath_1.select_on_sig('filt')
         
-        #dict_result["breath_1_peaks_index"]             = dl.breath_1.peaks_
-        #dict_result["breath_1_valleys_index"]           = dl.breath_1.valleys_ 
-        dict_result["breath_1_peaks_times"]             = dl.breath_1.peaks_times_ 
-        dict_result["breath_1_valleys_times"]           = dl.breath_1.valleys_times_ 
+        dict_result["breath_1_filtered"]                = [item.tolist() for item in (dl.breath_1.sig_clean_)]           # This is Sig clean !!!!
+        dict_result["breath_1_filtered_times"]          = get_first_time_value(dl.breath_1.times_clean_)                 # breath_1_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ? 
         
+        dict_result["respiratory_rate_quality_index"]   = 0 if brpm is None else 1                                       # Should be renamed to breath_1_brpm_quality_index ? 
+        dict_result["breath_quality_index"]             = (dl.breath_1.indicators_seconds_).tolist()                     # Should be renamed to breath_1_quality_index ?
+        dict_result["breath_quality_index_frequency"]   = dl.breath_1.indicators_frequency_                              # Should be renamed to breath_1_quality_index_frequency?
+
+        dict_result["respiratory_rate"]                 = brpm                                                           # This should be deleted at the next release !!!!
+        dict_result["breath_1_brpm"]                    = brpm                          ####
+        dict_result["breath_1_brv"]                     = brv_s                         #### 
+
+        dict_result["breath_1_peaks"]                   = dl.breath_1.peaks_            ####
+        dict_result["breath_1_valleys"]                 = dl.breath_1.valleys_          ####
+        dict_result["breath_1_inspi_over_expi"]         = dl.breath_1.inspi_over_expi_  ####
     
     if not dl.breath_2.is_empty_:
-        rpm = None
+        brpm = None
+        brv_s = None
         if len(dl.breath_2.rpm_) > 0:
-            rpm      = dl.breath_2.rpm_[0]
-            rpm      = int(round(rpm))
-            rpm_s    = dl.breath_2.rpm_s_[0]
-            rpm_s      = int(round(rpm_s))
-            
-        times, br_filtered, indic   = dl.breath_2.select_on_sig('filt')
-        dict_result["respiratory_rate_abdominal"]       = rpm
-        dict_result["breath_2_filtered"]                = [item.tolist() for item in br_filtered]
-        dict_result["breath_2_filtered_times"]          = [item.tolist() for item in times]  #[time_sequence[0].astype(datetime.datetime).replace(tzinfo=datetime.timezone.utc)
-#                                                           for time_sequence in times]
-        dict_result["respiratory_rate_2_quality_index"] = 0 if rpm is None else 1
-        dict_result["breath_2_rate"]                    = rpm_s # duree moyenne de la respiration (en secondes)
-        
-        #dict_result["breath_2_peaks_index"]             = dl.breath_2.peaks_
-        #dict_result["breath_2_valleys_index"]           = dl.breath_2.valleys_ 
-        dict_result["breath_2_peaks_times"]             = dl.breath_2.peaks_times_ 
-        dict_result["breath_2_valleys_times"]           = dl.breath_2.valleys_times_
-        
+            brpm      = dl.breath_2.rpm_[0]          # RPM: respirations per minute "how many cycles in a minute?"
+            brpm      = int(round(brpm))
+           
+        if len(dl.breath_2.rpm_var_) > 0:      
+            brv_s = dl.breath_2.rpm_var_s_[0]        # "Variation of lengh breath cycles (in seconds)"
+            brv_s = int(round(brv_s))
+
+        dict_result["breath_2_filtered"]                = [item.tolist() for item in (dl.breath_2.sig_clean_)]           # This is Sig clean !!!!
+        dict_result["breath_2_filtered_times"]          = get_first_time_value(dl.breath_2.times_clean_)                 # breath_2_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ? 
+
+        dict_result["respiratory_rate_2_quality_index"] = 0 if brpm is None else 1                                       # Should be renamed to breath_2_brpm_quality_index ? 
+
+        dict_result["breath_2_brpm"]                    = brpm                          ####
+        dict_result["breath_2_brv"]                     = brv_s                         #### 
+
+        dict_result["breath_2_peaks"]                   = dl.breath_2.peaks_            ####
+        dict_result["breath_2_valleys"]                 = dl.breath_2.valleys_          ####
+        dict_result["breath_2_inspi_over_expi"]         = dl.breath_2.inspi_over_expi_  #### 
+
         
 
     if not dl.ecg.is_empty_:
@@ -174,32 +183,36 @@ def process_data_interval(dict_params):
         pnn50 = None
         if len(dl.ecg.pnn50_) > 0:
             pnn50   = dl.ecg.pnn50_[0]
-            pnn50   = int(round(pnn50))
+            pnn50   = int(round(pnn50*100)) # it's a percentage so it need be multiplied by 100 to keep making sense
             
-        r_peak_index = None
+        r_peak = None
         if len(dl.ecg.peaks_) > 0:
-            r_peak_time  = dl.ecg.peaks_times_
+            r_peak  = dl.ecg.peaks_
         
-        q_start_time = None
+        q_start = None
         if len(dl.ecg.q_start_time_) > 0:
-            q_start_time   = dl.ecg.q_start_time_
+            q_start   = dl.ecg.q_start_index_
             
-        t_stop_index = None
+        t_stop = None
         if len(dl.ecg.t_stop_time_) > 0:
-            t_stop_time   = dl.ecg.t_stop_time_
+            t_stop   = dl.ecg.t_stop_index_
             
         qt_length_median_corrected = None
         if len(dl.ecg.qt_length_median_corrected_) > 0:
             qt_length_median_corrected   = dl.ecg.qt_length_median_corrected_[0]
             qt_length_median_corrected   = int(round(qt_length_median_corrected))
             
+        qt_c_framingham_per_seg = None
+        if len(dl.ecg.qt_c_framingham_per_seg_) > 0:
+            qt_c_framingham_per_seg   = dl.ecg.qt_c_framingham_per_seg_
+            
         dict_result["heartbeat"]                    = hr
         dict_result["HRV"]                          = hrv
-        dict_result["ecg_filtered"]                 = [item.tolist() for item in dl.ecg.sig_filt_mv_]
-        dict_result["heartbeat_quality_index"]      = 0 if hrv is None else 1
-        dict_result["ecg_quality_index"]            = dl.ecg.indicators_seconds_
+        dict_result["ecg_filtered"]                 = [item.tolist() for item in (dl.ecg.sig_clean_)]                    # This is Sig clean !!!!
+        dict_result["ecg_filtered_times"]           = get_first_time_value(dl.ecg.times_clean_)                          # ecg_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ?
+        dict_result["heartbeat_quality_index"]      = 0 if hrv is None else 1 
+        dict_result["ecg_quality_index"]            = (dl.ecg.indicators_seconds_).tolist()
         dict_result["HRV_quality_index"]            = 0 if hrv is None else 1
-        dict_result["ecg_filtered_times"]           = [item.tolist() for item in dl.ecg.times_]  
                                                  
         dict_result["ecg_quality_index_frequency"]  = dl.ecg.indicators_frequency_
         dict_result["rr_interval"]                  = rr
@@ -208,11 +221,11 @@ def process_data_interval(dict_params):
         dict_result["lnrmssd"]                      = lnrmssd
         dict_result["pnn50"]                        = pnn50
         
-        dict_result["q_start_time"]                 = q_start_time  # lists of indexes for each clean segment, the index number restart from 0 at each segment 
-        dict_result["r_peak_time"]                  = r_peak_time 
-        dict_result["t_stop_time"]                  = t_stop_time
-        dict_result["qt_length_median_corrected"]   = qt_length_median_corrected
-        
+        dict_result["q_start"]                      = q_start  # lists of indexes for each clean segment, the index number restart from 0 at each segment  ####
+        dict_result["r_peak"]                       = r_peak ####
+        dict_result["t_stop"]                       = t_stop ####
+        dict_result["qt_length_median_corrected"]   = qt_length_median_corrected ####
+        dict_result["qt_c_framingham_per_seg"]      = qt_c_framingham_per_seg[0]
         
     if not dl.temp_1.is_empty_:
         dict_result["averaged_temp_1"] = round(dl.temp_1.mean_*1e4)/1e2
@@ -222,4 +235,19 @@ def process_data_interval(dict_params):
         
     dict_result["is_worn"] = 1 if dl.is_worn_ else 0
     
+    
+    # print every key in the dictionary to provide logs for debug 
+    for key in dict_result:
+        res = dict_result[key]
+        if (type(res)==list)|(isinstance(res, np.ndarray)):
+            if (type(res[0])==list)|(isinstance(res[0], np.ndarray)) :
+                maxview = min(3, len(res[0]))
+                print(key, res[0][:maxview])
+            else :
+                maxview = min(3, len(res))
+                print(key, res[:maxview])
+        else :
+            print(key, res)
+    
     return dict_result
+

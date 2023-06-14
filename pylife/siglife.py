@@ -22,10 +22,10 @@ from pylife.useful import compute_median_iqr_window_unwrap
 #from pylife.compute_deltas import compute_deltas_ecg
 from pylife.remove import remove_noise_peak_valley_unwrap, remove_saturation_and_big_ampls_unwrap
 from pylife.remove import remove_no_rsp_signal_unwrap
-from pylife.remove import remove_noise_unwrap, remove_noise
-from pylife.remove import remove_noise_with_emd_unwrap
+#from pylife.remove import remove_noise #remove_noise_unwrap
+#from pylife.remove import remove_noise_with_emd_unwrap
 #from pylife.remove import remove_noise_with_psd_unwrap
-from pylife.remove import remove_noise_smooth_unwrap
+#from pylife.remove import remove_noise_smooth_unwrap
 from pylife.remove import remove_noisy_temp_unwrap
 # from pylife.remove import remove_noisy_temp
 # from pylife.remove import remove_peaks_unwrap
@@ -48,17 +48,17 @@ from pylife.cyclic_measurement import pos_2_time_interval_unwrap
 # from pylife.detection import detect_breathing_unwrap
 # from pylife.detection import detect_breathing2
 # from pylife.detection import detect_breathing_unwrap2
-from pylife.detection import detect_qrs_unwrap
+#from pylife.detection import detect_qrs_unwrap
 #from pylife.detection import detect_qrs
-from pylife.detection import detect_peaks_unwrap
+#from pylife.detection import detect_peaks_unwrap
 from pylife.detection import detect_rsp_peaks_unwrap
-from pylife.detection import detect_peaks_r_unwrap
+#from pylife.detection import detect_peaks_r_unwrap
 
 ### new 
 from pylife.detect_ECG_Peaks import unwrap_peak_ampl, getPeaks_unwrap
 
 
-from pylife.detection import detect_valid_peaks_breath_unwrap
+#from pylife.detection import detect_valid_peaks_breath_unwrap
 # from pylife.detection import detect_qrs_brassiere
 # from pylife.detection import detect_qrs_brassiere_unwrap
 # from pylife.detection import detect_breathing_EDR_unwrap
@@ -76,7 +76,7 @@ from pylife.show_functions import ppm_distplot
 # from pylife.time_functions import datetime_np2str
 # from pylife.time_functions import datetime_str2np
 
-import time
+#import time
 
 from pylife.env import get_env
 DEV = get_env()
@@ -415,7 +415,7 @@ class Siglife():
         self.disconnection_number_              = len(first_timestamps)-1
         self.disconnection_sample_percentage_   = np.sum(disconnection_durations)\
             /(np.sum(n_samples_per_sig)/fs)*100
-        if time_start != time_stop:
+        if (time_start != time_stop)&(np.sum(disconnection_durations)!=0):
             self.disconnection_percentage_      = np.sum(disconnection_durations)\
                 /((time_stop - time_start)/np.timedelta64(1, 's'))*100
         else:
@@ -916,8 +916,8 @@ class Siglife():
 
         times = self.times_
         new_times = []    
-        for time in times:
-            new_times.append(time + np.timedelta64(offset, time_format))
+        for timei in times:
+            new_times.append(timei + np.timedelta64(offset, time_format))
 
         self.times_ = new_times
         self.set_durations_info()
@@ -926,8 +926,8 @@ class Siglife():
             times = self.times_clean_
             new_times = []
         
-            for time in times:
-                new_times.append(time + np.timedelta64(offset,
+            for timej in times:
+                new_times.append(timej + np.timedelta64(offset,
                                                        time_format))
             self.times_clean_ = new_times
 
@@ -947,8 +947,8 @@ class Siglife():
                 times = self.steps_times_start_
                 new_times = []
                 
-                for time in times:
-                    new_times.append(time + np.timedelta64(offset,
+                for timei in times:
+                    new_times.append(timei + np.timedelta64(offset,
                                                            time_format))
                 self.steps_times_start_ = new_times
 
@@ -956,8 +956,8 @@ class Siglife():
             if len(self.rate_pm_times_start_) > 0:
                 times = self.rate_pm_times_start_
                 new_times = []                
-                for time in times:
-                    new_times.append(time + np.timedelta64(offset,
+                for timei in times:
+                    new_times.append(timei + np.timedelta64(offset,
                                                            time_format))
                 self.rate_pm_times_start_ = new_times
 
@@ -1154,8 +1154,8 @@ class SiglifePeriodic(Siglife):
 
         times = self.times_
         new_times = []    
-        for time in times:
-            new_times.append(time + np.timedelta64(offset, time_format))
+        for timei in times:
+            new_times.append(timei + np.timedelta64(offset, time_format))
 
         self.times_ = new_times
         self.set_durations_info()
@@ -1164,8 +1164,8 @@ class SiglifePeriodic(Siglife):
             times = self.times_clean_
             new_times = []
         
-            for time in times:
-                new_times.append(time + np.timedelta64(offset,
+            for timei in times:
+                new_times.append(timei + np.timedelta64(offset,
                                                        time_format))
             self.times_clean_ = new_times
 
@@ -1185,8 +1185,8 @@ class SiglifePeriodic(Siglife):
                 times = self.steps_times_start_
                 new_times = []
                 
-                for time in times:
-                    new_times.append(time + np.timedelta64(offset,
+                for timei in times:
+                    new_times.append(timei + np.timedelta64(offset,
                                                            time_format))
                 self.steps_times_start_ = new_times
 
@@ -1194,8 +1194,8 @@ class SiglifePeriodic(Siglife):
             if len(self.rate_pm_times_start_) > 0:
                 times = self.rate_pm_times_start_
                 new_times = []                
-                for time in times:
-                    new_times.append(time + np.timedelta64(offset,
+                for timei in times:
+                    new_times.append(timei + np.timedelta64(offset,
                                                            time_format))
                 self.bpm_times_start_ = new_times
 
@@ -1624,6 +1624,7 @@ class Breath(SiglifePeriodic):
         self.rpm_var_                   = []
         self.rpm_s_                     = []
         self.rpm_var_s_                 = []
+        self.inspi_over_expi_           = [] # This is ratio of times intervals (inspi/expi) 
         self.times_indicators_seconds_  = []
         self.indicators_seconds_        = []
         
@@ -1682,7 +1683,7 @@ class Breath(SiglifePeriodic):
         #                                                        strict=True)
         
         # ---- Clean 1: Clean for breath rate processing ----
-        times_clean, sig_clean, indicators_clean = remove_no_rsp_signal_unwrap(
+        times_clean, sig_clean, indicators_clean = remove_no_rsp_signal_unwrap(                                         # verify thar times clean is in microseconds(us) and not bigger than that like nanoseconds
                                                     times,
                                                     sig,
                                                     fs, 
@@ -1721,8 +1722,8 @@ class Breath(SiglifePeriodic):
         else:
             indicators_frequency = None
       
-        sig_clean           = set_list_of_list(sig_clean)
-        times_clean         = set_list_of_list(times_clean)
+        # sig_clean           = set_list_of_list(sig_clean)
+        # times_clean         = set_list_of_list(times_clean)
         
         # Properties
         self.clean_step_                = 1
@@ -1789,10 +1790,12 @@ class Breath(SiglifePeriodic):
         
         times_rr                  = rsp_features['rsp_cycles_times']
         rr_intervals              = rsp_features['rsp_rr_intervals']
+        inspi_over_expi           = rsp_features['inhale_exhale_interval_ratio']
         self.times_rr_            = times_rr
         self.rr_                  = rr_intervals
+        self.inspi_over_expi_     = inspi_over_expi
         self.rsp_features_        = rsp_features
-        
+
         
         if is_list_of_list(rr_intervals):
             rr_intervals = unwrap(rr_intervals)
@@ -2139,7 +2142,7 @@ class ECG(SiglifePeriodic):
         ####### temporary clean version
         #beg = time.time()
         times_clean, sig_clean,\
-            indicators_clean = remove_saturation_and_big_ampls_unwrap(ecg_raw = self.sig_, 
+            indicators_clean = remove_saturation_and_big_ampls_unwrap(ecg_raw = self.sig_,                              # verify thar times clean is in microseconds(us) and not bigger than that like nanoseconds
                                                                       ecg_filt = sig,
                                                                       ecg_time = times, 
                                                                       fs = 200, 
@@ -2220,8 +2223,8 @@ class ECG(SiglifePeriodic):
         # nd = time.time()
         # print('indicators_clean_2.append(indicators_clean_2_unwrap[imin:imax] calc time = ', round(nd - beg, 3), ' s')
         #beg = time.time()                
-        sig_clean           = set_list_of_list(sig_clean)
-        times_clean         = set_list_of_list(times_clean)
+        # sig_clean           = set_list_of_list(sig_clean)                     it's already a list of list 
+        # times_clean         = set_list_of_list(times_clean)                   it's already a list of list
         
         # sig_clean_2         = set_list_of_list(sig_clean_2)
         # times_clean_2       = set_list_of_list(times_clean_2)

@@ -91,6 +91,30 @@ def get_all_api_types():
     """ Returns all labels used in database """
     return get_signal_types() + get_signal_filtered_types() + get_signal_result_types() + get_app_info_types()
 
+
+def unwrap_signals_dashboard(values):
+    """ Unwrap values from list
+
+     Parameter
+    ----------
+    values:     Values to unwrap
+
+    Returns
+    ----------
+    new_values: unwrapped values
+
+    # """
+
+    new_values = []
+    for value in values:     
+        if value is not None and type(value)==float:            
+            new_values.append(value)
+        else:
+             if value is not None:
+                 new_values.extend(value) 
+
+    return np.array(new_values)
+
 def unwrap(values):
     """ Unwrap values from list
 
@@ -1479,7 +1503,7 @@ def compute_rr_features_unwrap(peaks_times, peaks, fs):
         peaks_seg   = np.array(peaks_seg)
         times_rr    = peaks_times[i][1:]
         # *1000 et non /1000 for  interval it in ms
-        rr_interval = (peaks_seg[1:] - peaks_seg[:-1])/(fs)*1e3                
+        rr_interval = ((peaks_seg[1:] - peaks_seg[:-1])/(fs))*1e3                
         rr_interval =np.array([ round(rs ,2) for rs in rr_interval])
         if len(rr_interval)>1:
             std_cons.append(np.std(rr_interval))
