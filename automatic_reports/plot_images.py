@@ -49,7 +49,7 @@ def plot_steps(path_save, steps_score):
                     startangle=90,
                     counterclock=False)
             
-        my_circle=plt.Circle( (0,0), 0.9, color="green")
+        my_circle=plt.Circle( (0,0), 0.9, color="white")
         p=plt.gcf()
         p.gca().add_artist(my_circle)  
 

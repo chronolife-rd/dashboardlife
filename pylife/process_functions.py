@@ -144,14 +144,8 @@ def process_data_interval(dict_params):
             brv_s = dl.breath_2.rpm_var_s_[0]        # "Variation of lengh breath cycles (in seconds)"
             brv_s = int(round(brv_s))
 
-<<<<<<< HEAD
         dict_result["breath_2_filtered"]                = [item.tolist() for item in (dl.breath_2.sig_clean_)]           # This is Sig clean !!!!
         dict_result["breath_2_filtered_times"]          = get_first_time_value(dl.breath_2.times_clean_)                 # breath_2_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ? 
-=======
-        dict_result["breath_2_filtered"]                = [[round(respj,4) for respj in respij] for respij in dl.breath_2.sig_clean_] #[item.tolist() for item in (dl.breath_2.sig_clean_)]           # This is Sig clean !!!!
-        
-        dict_result["breath_2_filtered_times"]          = get_first_time_value(dl.breath_2.times_clean_)      ####       breath_2_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ? 
->>>>>>> 545ac0ace607eb7b831ee8eb5f19d1b8784eee1d
 
         dict_result["respiratory_rate_2_quality_index"] = 0 if brpm is None else 1                                       # Should be renamed to breath_2_brpm_quality_index ? 
 
@@ -238,15 +232,9 @@ def process_data_interval(dict_params):
         print('ecg dict fill')
         dict_result["heartbeat"]                    = hr
         dict_result["HRV"]                          = hrv
-<<<<<<< HEAD
         dict_result["ecg_filtered"]                 = [item.tolist() for item in (dl.ecg.sig_clean_)]                    # This is Sig clean !!!!
         dict_result["ecg_filtered_times"]           = get_first_time_value(dl.ecg.times_clean_)                          # ecg_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ?
         dict_result["heartbeat_quality_index"]      = 0 if hrv is None else 1 
-=======
-        dict_result["ecg_filtered"]                 = [[round(itemj,4) for itemj in itemij] for itemij in dl.ecg.sig_clean_] #[item.tolist() for item in (dl.ecg.sig_clean_)]                    # This is Sig clean !!!!
-        dict_result["ecg_filtered_times"]           = get_first_time_value(dl.ecg.times_clean_)   # ecg_filtered_times gets the first timestamp of each signal interval, because after it's parsed on servers ?
-        dict_result["heartbeat_quality_index"]      = 0 if hrv is None else 1
->>>>>>> 545ac0ace607eb7b831ee8eb5f19d1b8784eee1d
         dict_result["ecg_quality_index"]            = (dl.ecg.indicators_seconds_).tolist()
         dict_result["HRV_quality_index"]            = 0 if hrv is None else 1
                                                  
