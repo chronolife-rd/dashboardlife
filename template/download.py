@@ -12,7 +12,7 @@ from automatic_reports.compute_common_for_pdf import get_common_indicators_pdf
 from automatic_reports.plot_images import plot_images
 from data.data import get_steps
 
-from pylife.useful import unwrap
+from pylife.useful import unwrap, unwrap_signals_dashboard
 
 @st.cache_data
 def data_report_pdf():
@@ -95,10 +95,10 @@ def parse_acceleration_for_excel():
     accy    = st.session_state.smart_textile_raw_data[constant.TYPE()["ACCELERATION_Y"]]
     accz    = st.session_state.smart_textile_raw_data[constant.TYPE()["ACCELERATION_Z"]]
     
-    times   = unwrap(accx['times'])
-    x       = unwrap(accx['sig'])
-    y       = unwrap(accy['sig'])
-    z       = unwrap(accz['sig'])
+    times   = unwrap_signals_dashboard(accx['times'])
+    x       = unwrap_signals_dashboard(accx['sig'])
+    y       = unwrap_signals_dashboard(accy['sig'])
+    z       = unwrap_signals_dashboard(accz['sig'])
     
     data_dict = {
       "Date": times,
@@ -113,9 +113,9 @@ def parse_acceleration_for_excel():
 def parse_breath_for_excel():
     breath_1    = st.session_state.smart_textile_raw_data[constant.TYPE()["BREATH_THORACIC"]]
     breath_2    = st.session_state.smart_textile_raw_data[constant.TYPE()["BREATH_ABDOMINAL"]]
-    times       = unwrap(breath_1['times'])
-    breath_tho  = unwrap(breath_1['sig'])
-    breath_abd  = unwrap(breath_2['sig'])
+    times       = unwrap_signals_dashboard(breath_1['times'])
+    breath_tho  = unwrap_signals_dashboard(breath_1['sig'])
+    breath_abd  = unwrap_signals_dashboard(breath_2['sig'])
     
     data_dict = {
       "Date": times,
@@ -128,8 +128,8 @@ def parse_breath_for_excel():
 
 def parse_ecg_for_excel():
     ecg     = st.session_state.smart_textile_raw_data[constant.TYPE()['ECG']]
-    times   = unwrap(ecg['times'])
-    values  = unwrap(ecg['sig'])
+    times   = unwrap_signals_dashboard(ecg['times'])
+    values  = unwrap_signals_dashboard(ecg['sig'])
     
     data_dict = {
       "Date": times,

@@ -231,8 +231,13 @@ def low_high_pass_f(input_sig, f_sig, filter_order, w_c, type_f):
     """
     coeff_b, coeff_a = scipy.signal.butter(filter_order, w_c/(f_sig/2.),
                                            type_f)
+    #adding a padding to limit side effects
+    #padwidth = min(50, len(input_sig))
+    #input_sig = np.pad(input_sig, pad_width = padwidth, mode='reflect')
     output_sig = scipy.signal.filtfilt(coeff_b, coeff_a, input_sig)
-    return output_sig
+    
+    #return output_sig[padwidth:len(input_sig)-padwidth]
+    return output_sig #[padwidth:len(input_sig)-padwidth]
 
 # This filter is used !!!
 def filter_breath_scipy(sig, fs):

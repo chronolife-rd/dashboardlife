@@ -36,6 +36,7 @@ def remove_baseline(sig, fs, inter_1=0.465, inter_2=0.945, show_plot=False):
             plt.title('baseline removal')
     return sig-med
 
+
 def remove_disconnection(times, sig, fs, stat=[]):
     """ Remove disconnection of a signal and return list of signals without
     disconnection
@@ -95,74 +96,12 @@ def remove_disconnection(times, sig, fs, stat=[]):
             new_t.append(times)
             new_seg.append(sig)
     
-    new_times   = np.array(new_t)
-    new_sig     = np.array(new_seg) 
+    # new_times   = np.array(new_t)
+    # new_sig     = np.array(new_seg) 
+
+    new_times   = new_t
+    new_sig     = new_seg
     return new_times, new_sig, stat
-
-
-def remove_disconnection_old(times, sig, fs, stat=[]):
-    """ Remove disconnection of a signal and return list of signals without
-    disconnection
-
-    Parameters
-    ---------------------
-    time : timestamp list
-    signal : signal
-    fs
-    stat: list of info about the signal
-
-    Returns
-    ---------------------
-    new_t : list of list of timestamp
-    new_seg : list of signals
-    stat : list of info about the signal
-    """
-    new_seg = []
-    new_t = []
-    
-    if len(times) > 0:
-        
-        times = np.array(times).astype('datetime64')
-        sig = np.array(sig)
-        diff = times[1:]-times[:-1]
-        id_deco = np.where(np.array(diff) > np.timedelta64(1+int(1/fs*1E6),
-                                                            'us'))[0]
-        size_deco = diff[id_deco]
-        lenght_signal = []
-        
-        if id_deco.tolist():
-            new_t.append(times[0:id_deco[0]+1])
-            new_seg.append(sig[0:id_deco[0]+1])
-            lenght_signal.append(len(sig[0:id_deco[0]+1])/fs)
-    
-            for nb_deco in range(1, len(id_deco)):
-                new_t.append(times[id_deco[nb_deco-1]+1:id_deco[nb_deco]+1])
-                new_seg.append(sig[id_deco[nb_deco-1]+1:id_deco[nb_deco]+1])
-                lenght_signal.append(len(sig[id_deco[nb_deco-1]+1:
-                                             id_deco[nb_deco]+1])/fs)
-    
-            new_t.append(times[id_deco[-1]+1:])
-            new_seg.append(sig[id_deco[-1]+1:])
-            lenght_signal.append(len(sig[id_deco[-1]+1:])/fs)
-            max_l = np.max(lenght_signal)
-            stat.append(float(max_l))
-            if len(size_deco) > 1:
-                stat.append(np.max(size_deco).item().total_seconds())
-                stat.append(np.mean(size_deco).item().total_seconds())
-            else:
-                stat.append(size_deco[0]/np.timedelta64(1, 's'))
-                stat.append(size_deco[0]/np.timedelta64(1, 's'))
-        else:
-            stat.append(len(sig))
-            stat.append('NA')
-            stat.append('NA')
-            new_t.append(times)
-            new_seg.append(sig)
-    
-    new_times   = np.array(new_t)
-    new_sig     = np.array(new_seg) 
-    return new_times, new_sig, stat
-
 
 def remove_disconnection_loss(times, sig, fs):
     """ Remove disconnection of a signal and return list of signals without
@@ -181,7 +120,7 @@ def remove_disconnection_loss(times, sig, fs):
     new_seg : list of signals
     stat : list of info about the signal
     """
-    times = np.array(times).astype('datetime64')
+    times = np.array(times).astype('datetime64[us]')   # us is microseconds
     sig = np.array(sig)
     diff = times[1:]-times[:-1]
     id_deco = np.where(np.array(diff) != np.timedelta64(int(1/fs*1E6),
@@ -1483,6 +1422,34 @@ def method_window_np(sig, window_s, fs=200, method = 'max'):
             
     return temp_val
 
+# This function is used in siglife, class Breath, def clean
+def remove_no_rsp_signal_unwrap(
+        rsp_time, 
+        rsp_filt, 
+        fs = 20, 
+        window_s = 15, 
+        rsp_amp_min = 6
+        ):
+    
+    sig_clean           = []
+    times_clean         = []
+    indicators_clean    = []
+    for id_seg, seg in enumerate(rsp_filt):
+        t_clean, s_clean, i_clean = remove_no_rsp_signal(
+                                    rsp_time = rsp_time[id_seg],
+                                    rsp_filt = seg,
+                                    window_s = window_s, 
+                                    rsp_amp_min = rsp_amp_min)
+
+        indicators_clean.append(i_clean)
+        if len(t_clean) > 0:
+            sig_clean.extend(s_clean)
+            times_clean.extend(t_clean)
+
+    times_clean, sig_clean, _ = remove_disconnection_loss(times_clean, sig_clean, fs)
+    
+    return times_clean, sig_clean, indicators_clean
+
 def remove_no_rsp_signal(
         rsp_time,
         rsp_filt, 
@@ -1511,34 +1478,6 @@ def remove_no_rsp_signal(
     indicateur = [int(ind)*100 for ind in indicateur]
     
     return datagood['rsp_t'].values, datagood['rsp_f'].values, indicateur
-
-def remove_no_rsp_signal_unwrap(
-        rsp_time, 
-        rsp_filt, 
-        fs = 20, 
-        window_s = 15, 
-        rsp_amp_min = 6
-        ):
-    
-    sig_clean           = []
-    times_clean         = []
-    indicators_clean    = []
-    for id_seg, seg in enumerate(rsp_filt):
-        t_clean, s_clean, i_clean = remove_no_rsp_signal(
-                                    rsp_time = rsp_time[id_seg],
-                                    rsp_filt = seg,
-                                    window_s = window_s, 
-                                    rsp_amp_min = rsp_amp_min)
-
-        indicators_clean.append(i_clean)
-        if len(t_clean) > 0:
-            sig_clean.extend(s_clean)
-            times_clean.extend(t_clean)
-
-    times_clean, sig_clean, _ = remove_disconnection_loss(times_clean, sig_clean, fs)
-    
-    return times_clean, sig_clean, indicators_clean
-
 
 def remove_saturation_and_big_ampls (ecg_raw, ecg_filt, ecg_time, 
                   window_s = 5, 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import data.data as data
 import data.cst_raw_data as cst_raw_data
 import template.constant as constant 
-from pylife.useful import unwrap
+from pylife.useful import unwrap, unwrap_signals_dashboard
 from scipy.signal import medfilt
 import numpy as np
 import datetime 
@@ -518,7 +518,7 @@ def smart_textile_raw_data():
     # st.plotly_chart(fig_acc, use_container_width=True)
     
 def ecg_signal(template='plotly_white', width_line=2, height=500):
-    
+    fig = go.Figure()
     # offset = data.get_offset
     # if isinstance(offset["value"], str) == False:
     #     value = offset["value"]
@@ -526,13 +526,15 @@ def ecg_signal(template='plotly_white', width_line=2, height=500):
     
     # ECG
     raw_data = st.session_state.smart_textile_raw_data[constant.TYPE()['ECG']]
-    ymin = max([min(unwrap(raw_data['sig']))*1.1, -1000])
-    ymax = min([max(unwrap(raw_data['sig']))*1.1, 1000])
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(raw_data['sig']),
-                        mode='lines',
-                        line=dict(color=constant.COLORS()["ecg"], width=width_line),
-                                  name='ECG'))
+    ymin = max([min(unwrap_signals_dashboard(raw_data['sig']))*1.1, -1000])
+    ymax = min([max(unwrap_signals_dashboard(raw_data['sig']))*1.1, 1000])
+    
+    for seg in range(len(raw_data["times"])):
+        fig.add_trace(go.Scatter(x=raw_data["times"][seg], y=raw_data["sig"][seg],
+                    mode='lines',
+                    line=dict(color=constant.COLORS()["ecg"], width=width_line),
+                                name='ECG'))
+            
     fig.update_layout(height=height,
                       title='Electrocardiogram',
                       yaxis = dict(range=[ymin, ymax]), 
@@ -545,24 +547,44 @@ def ecg_signal(template='plotly_white', width_line=2, height=500):
     return fig
     
 def breath_signal(template='plotly_white', width_line=2, height=500):
-    # Breath
-    raw_data = st.session_state.smart_textile_raw_data[constant.TYPE()["BREATH_ABDOMINAL"]]
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(raw_data['sig']),
-                              mode='lines',
-                              line=dict(color=constant.COLORS()["breath_2"], width=width_line),
-                              name='Abdominal Breath'))
+    # Abdominal
+    raw_data = st.session_state.smart_textile_raw_data[constant.TYPE()["BREATH_ABDOMINAL"]]
+    for seg in range(len(raw_data["times"])):
+        fig.add_trace(go.Scatter(x=raw_data["times"][seg], y=raw_data["sig"][seg],
+                    mode='lines',
+                    line=dict(color=constant.COLORS()["breath_2"], width=width_line),
+                    name='Abdominal Breath', showlegend=False))
+    # Thoracic 
     raw_data = st.session_state.smart_textile_raw_data[constant.TYPE()["BREATH_THORACIC"]]
-    fig.add_trace(go.Scatter(x=unwrap(raw_data['times']), y=unwrap(raw_data['sig']),
-                        mode='lines',
-                        line=dict(color=constant.COLORS()["breath"], width=width_line),
-                        name='Thoracic Breath'))
+    for seg in range(len(raw_data["times"])):
+        fig.add_trace(go.Scatter(x=raw_data["times"][seg], y=raw_data["sig"][seg],
+                    mode='lines',
+                    line=dict(color=constant.COLORS()["breath"], width=width_line),
+                    name='Thoracic Breath', showlegend=False)) 
+        
+    fig.update_layout(showlegend=False)
+        
+    # Add line and set the legend:
+    raw_data = st.session_state.smart_textile_raw_data[constant.TYPE()["BREATH_ABDOMINAL"]]
+    fig.add_trace(go.Scatter(x=raw_data["times"][0], y=raw_data["sig"][0],
+                    mode='lines',
+                    line=dict(color=constant.COLORS()["breath_2"], width=width_line),
+                                name='Abdominal Breath'))
+    
+    # Add line and set the legend:
+    raw_data = st.session_state.smart_textile_raw_data[constant.TYPE()["BREATH_THORACIC"]]
+    fig.add_trace(go.Scatter(x=raw_data["times"][0], y=raw_data["sig"][0],
+                    mode='lines',
+                    line=dict(color=constant.COLORS()["breath"], width=width_line),
+                                name='Thoracic Breath')) 
+
     fig.update_layout(height=height, 
                       template=template, 
                       title='Breath',
+                      showlegend=True, 
                       paper_bgcolor=BGCOLOR, 
                       plot_bgcolor=BGCOLOR,
-                      showlegend=True,
                       legend=dict(yanchor="top",
                                   y=0.99, xanchor="left", 
                                   x=0.01,

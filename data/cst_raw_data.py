@@ -47,9 +47,11 @@ def get_raw_data():
     
     # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).
     reply = get_reply(params, url, api_key)
-    _, status_code = test.api_status(reply)
+    message, status_code = test.api_status(reply)
+    print(message)
 
-    raw_data = request_datas(reply, status_code)
+    # Convert the reply content into a json object
+    raw_data = convert_reply_to_datas(reply, status_code, offset_info)
 
     # Declare as global variable
     st.session_state.smart_textile_raw_data = raw_data
@@ -58,9 +60,9 @@ def get_reply(params, url, api_key):
     reply = requests.get(url, headers={"X-API-Key": api_key}, params=params)
     return reply
 
-def request_datas(reply, status_code):
-    datas = []
-    raw_data    = []
+def convert_reply_to_datas(reply, status_code, offset_info):
+    datas  = []
+    result = []
 
     if status_code == 200:  
         json_list_of_records = json.loads(reply.text) 
@@ -69,37 +71,55 @@ def request_datas(reply, status_code):
         
         if len(datas) == 0:
             status_code = 600
+            print("Lenght of datas is 0")
     
+    # If len(datas) != 0
     if status_code == 200:
-        raw_data = {}
+        result = {}
 
         # --- Map raw data 
-        map_raw_data(datas, raw_data)
+        map_raw_data(datas, result, offset_info)
         
         # --- Map filtered data 
-        map_filtered_data(datas, raw_data)
-        print(raw_data)
-    
-    return raw_data
+        map_filtered_data(datas, result, offset_info)
 
-def map_raw_data(datas, raw_data):
+    return result
+
+def map_raw_data(datas, result, offset_info):
     types_raw    = constant.TYPE()["RAW_SIGNALS"].split(',')
     datas_mapped = map_data(datas, types_raw)
     
     for key_type in types_raw:
-        raw_data[key_type] = {}
-        for val_type in ["times", "sig"]:
-            tmp = get_sig_info(datas_mapped, key_type, verbose=0)
-            raw_data[key_type][val_type] = tmp[val_type]
+        result[key_type] = get_sig_info(datas_mapped, key_type, verbose=0)
+        result[key_type]["times"] = add_offset(result[key_type]["times"], offset_info)
     
-def map_filtered_data(datas, raw_data):
+def map_filtered_data(datas, result, offset_info):
     types_filtered  = constant.TYPE()["FILTERED_SIGNALS"].split(',')
     datas_filtered_mapped = map_data_filt(datas, types_filtered)
     for key_type in types_filtered:
-        raw_data[key_type] = {}
-        for val_type in ["times", "sig"]:
-            tmp = get_sig_info(datas_filtered_mapped, key_type, verbose=0)
-            raw_data[key_type][val_type] = tmp[val_type]
+        result[key_type] = get_sig_info(datas_filtered_mapped, key_type, verbose=0)
+        result[key_type]["times"] = add_offset(result[key_type]["times"], offset_info)
+
+def add_offset(times, offset_info):
+    if isinstance(offset_info["value"], str) == False:
+        value = offset_info["value"] 
+        sign = offset_info["sign"] 
+
+        new_times = []
+        for i, times_seg in enumerate((times)):
+            new_times_seg = []
+            for i, time_value in enumerate(times_seg):
+                time_value = time_value.astype(datetime)   # datetime
+                time_value = time_value - sign*timedelta(seconds = value)
+                new_times_seg.append(time_value)
+
+            new_times.append(new_times_seg)
+            
+    return new_times
+     
+
+
+
 
 
 
