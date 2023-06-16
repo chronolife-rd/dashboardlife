@@ -238,14 +238,14 @@ def plot_duration(cst_times, garmin_times, date):
     
         # Plot CST
         for i in range(len(cst_times)):
-            interval = cst_times[i][:]
+            interval = np.array(cst_times[i][:])
             if (len(interval) > 10):
                 y_value = np.zeros(len(interval)) + 0.25
                 plt.plot(interval, y_value, color = CST_COLOR, linewidth=20, solid_capstyle='round')
     
         # Plot Garmin
         for i in range(len(garmin_times)):
-            interval = garmin_times[i][:]
+            interval = np.array(garmin_times[i][:])
             if (len(interval) > 10):
                 y_value = np.ones(len(interval)) + 0.25
                 plt.plot(interval, y_value, color = GARMIN_COLOR, linewidth=20, solid_capstyle='round')
