@@ -340,6 +340,13 @@ def overview_health_indicators():
     hrv         = data.get_hrv()
     hrv_rest    = hrv["rest"]
     
+    # Alerts
+    data.get_qt()
+    data.get_bradycardia()
+    data.get_tachycardia()
+    data.get_bradypnea()
+    data.get_tachypnea()
+
     # breath brpm
     brpm        = data.get_brpm()
     brpm_high   = brpm["high"]
