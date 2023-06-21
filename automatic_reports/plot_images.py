@@ -129,28 +129,31 @@ def plot_sleep(sleep_dict, path_save):
         os.remove(image_path)
 
     if isinstance(sleep_dict["recorded_time"], str) == False:
-        score   = sleep_dict["score"]
-        quality = sleep_dict["quality"]
-        deep    = sleep_dict["deep"]/sleep_dict["recorded_time"]
-        light   = sleep_dict["light"]/sleep_dict["recorded_time"]
-        rem     = sleep_dict["rem"]/sleep_dict["recorded_time"]
-        awake   = sleep_dict["awake"]/sleep_dict["recorded_time"]
-    
-        size_of_groups=[deep, light, rem, awake]
         plt.figure(figsize=(5,5))
-        plt.pie(size_of_groups, 
-                colors = ['#044A9A', '#1878CF', '#9D0FB1', '#EB79D2'], 
-                startangle = 90,
-                counterclock = False,
-                wedgeprops = {"linewidth": 1, "edgecolor": "white"},
-               )
-        
-        my_circle=plt.Circle( (0,0), 0.9, color="white")
-        p=plt.gcf()
-        p.gca().add_artist(my_circle)
-        plt.text(0, 0, (str(score) + '/100'), fontsize=30, color= BLUE,  horizontalalignment = "center")
-        plt.text(0, -.35, 'Quality:', fontsize=20, color=GREY,  horizontalalignment = "center")
-        plt.text(0, -.60, quality, fontsize=20, color=GREY,  horizontalalignment = "center")
+        if sleep_dict["recorded_time"] > 0:
+            score   = sleep_dict["score"]
+            quality = sleep_dict["quality"]
+            deep    = sleep_dict["deep"]/sleep_dict["recorded_time"]
+            light   = sleep_dict["light"]/sleep_dict["recorded_time"]
+            rem     = sleep_dict["rem"]/sleep_dict["recorded_time"]
+            awake   = sleep_dict["awake"]/sleep_dict["recorded_time"]
+
+            
+            size_of_groups=[deep, light, rem, awake]
+            
+            plt.pie(size_of_groups, 
+                    colors = ['#044A9A', '#1878CF', '#9D0FB1', '#EB79D2'], 
+                    startangle = 90,
+                    counterclock = False,
+                    wedgeprops = {"linewidth": 1, "edgecolor": "white"},
+                )
+            
+            my_circle=plt.Circle( (0,0), 0.9, color="white")
+            p=plt.gcf()
+            p.gca().add_artist(my_circle)
+            plt.text(0, 0, (str(score) + '/100'), fontsize=30, color= BLUE,  horizontalalignment = "center")
+            plt.text(0, -.35, 'Quality:', fontsize=20, color=GREY,  horizontalalignment = "center")
+            plt.text(0, -.60, quality, fontsize=20, color=GREY,  horizontalalignment = "center")
         plt.savefig(image_path, transparent=True)
     
 # --- Stress ---

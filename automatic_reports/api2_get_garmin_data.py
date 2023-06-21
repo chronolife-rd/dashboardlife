@@ -375,21 +375,23 @@ def init_sleep_dict_tamplate():
     return output
 
 def convert_dict_to_df(signal_data, start_time) -> pd.DataFrame:
-    start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
-    output = pd.DataFrame.from_dict(signal_data, orient='index', columns=['values'])
+    output = []
+    if len(signal_data) > 0:
+        output = pd.DataFrame.from_dict(signal_data, orient='index', columns=['values'])
 
-    # Get the offsets
-    offsets = output.index
-    # Add times column to the dataframe
-    output['times'] = np.nan
-    # Reset the index
-    output = output.reset_index(drop = True)
+        start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
+        # Get the offsets
+        offsets = output.index
+        # Add times column to the dataframe
+        output['times'] = np.nan
+        # Reset the index
+        output = output.reset_index(drop = True)
 
-    for i in range(len(offsets)):
-        offset = timedelta(seconds = int(offsets[i]))
-        output.loc[i, 'times'] = start_time + offset
-    output.reset_index(drop=True)
-    
+        for i in range(len(offsets)):
+            offset = timedelta(seconds = int(offsets[i]))
+            output.loc[i, 'times'] = start_time + offset
+        output.reset_index(drop=True)
+        
     return copy.deepcopy(output)
 
 def data_per_min(input_df):
