@@ -30,8 +30,8 @@ def get_raw_data():
         start_time = datetime.strptime(start_time, format_datetime) # datetime
         end_time   = datetime.strptime(end_time, format_datetime)   # datetime
         
-        time_gte  = start_time + sign*timedelta(seconds = offset_info["value"])
-        time_lt   = end_time + sign*timedelta(seconds = offset_info["value"])
+        time_gte  = start_time - sign*timedelta(seconds = offset_info["value"])
+        time_lt   = end_time - sign*timedelta(seconds = offset_info["value"])
 
         # Datetime to str 
         time_gte = datetime.strftime(time_gte, format_datetime)  # str
@@ -110,7 +110,7 @@ def add_offset(times, offset_info):
             new_times_seg = []
             for i, time_value in enumerate(times_seg):
                 time_value = time_value.astype(datetime)   # datetime
-                time_value = time_value - sign*timedelta(seconds = value)
+                time_value = time_value + sign*timedelta(seconds = value)
                 new_times_seg.append(time_value)
 
             new_times.append(new_times_seg)

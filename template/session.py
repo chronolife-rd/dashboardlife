@@ -235,6 +235,9 @@ def init():
 
     if 'chronolife_indicators_pdf' not in st.session_state:
             st.session_state.chronolife_indicators_pdf = []
+    
+    if 'chronolife_offset' not in st.session_state:
+            st.session_state.chronolife_offset = ''
                         
     if 'translate' not in st.session_state:
         st.session_state.translate = ''
