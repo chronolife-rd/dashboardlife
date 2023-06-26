@@ -381,6 +381,7 @@ def convert_dict_to_df(signal_data, start_time) -> pd.DataFrame:
     if len(signal_data) > 0:
         output = pd.DataFrame.from_dict(signal_data, orient='index', columns=['values'])
 
+        # String to datetime object
         start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
         # Get the offsets
         offsets = output.index
