@@ -62,14 +62,13 @@ def get_health_indicators():
     # Format Garmin's text that will be added to pdf 
     garmin_indicators_pdf = garmin_data_for_pdf(garmin_data)
 
-
     st.session_state.garmin_indicators          = garmin_data
     st.session_state.chronolife_indicators      = cst_data
-    st.session_state.common_data                = common_data             # New
-    st.session_state.common_indicators          = common_indicators       # New
-    st.session_state.common_indicators_pdf      = common_indicators_pdf   # New
-    st.session_state.garmin_indicators_pdf      = garmin_indicators_pdf   # New
-    st.session_state.chronolife_indicators_pdf  = chronolife_indicators_pdf   # New
+    st.session_state.common_data                = common_data             
+    st.session_state.common_indicators          = common_indicators       
+    st.session_state.common_indicators_pdf      = common_indicators_pdf   
+    st.session_state.garmin_indicators_pdf      = garmin_indicators_pdf   
+    st.session_state.chronolife_indicators_pdf  = chronolife_indicators_pdf     
 
 def get_offset():
     datas = st.session_state.chronolife_indicators
@@ -78,9 +77,16 @@ def get_offset():
     output["value"] = ""
     output["sign"] = ""
 
-    if len(datas) > 0  and isinstance(datas["offset"]["value"], str) == False:
-        output["value"]   = datas["offset"]["value"]
-        output["sign"]   = datas["offset"]["sign"]
+    if len(datas) > 0  and isinstance(datas["offset"], str) == False:
+        offset = datas["offset"]
+        sign = 1
+        if offset>=0:
+            sign = 1
+        elif offset<0:
+            sign = -1 
+
+        output["value"] = abs(offset)
+        output["sign"]  = sign
     
     return output
 

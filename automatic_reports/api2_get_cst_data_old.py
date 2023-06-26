@@ -33,17 +33,15 @@ def get_cst_data(user_id, date, api, url):
     
     datas_3_days = datas + datas_before + datas_after
 
-    # Get offset zone value 
-    offset = get_cst_offset(datas_3_days) 
     # Save the results in a dictionary
     results_dict = initialize_dictionary_with_template()
     results_dict['user_id']  = user_id
-    results_dict['offset']  = offset
-    add_cardio(date, datas_3_days, results_dict['cardio'], offset)
-    add_breath(date, datas_3_days, results_dict['breath'], offset)                  
-    add_activity(date, datas_3_days, results_dict['activity'], offset)
-    add_temperature(date, datas_3_days, results_dict['temperature'], offset)
-    add_durations(date, results_dict) 
+    add_cardio(date, datas_3_days, results_dict['cardio'])
+    add_breath(date, datas_3_days, results_dict['breath'])                  
+    add_activity(date, datas_3_days, results_dict['activity'])
+    add_temperature(date, datas_3_days, results_dict['temperature'])
+    add_durations(date, results_dict)
+    add_offset(datas, results_dict['offset'])
     
     # Add activity level to each indicator
     results_dict_2 = add_activity_to_indicators(copy.deepcopy(results_dict))
@@ -137,16 +135,20 @@ def initialize_dictionary_with_template() -> dict :
         'min' : "", 
         'max' : "", 
     }
+    offset_dict = {
+        'value' : "",
+        'sign' : ""}
 
     dict_template = {
                     'user_id' : "",
-                    'offset' : 7200,
+                    'offset' : copy.deepcopy(offset_dict),
                     'activity' : copy.deepcopy(activity_dict),
                     'anomalies' : copy.deepcopy(anomalies_dict),
                     'breath' : copy.deepcopy(breath_dict),
                     'cardio' : copy.deepcopy(cardio_dict),
                     'temperature' : copy.deepcopy(temperature_dict),
                     'duration': copy.deepcopy(duration_dict),
+                    'offset': '' 
                     }
     return copy.deepcopy(dict_template)
 
@@ -176,27 +178,27 @@ def initialize_alerts_with_template() -> dict :
     }
     return copy.deepcopy(dict_template)
 
-def add_cardio(date, datas, cardio_dict, offset):
-    rate = get_cst_result_info(date, datas, offset, result_type='heartbeat')
-    rate_var = get_cst_result_info(date, datas, offset, result_type='HRV')
-    qt = get_cst_result_info_segment(date, datas, offset, result_type='qt_c_framingham_per_seg', type = 'qt')
+def add_cardio(date, datas, cardio_dict):
+    rate = get_cst_result_info(date, datas, result_type='heartbeat')
+    rate_var = get_cst_result_info(date, datas, result_type='HRV')
+    qt = get_cst_result_info_segment(date, datas, result_type='qt_c_framingham_per_seg', type = 'qt')
 
     cardio_dict['rate'] = rate
     cardio_dict['rate_var'] = rate_var
     cardio_dict['qt'] = qt
 
-def add_breath(date, datas, breath_dict, offset):
-    rate = get_cst_result_info(date, datas, offset, result_type='breath_2_brpm')
-    rate_var = get_cst_result_info(date, datas, offset, result_type='breath_2_brv')
-    inspi_expi = get_cst_result_info_segment(date, datas, offset, result_type='breath_2_inspi_over_expi', type = 'ratio')
+def add_breath(date, datas, breath_dict):
+    rate = get_cst_result_info(date, datas, result_type='breath_2_brpm')
+    rate_var = get_cst_result_info(date, datas, result_type='breath_2_brv')
+    inspi_expi = get_cst_result_info_segment(date, datas, result_type='breath_2_inspi_over_expi', type = 'ratio')
 
     breath_dict['rate'] = rate
     breath_dict['rate_var'] = rate_var
     breath_dict['inspi_expi'] = inspi_expi
 
-def add_temperature(date, datas, temperature_dict, offset):
-    right = get_cst_result_info(date, datas, offset, result_type='temp_1')
-    left = get_cst_result_info(date, datas, offset, result_type='temp_2')
+def add_temperature(date, datas, temperature_dict):
+    right = get_cst_result_info(date, datas, result_type='temp_1')
+    left = get_cst_result_info(date, datas, result_type='temp_2')
 
     right = right.drop_duplicates(subset=['times'])
     left = left.drop_duplicates(subset=['times'])
@@ -217,9 +219,9 @@ def add_temperature(date, datas, temperature_dict, offset):
     temperature_dict['min'] = min_value
     temperature_dict['max'] = max_values
 
-def add_activity(date, datas, activity_dict, offset) : 
-    averaged_activity = get_cst_result_info(date, datas, offset, result_type='averaged_activity')
-    steps_number = get_cst_result_info(date, datas, offset, result_type='steps_number')
+def add_activity(date, datas, activity_dict) : 
+    averaged_activity = get_cst_result_info(date, datas, result_type='averaged_activity')
+    steps_number = get_cst_result_info(date, datas, result_type='steps_number')
 
     # Compose the distance dataframe  
     times = steps_number["times"]
@@ -312,6 +314,26 @@ def add_durations(date, results_dict):
         duration_dict["rest"] = timedelta_formatter(rest_in_s)
         duration_dict["active"] = timedelta_formatter(active_in_s)
     
+def add_offset(datas, offset_dict):
+    if len(datas) > 0 : 
+        dict_aux = datas[0]
+        id_date = dict_aux['_id']
+        date_local = id_date[:id_date.index(".")]
+        date_local = int(date_local)
+        
+        date_utc = datetime.strptime(dict_aux['mtimestamp'], "%Y-%m-%dT%H:%M:%S") 
+        date_utc = int(round(date_utc.timestamp())) 
+
+        offset = date_utc - date_local # in hours
+        
+        if date_utc < date_local:
+            sign = -1   # before utc
+        else: sign = +1 # after utc
+        
+        offset_dict['value'] = abs(offset)
+        offset_dict['sign'] = sign 
+        
+
 def add_anomalies(results_dict, date):
     alerts_dict = results_dict['anomalies']
     # --- Set alerts image positions ---
@@ -426,7 +448,7 @@ def merge_on_times(df_1, df_2):
                    
     return copy.deepcopy(df_result)
 
-def get_cst_result_info(date, datas, offset, result_type):
+def get_cst_result_info(date, datas, result_type):
     times = []
     values = []
     output = pd.DataFrame({
@@ -436,7 +458,7 @@ def get_cst_result_info(date, datas, offset, result_type):
 
     for data in datas:
         if result_type == data['type']:
-            timestamp = compute_local_timestamp(data['mtimestamp'], offset)
+            timestamp = get_timestamp(data['_id'])
             times.append(timestamp)
             values.append(data['values'])
 
@@ -462,7 +484,7 @@ def get_cst_result_info(date, datas, offset, result_type):
 
     return output
 
-def get_cst_result_info_segment(date, datas, offset, result_type, type):
+def get_cst_result_info_segment(date, datas, result_type, type):
     times = []
     values = []
     output = pd.DataFrame({
@@ -472,7 +494,7 @@ def get_cst_result_info_segment(date, datas, offset, result_type, type):
 
     for data in datas:
         if result_type == data['type']:
-            timestamp = compute_local_timestamp(data['mtimestamp'], offset)
+            timestamp = get_timestamp(data['_id'])
             times.append(timestamp)
             if type == "ratio" : 
                 segment_values = unwrap_ratio_inspi_expi(data['values'])
@@ -506,36 +528,13 @@ def get_cst_result_info_segment(date, datas, offset, result_type, type):
 
     return output
 
-def get_cst_offset(datas):
-    offset = 7200
-    result_type='temp_1'
+def get_timestamp(id_:str):
+    output = 0
+    timestamp = id_[:id_.index(".")]
+    timestamp_int = int(timestamp)
+    output = datetime.fromtimestamp(timestamp_int)
 
-    for data in datas:
-        if result_type == data['type']:
-            offset = data['timezone_offset']
-            break
-
-    return offset
-
-def compute_local_timestamp(mtimestamp:str, offset:int):
-    new_timestamp_dt = 0
-    sign = get_offset_sign(offset)
-
-    # String to datetime object
-    timestamp_dt = datetime.strptime(mtimestamp, '%Y-%m-%dT%H:%M:%S') 
-
-    # Add offset 
-    new_timestamp_dt = timestamp_dt + sign*timedelta(seconds=abs(offset))
-
-    return new_timestamp_dt
-
-def get_offset_sign(offset:int):
-    sign = 1
-    if offset>=0:
-        sign = 1
-    elif offset<0:
-        sign = -1
-    return sign
+    return output
 
 def data_per_15_min(input_df):
 
