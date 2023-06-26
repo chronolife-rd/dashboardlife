@@ -26,6 +26,7 @@ def get_cst_data(user_id, date, api, url):
     date_after = change_date(date, sign = +1)
     date_before = change_date(date, sign = -1)
     
+    print("-- Requesting Chronolife data for 3 days --")
     datas = get_datas(user_id, date, CST_SIGNAL_TYPES, api, url)
     datas_before = get_datas(user_id, date_before, CST_SIGNAL_TYPES, api, url)
     datas_after = get_datas(user_id, date_after, CST_SIGNAL_TYPES, api, url)
@@ -100,7 +101,7 @@ def error_management(date, reply) :
         print('Invalid user ID')
     
     if len(datas) == 0:
-        print('No data found for day:', date)
+        print('No Chronolife data found for , day:', date)
     
     return datas
 

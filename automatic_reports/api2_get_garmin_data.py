@@ -21,6 +21,7 @@ def get_garmin_data(user_id, date, api, url):
          }
     
     # Request data from servers
+    print("-- Requesting Garmin data for the day", date, "--")
     reply = request_data_from_servers(params, api, url)
     # Convert the reply content into a json object
     datas = error_management(date, reply)
@@ -59,7 +60,7 @@ def error_management(date, reply):
         print('Invalid user ID')
     
     if len(datas) == 0:
-        print('No data found for day:', date)
+        print('No Garmin data found for day:', date)
     
     return datas
 
@@ -344,6 +345,7 @@ def get_sleep_of_day_before(date, date_before, user_id, api, url):
         'date'    : date_before,
         }
     # Request data from servers
+    print("-- Requesting Garmin data for sleep --")
     reply = request_data_from_servers(params, api, url)
     # Convert the reply content into a json object
     datas_day_before = error_management(date, reply)
