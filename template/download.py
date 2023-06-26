@@ -14,7 +14,7 @@ from data.data import get_steps
 
 from pylife.useful import unwrap, unwrap_signals_dashboard
 
-@st.cache_data
+# @st.cache_data
 def data_report_pdf():
     
     # Delete pdf if exists
@@ -27,8 +27,7 @@ def data_report_pdf():
     common_indicators_pdf       = st.session_state.common_indicators_pdf 
     chronolife_indicators_pdf   = st.session_state.chronolife_indicators_pdf 
     garmin_indicators_pdf       = st.session_state.garmin_indicators_pdf 
-  
-    print(date)
+
     # Get intervals and alerts
     garmin_time_intervals = garmin_data['duration']['intervals']
     cst_time_intervals = chronolife_data['duration']['intervals']
@@ -45,7 +44,7 @@ def data_report_pdf():
     with open(constant.PDF_FILE, "rb") as pdf_file:
         return pdf_file.read()
       
-@st.cache_data
+# @st.cache_data
 def health_indicators_to_excel():
     # !!! TO BE UPDATED !!!
     # Cache the conversion to prevent computation on every rerun
@@ -67,7 +66,7 @@ def health_indicators_to_excel():
     data = output.getvalue()
     return data
 
-@st.cache_data
+# @st.cache_data
 def raw_data_to_excel():
         
     output = io.BytesIO()
