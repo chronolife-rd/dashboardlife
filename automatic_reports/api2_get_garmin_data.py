@@ -130,6 +130,7 @@ def add_breath(datas, breath_dict):
                 values_dict = data['value'][output_type]
                 df_temp = convert_dict_to_df(values_dict, start_time)
                 df_output = pd.concat([df_output, df_temp])
+        df_output = df_output[(df_output["values"] > 0)]
         df_output.sort_values(by='times', inplace=True)
         df_output = df_output.reset_index(drop = True)         
         breath_dict['rate'] = df_output
