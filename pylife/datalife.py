@@ -3904,7 +3904,7 @@ class Apilife(Datalife):
             to_time         = time_shift_api(to_time, - utc_offset_minute, time_format='m')
              
         # Remove 1 second for a time interval closed [from_time, to_time]
-        from_time             = time_shift_api(from_time, - 1, time_format='s')    
+        #from_time             = time_shift_api(from_time, - 1, time_format='s')    
         self.from_time_     = from_time
         self.to_time_       = to_time
         self.from_date_     = from_time[:10]

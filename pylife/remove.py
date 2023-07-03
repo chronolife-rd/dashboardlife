@@ -96,10 +96,12 @@ def remove_disconnection(times, sig, fs, stat=[]):
             new_t.append(times)
             new_seg.append(sig)
     
-    new_times   = np.array(new_t)
-    new_sig     = np.array(new_seg) 
-    return new_times, new_sig, stat
+    # new_times   = np.array(new_t)
+    # new_sig     = np.array(new_seg) 
 
+    new_times   = new_t
+    new_sig     = new_seg
+    return new_times, new_sig, stat
 
 def remove_disconnection_loss(times, sig, fs):
     """ Remove disconnection of a signal and return list of signals without
@@ -118,7 +120,7 @@ def remove_disconnection_loss(times, sig, fs):
     new_seg : list of signals
     stat : list of info about the signal
     """
-    times = np.array(times).astype('datetime64')
+    times = np.array(times).astype('datetime64[us]')   # us is microseconds
     sig = np.array(sig)
     diff = times[1:]-times[:-1]
     id_deco = np.where(np.array(diff) != np.timedelta64(int(1/fs*1E6),
@@ -1420,6 +1422,34 @@ def method_window_np(sig, window_s, fs=200, method = 'max'):
             
     return temp_val
 
+# This function is used in siglife, class Breath, def clean
+def remove_no_rsp_signal_unwrap(
+        rsp_time, 
+        rsp_filt, 
+        fs = 20, 
+        window_s = 15, 
+        rsp_amp_min = 6
+        ):
+    
+    sig_clean           = []
+    times_clean         = []
+    indicators_clean    = []
+    for id_seg, seg in enumerate(rsp_filt):
+        t_clean, s_clean, i_clean = remove_no_rsp_signal(
+                                    rsp_time = rsp_time[id_seg],
+                                    rsp_filt = seg,
+                                    window_s = window_s, 
+                                    rsp_amp_min = rsp_amp_min)
+
+        indicators_clean.append(i_clean)
+        if len(t_clean) > 0:
+            sig_clean.extend(s_clean)
+            times_clean.extend(t_clean)
+
+    times_clean, sig_clean, _ = remove_disconnection_loss(times_clean, sig_clean, fs)
+    
+    return times_clean, sig_clean, indicators_clean
+
 def remove_no_rsp_signal(
         rsp_time,
         rsp_filt, 
@@ -1448,34 +1478,6 @@ def remove_no_rsp_signal(
     indicateur = [int(ind)*100 for ind in indicateur]
     
     return datagood['rsp_t'].values, datagood['rsp_f'].values, indicateur
-
-def remove_no_rsp_signal_unwrap(
-        rsp_time, 
-        rsp_filt, 
-        fs = 20, 
-        window_s = 15, 
-        rsp_amp_min = 6
-        ):
-    
-    sig_clean           = []
-    times_clean         = []
-    indicators_clean    = []
-    for id_seg, seg in enumerate(rsp_filt):
-        t_clean, s_clean, i_clean = remove_no_rsp_signal(
-                                    rsp_time = rsp_time[id_seg],
-                                    rsp_filt = seg,
-                                    window_s = window_s, 
-                                    rsp_amp_min = rsp_amp_min)
-
-        indicators_clean.append(i_clean)
-        if len(t_clean) > 0:
-            sig_clean.extend(s_clean)
-            times_clean.extend(t_clean)
-
-    times_clean, sig_clean, _ = remove_disconnection_loss(times_clean, sig_clean, fs)
-    
-    return times_clean, sig_clean, indicators_clean
-
 
 def remove_saturation_and_big_ampls (ecg_raw, ecg_filt, ecg_time, 
                   window_s = 5, 
