@@ -390,11 +390,9 @@ def get_qt():
         output["evening"]    = datas["anomalies"]["qt"]["evening"]
     
     if output["exists"]:
-        qt_alert_icon = st.session_state.alert
-    else:
-        qt_alert_icon = st.session_state.alert_no
-    st.session_state.qt_alert_icon = qt_alert_icon
-    
+        st.session_state.qt_alert_icon = st.session_state.alert
+    elif output["exists"] == False:
+        st.session_state.qt_alert_icon = st.session_state.alert_no
     return output
 
 def get_bradycardia():
@@ -412,11 +410,10 @@ def get_bradycardia():
         output["percentage"]  = datas["anomalies"]["bradycardia"]["percentage"]
     
     if output["exists"]:
-        bradycardia_alert_icon = st.session_state.alert
-    else:
-        bradycardia_alert_icon = st.session_state.alert_no
-    st.session_state.bradycardia_alert_icon = bradycardia_alert_icon
-    
+        st.session_state.bradycardia_alert_icon = st.session_state.alert
+    elif output["exists"] == False:
+        st.session_state.bradycardia_alert_icon = st.session_state.alert_no
+        
     return output
     
 def get_tachycardia():
@@ -434,10 +431,9 @@ def get_tachycardia():
         output["percentage"]  = datas["anomalies"]["tachycardia"]["percentage"]
     
     if output["exists"]:
-        tachycardia_alert_icon = st.session_state.alert
-    else:
-        tachycardia_alert_icon = st.session_state.alert_no
-    st.session_state.tachycardia_alert_icon = tachycardia_alert_icon
+        st.session_state.tachycardia_alert_icon  = st.session_state.alert
+    elif output["exists"] == False:
+        st.session_state.tachycardia_alert_icon  = st.session_state.alert_no
     
     return output
 
@@ -513,10 +509,9 @@ def get_bradypnea():
         output["percentage"]  = datas["anomalies"]["bradypnea"]["percentage"]
     
     if output["exists"]:
-        bradypnea_alert_icon = st.session_state.alert
-    else:
-        bradypnea_alert_icon = st.session_state.alert_no
-    st.session_state.bradypnea_alert_icon = bradypnea_alert_icon
+        st.session_state.bradypnea_alert_icon = st.session_state.alert
+    elif output["exists"] == False:
+        st.session_state.bradypnea_alert_icon = st.session_state.alert_no
     
     return output
     
@@ -536,10 +531,9 @@ def get_tachypnea():
         output["percentage"]  = datas["anomalies"]["tachypnea"]["percentage"]
     
     if output["exists"]:
-        tachypnea_alert_icon = st.session_state.alert
-    else:
-        tachypnea_alert_icon = st.session_state.alert_no
-    st.session_state.tachypnea_alert_icon = tachypnea_alert_icon
+        st.session_state.tachypnea_alert_icon  = st.session_state.alert
+    elif output["exists"] == False:
+        st.session_state.tachypnea_alert_icon  = st.session_state.alert_no
     
     return output
 
