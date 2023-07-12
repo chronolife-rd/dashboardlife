@@ -7,10 +7,13 @@ from datetime import datetime, timedelta
 from pylife.api_functions import map_data
 from pylife.api_functions import map_data_filt
 from pylife.api_functions import get_sig_info
-from data.data import get_offset
+
    
 def get_raw_data():
-    offset_info = get_offset()
+    offset_info = {
+        'value' : 7200,
+        'sign' : 1
+    }
     
     url         = st.session_state.url_data
     api_key     = st.session_state.api_key
@@ -48,7 +51,6 @@ def get_raw_data():
     # Perform the POST request authenticated with YOUR API key (NOT the one of the sub-user!).
     reply = get_reply(params, url, api_key)
     message, status_code = test.api_status(reply)
-    print(message)
 
     # Convert the reply content into a json object
     raw_data = convert_reply_to_datas(reply, status_code, offset_info)

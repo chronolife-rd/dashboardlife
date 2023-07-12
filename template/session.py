@@ -123,7 +123,7 @@ def init():
         st.session_state.tshirt_right = img_to_bytes('template/images/tshirt_right.png')
     
     if 'garrmin' not in st.session_state:
-        st.session_state.garrmin = img_to_bytes('template/images/garrmin.png')
+        st.session_state.garrmin = img_to_bytes('template/images/gramin_grey.png')
     
     if 'alert' not in st.session_state:
         st.session_state.alert = img_to_bytes('template/images/alert.png')

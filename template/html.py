@@ -216,7 +216,7 @@ def overview_data_collection():
                     </div>
                     <div class="row overview_sub_section_smart_textile">
                         <div class='{col_logo}'>
-                            <img class=device_icon src='data:image/png;base64,{st.session_state.tshirt_right}'/>
+                            <img class=chronolife_icon src='data:image/png;base64,{st.session_state.tshirt_right}'/>
                         </div>
                         <div class='{col_data}'>
                             <div class="row data_collection">
@@ -274,7 +274,7 @@ def overview_data_collection():
                     </div>
                     <div class="row overview_sub_section_garmin">
                         <div class='{col_logo}'>
-                            <img class=device_icon src='data:image/png;base64,{st.session_state.garrmin}'/>
+                            <img class=garmin_icon src='data:image/png;base64,{st.session_state.garrmin}'/>
                         </div>
                         <div class='{col_data}'>
                             <div class="row data_collection">

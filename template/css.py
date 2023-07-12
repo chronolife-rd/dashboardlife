@@ -133,8 +133,13 @@ def body():
                         height: 300px;
                         }
                     
-                    .device_icon {
+                    .chronolife_icon {
                         width: 150px;
+                        padding-right: 50px;
+                        margin-top: 50px;
+                        }
+                    .garmin_icon {
+                        width: 200px;
                         padding-right: 50px;
                         margin-top: 50px;
                         }
