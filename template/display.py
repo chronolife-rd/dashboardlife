@@ -485,13 +485,19 @@ def health_indicators_heart_bpm():
 def health_indicators_heart_hrv():
     """ Display hrv in health indicators section """
     st.markdown(html.health_indicators_heart_hrv_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,2])
-    col1.markdown(html.health_indicators_heart_hrv_results(), unsafe_allow_html=True)
-    
-    fig = chart.heart_hrv()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
-    
+
+    if st.session_state.chronolife_data_available :
+
+        col1, col2 = st.columns([1,2])
+        col1.markdown(html.health_indicators_heart_hrv_results(), unsafe_allow_html=True)
+        
+        fig = chart.heart_hrv()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+    else :
+        st.warning(st.session_state.translate["no_chronolife_data"])  
+
+
 def health_indicators_heart_tachy_brady_qt():
     """ Display alerts and data for tachy/brady and QT in health indicators section """
     st.markdown(html.health_indicators_heart_tachy_brady_qt(), unsafe_allow_html=True)
@@ -509,23 +515,32 @@ def health_indicators_breath_brpm():
 def health_indicators_breath_brv():
     """ Display brv in health indicators section """
     st.markdown(html.health_indicators_breath_brv_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,2])
-    col1.markdown(html.health_indicators_breath_brv_results(), unsafe_allow_html=True)
-    
-    fig = chart.breath_brv()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
+
+    if st.session_state.chronolife_data_available :
+
+        col1, col2 = st.columns([1,2])
+        col1.markdown(html.health_indicators_breath_brv_results(), unsafe_allow_html=True)   
+        fig = chart.breath_brv()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+    else :
+        st.warning(st.session_state.translate["no_chronolife_data"])
+
 
 def health_indicators_breath_inex():
     """ Display in/ex ratio in health indicators section """
     st.markdown(html.health_indicators_breath_inex_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,2])
-    col1.markdown(html.health_indicators_breath_inex_results(), unsafe_allow_html=True)
-    
-    fig = chart.breath_inex()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
 
+    if st.session_state.chronolife_data_available :
+
+        col1, col2 = st.columns([1,2])
+        col1.markdown(html.health_indicators_breath_inex_results(), unsafe_allow_html=True)
+        
+        fig = chart.breath_inex()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+    else :
+        st.warning(st.session_state.translate["no_chronolife_data"])
 
 def health_indicators_breath_tachy_brady_inexratio():
     """ Display alerts and data for tachy/brady and ratio breath in/out in health indicators section """
@@ -534,52 +549,76 @@ def health_indicators_breath_tachy_brady_inexratio():
 def health_indicators_temperature():
     """ Display temperature in health indicators section """
     st.markdown(html.health_indicators_temperature_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,2])
-    col1.markdown(html.health_indicators_temperature_results(), unsafe_allow_html=True)
-    
-    fig = chart.temperature_mean()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
-    
+    if st.session_state.chronolife_data_available :
+        
+        col1, col2 = st.columns([1,2])
+        col1.markdown(html.health_indicators_temperature_results(), unsafe_allow_html=True)
+        
+        fig = chart.temperature_mean()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+    else:
+         st.warning(st.session_state.translate["no_chronolife_data"])   
+         
 def health_indicators_stress():
     """ Display stress in health indicators section """
     st.markdown(html.health_indicators_stress_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    col1.markdown(html.health_indicators_stress_results(), unsafe_allow_html=True)
+
+    if st.session_state.garmin_data_available :    
+        col1, col2 = st.columns(2)
+        col1.markdown(html.health_indicators_stress_results(), unsafe_allow_html=True)
     
-    fig = chart.stress()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
+        fig = chart.stress()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+    else :
+        st.warning(st.session_state.translate["no_garmin_data"])
     
 def health_indicators_pulseox():
     """ Display pulseox in health indicators section """
     st.markdown(html.health_indicators_pulseox_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    col1.markdown(html.health_indicators_pulseox_results(), unsafe_allow_html=True)
-    
-    fig = chart.pulseox()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
+
+    if st.session_state.garmin_data_available :
+        col1, col2 = st.columns(2)
+        col1.markdown(html.health_indicators_pulseox_results(), unsafe_allow_html=True)
+        
+        fig = chart.pulseox()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+
+    else :
+        st.warning(st.session_state.translate["no_garmin_data"])
+
 
 def health_indicators_bodybattery():
     """ Display body battery in health indicators section """
     st.markdown(html.health_indicators_bodybattery_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns([1,2])
-    col1.markdown(html.health_indicators_bodybattery_results(), unsafe_allow_html=True)
-    
-    fig = chart.bodybattery()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
-    
+
+    if st.session_state.garmin_data_available :
+        col1, col2 = st.columns([1,2])
+        col1.markdown(html.health_indicators_bodybattery_results(), unsafe_allow_html=True)
+        
+        fig = chart.bodybattery()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+    else :
+        st.warning(st.session_state.translate["no_garmin_data"])
+
+
 def health_indicators_sleep():
     """ Display sleep in health indicators section """
     st.markdown(html.health_indicators_sleep_title(), unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    col1.markdown(html.health_indicators_sleep_results(), unsafe_allow_html=True)
-    
-    fig = chart.sleep()
-    config = {'displayModeBar': True}
-    col2.plotly_chart(fig, config=config, use_container_width=True)
+
+    if st.session_state.garmin_data_available :
+        col1, col2 = st.columns(2)
+        col1.markdown(html.health_indicators_sleep_results(), unsafe_allow_html=True)
+        
+        fig = chart.sleep()
+        config = {'displayModeBar': True}
+        col2.plotly_chart(fig, config=config, use_container_width=True)
+    else :
+        st.warning(st.session_state.translate["no_garmin_data"])
+
 
 def data_report():
     """ Display data report section """

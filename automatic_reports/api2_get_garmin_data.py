@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter
 from automatic_reports.config import GARMIN_SIGNAL_TYPES
 
+import streamlit as st 
 # ------------------------ The main function ---------------------------------
 # ----------------------------------------------------------------------------
 # Request user's data from servers
@@ -25,6 +26,16 @@ def get_garmin_data(user_id, date, api, url):
     reply = request_data_from_servers(params, api, url)
     # Convert the reply content into a json object
     datas = error_management(date, reply)
+
+    #  Manage display of Garmin indicators when the user use the t-shirt 
+
+    if len(datas)==0:
+        st.session_state.garmin_data_available = False
+    else :
+        st.session_state.garmin_data_available = True
+   
+
+
     # Organize the data in a dictionary 
     result_dict = save_datas_in_dict(date, user_id, datas, api, url)
 

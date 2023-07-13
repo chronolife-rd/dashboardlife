@@ -4,6 +4,10 @@ import template.language.fr as fr
 from template.util import img_to_bytes
 
 def init():
+
+    st.session_state.chronolife_data_available = False
+    st.session_state.garmin_data_available = False
+
     
     if 'prod' not in st.session_state:
         st.session_state.prod = True
@@ -251,6 +255,7 @@ def init_simul():
     st.session_state.qt_alert_icon = st.session_state.alert_no
     st.session_state.tachypnea_alert_icon = st.session_state.alert
     st.session_state.bradypnea_alert_icon = st.session_state.alert_no
+    
         
 def restart():
     for key in st.session_state.keys():

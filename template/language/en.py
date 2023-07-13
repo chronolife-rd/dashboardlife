@@ -183,5 +183,7 @@ def translate():
     
     translate["no_data"]                        = "No data"
     translate["no_enduser"]                     = "No end user"
+    translate["no_chronolife_data"]             = "No T-shirt data"
+    translate["no_garmin_data"]                 = "No Garmin data"
     
     return translate

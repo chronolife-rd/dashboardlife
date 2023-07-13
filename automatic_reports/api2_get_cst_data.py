@@ -9,6 +9,8 @@ import numpy as np
 import statistics
 from datetime import datetime, timedelta
 
+import streamlit as st
+
 from automatic_reports.useful_functions import find_time_intervals, sum_time_intervals, timedelta_formatter, unwrap, unwrap_ratio_inspi_expi
 from automatic_reports.config import CST_SIGNAL_TYPES
 from automatic_reports.config import RED_ALERT, GREEN_ALERT, ALERT_SIZE, ACTIVITY_THREASHOLD, TEMPERATURE_THREASHOLD
@@ -32,6 +34,12 @@ def get_cst_data(user_id, date, api, url):
     datas_after = get_datas(user_id, date_after, CST_SIGNAL_TYPES, api, url)
     
     datas_3_days = datas + datas_before + datas_after
+   
+   #  Manage display of chronolife indicators when the user use the t-shirt 
+    if len(datas)==0:
+        st.session_state.chronolife_data_available = False
+    else :
+        st.session_state.chronolife_data_available = True
 
     # Get offset zone value 
     offset = get_cst_offset(datas_3_days) 
@@ -85,6 +93,7 @@ def request_data_from_servers(params, api_key, url):
 
 def error_management(date, reply) :
     datas = []
+    
     # Error management 
     if reply.status_code == 200:
       # Convert the reply content into a json object.
@@ -104,7 +113,7 @@ def error_management(date, reply) :
     
     if len(datas) == 0:
         print('No Chronolife data found for , day:', date)
-    
+
     return datas
 
 def initialize_dictionary_with_template() -> dict :  
